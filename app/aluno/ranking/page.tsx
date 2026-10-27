@@ -1,0 +1,8 @@
+import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
+import { Trophy } from 'lucide-react'
+import { auth } from '@/lib/auth'
+import { StudentFeatureShell } from '@/components/student-feature-shell'
+
+const students = [{ name: 'Amélia M.', points: 1840, streak: 18 }, { name: 'Tomás C.', points: 1620, streak: 14 }, { name: 'Lídia S.', points: 1490, streak: 11 }, { name: 'Tu', points: 1280, streak: 9 }]
+export default async function RankingPage() { const session = await auth.api.getSession({ headers: await headers() }); if (!session?.user) redirect('/sign-in'); return <StudentFeatureShell firstName={session.user.name.split(' ')[0]} eyebrow="Comunidade académica" title="Ranking de aprendizagem." description="Acompanha o teu ritmo e celebra o progresso da comunidade."><div className="space-y-3">{students.map((student, index) => <article key={student.name} className={`flex items-center gap-4 rounded-2xl border p-4 ${student.name === 'Tu' ? 'border-[#b8cdbd] bg-[#eef3ed]' : 'border-[#e1e4db] bg-white'}`}><span className="flex size-10 items-center justify-center rounded-full bg-[#eee9dc] text-sm font-bold text-[#1d4d41]">{index + 1}</span><div className="min-w-0 flex-1"><p className="font-semibold">{student.name}</p><p className="text-xs text-[#7c847c]">Sequência de {student.streak} dias</p></div><p className="text-sm font-bold text-[#1d4d41]">{student.points.toLocaleString('pt-PT')} pts</p></article>)}</div><div className="mt-6 flex gap-3 rounded-2xl bg-[#e8dfcc] p-5 text-sm text-[#596259]"><Trophy className="shrink-0 text-[#1d4d41]" size={20} /> Os pontos valorizam consistência, simulados concluídos e ajuda à comunidade.</div></StudentFeatureShell> }

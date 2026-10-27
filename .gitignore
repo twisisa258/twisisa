@@ -1,0 +1,15 @@
+# Ambiente
+.env.local
+.env.*
+.env
+!.env.example
+.vercel/
+.backup-*
+# Dependências e build
+node_modules
+.next/
+.DS_Store
+.md
+.vercel
+.env*
+*.tsbuildinfo
