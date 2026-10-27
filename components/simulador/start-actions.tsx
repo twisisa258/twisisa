@@ -5,9 +5,8 @@ import { useState, useTransition } from 'react'
 import { ArrowRight } from 'lucide-react'
 import { useFeedback } from '@/components/feedback-provider'
 import { startSession } from '@/app/aluno/simulador/actions'
+import { tapCard } from '@/components/simulador/styles'
 import type { AttemptMode } from '@/lib/simulator-shared'
-
-const soft = 'shadow-[0_1px_2px_rgba(20,50,40,0.05)]'
 
 function useStart(mode: AttemptMode, subjectId: string, variant: string | null, topicId: string | null = null) {
   const router = useRouter()
@@ -37,14 +36,14 @@ function useStart(mode: AttemptMode, subjectId: string, variant: string | null, 
 export function VariantCard({ mode = 'pratica', subjectId, variant, topicId = null, title, caption, count, fresh, size }: { mode?: AttemptMode; subjectId: string; variant: string | null; topicId?: string | null; title: string; caption: string; count: number; fresh?: number; size: number }) {
   const { start, busy } = useStart(mode, subjectId, variant, topicId)
   return (
-    <button type="button" onClick={start} disabled={busy} className={`group flex w-full items-center gap-4 rounded-2xl bg-gradient-to-br from-white to-[#f4f6f1] p-4 text-left transition-colors hover:to-[#eaf1ec] disabled:opacity-70 ${soft}`}>
+    <button type="button" onClick={start} disabled={busy} className={`group flex w-full items-center gap-4 rounded-2xl p-4 text-left disabled:opacity-70 ${tapCard}`}>
       <span className="min-w-0 flex-1">
-        <span className="block text-[16px] font-semibold tracking-[-0.01em] text-[#202923]">{title}</span>
-        <span className="mt-0.5 block text-[12.5px] leading-5 text-[#6b756e]">{busy ? 'A preparar as questões…' : caption}</span>
+        <span className="block text-[16px] font-semibold tracking-[-0.01em] text-[#1d4d41]">{title}</span>
+        <span className="mt-0.5 block text-[12.5px] leading-5 text-[#5d6f64]">{busy ? 'A preparar as questões…' : caption}</span>
         <span className="mt-2 flex flex-wrap gap-1.5">
-          <span className="inline-block rounded-full bg-[#1d4d41]/[0.07] px-2.5 py-0.5 text-[12px] font-semibold text-[#1d4d41]">{Math.min(size, count)} questões</span>
+          <span className="inline-block rounded-full bg-white/75 px-2.5 py-0.5 text-[12px] font-semibold text-[#1d4d41]">{Math.min(size, count)} questões</span>
           {typeof fresh === 'number' && (
-            <span className="inline-block rounded-full bg-[#c8922a]/[0.12] px-2.5 py-0.5 text-[12px] font-semibold text-[#805f19]">{fresh === 0 ? 'Já viste tudo' : `${fresh} por ver`}</span>
+            <span className="inline-block rounded-full bg-[#fff3dc] px-2.5 py-0.5 text-[12px] font-semibold text-[#805f19]">{fresh === 0 ? 'Já viste tudo' : `${fresh} por ver`}</span>
           )}
         </span>
       </span>

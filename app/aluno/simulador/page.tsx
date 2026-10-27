@@ -7,6 +7,7 @@ import { getSimulatorHub } from '@/lib/simulator'
 import { requireSimulatorScope } from '@/lib/simulator-scope'
 import { MODE_META, SLUG_BY_MODE, formatPoints, percent, type AttemptMode } from '@/lib/simulator-shared'
 import { cn } from '@/lib/utils'
+import { tapCard } from '@/components/simulador/styles'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
 import { EmptyState } from '@/components/states/empty-state'
 import { SimHeader } from '@/components/simulador/sim-header'
@@ -107,18 +108,18 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
                   const hint = noErrors ? 'Ainda não tens erros para rever' : mode === 'revisao' ? `${hub.errorCount} ${hub.errorCount === 1 ? 'questão para rever' : 'questões para rever'}` : meta.tagline
                   const body = (
                     <>
-                      <span className={cn('flex size-10 shrink-0 items-center justify-center rounded-xl', locked ? 'bg-[#eef0ea] text-[#9aa29b]' : 'bg-[#1d4d41]/[0.08] text-[#1d4d41]')}><Icon size={18} aria-hidden /></span>
+                      <span className={cn('flex size-10 shrink-0 items-center justify-center rounded-xl', locked ? 'bg-[#eef0ea] text-[#9aa29b]' : 'bg-white/85 text-[#1d4d41]')}><Icon size={18} aria-hidden /></span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-[15px] font-semibold leading-5">{meta.label}</span>
-                        <span className="block truncate text-[12.5px] leading-5 text-[#6b756e]">{hint}</span>
+                        <span className={cn('block text-[15px] font-semibold leading-5', !locked && 'text-[#1d4d41]')}>{meta.label}</span>
+                        <span className={cn('block truncate text-[12.5px] leading-5', locked ? 'text-[#6b756e]' : 'text-[#5d6f64]')}>{hint}</span>
                       </span>
-                      {locked ? <Lock size={15} className="shrink-0 text-[#b3b9b2]" aria-hidden /> : <ArrowRight size={16} className="shrink-0 text-[#1d4d41]" aria-hidden />}
+                      {locked ? <Lock size={15} className="shrink-0 text-[#b3b9b2]" aria-hidden /> : <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#1d4d41] text-white"><ArrowRight size={16} aria-hidden /></span>}
                     </>
                   )
                   return locked ? (
                     <div key={mode} aria-disabled="true" className="flex items-center gap-3 rounded-2xl bg-white/60 p-3.5 opacity-70">{body}</div>
                   ) : (
-                    <Link key={mode} href={`/aluno/simulador/${SLUG_BY_MODE[mode]}?d=${encodeURIComponent(chosen!.id)}`} className={cn(card, 'flex items-center gap-3 p-3.5 transition-colors hover:to-[#eaf1ec]')}>{body}</Link>
+                    <Link key={mode} href={`/aluno/simulador/${SLUG_BY_MODE[mode]}?d=${encodeURIComponent(chosen!.id)}`} className={cn(tapCard, 'flex items-center gap-3 rounded-2xl p-3.5')}>{body}</Link>
                   )
                 })}
               </div>

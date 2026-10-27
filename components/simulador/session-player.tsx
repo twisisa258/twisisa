@@ -3,9 +3,10 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ArrowRight, Check, Clock, Flame, Lightbulb, MessageCircle, X } from 'lucide-react'
+import { ArrowRight, Check, Clock, Flame, Sparkles, X } from 'lucide-react'
 import { MathText } from '@/lib/math-text'
 import { finishSession, saveAnswer } from '@/app/aluno/simulador/actions'
+import { JonasExplainSheet } from '@/components/simulador/jonas-explain'
 import { QuestionImage } from '@/components/simulador/question-image'
 import { MODE_META, QUICK_SECONDS_PER_QUESTION, clock, formatPoints, percent, type PlayData, type PlayItem } from '@/lib/simulator-shared'
 
@@ -129,7 +130,7 @@ export function SessionPlayer({ data }: { data: PlayData }) {
   const danger = timed && secs <= 10 && !fb
   const done = items.filter((i) => i.feedback).length
   const correctLetter = fb ? LETTERS[Math.max(0, item.options.findIndex((o) => o.id === fb.correctOptionId))] : ''
-  const hasExplanation = !!fb && (!!fb.explanation || fb.images.length > 0)
+  const closeSheet = useCallback(() => setSheet(false), [])
   const imageOptions = item.options.length > 1 && item.options.every((o) => o.image)
 
   return (
@@ -193,11 +194,7 @@ export function SessionPlayer({ data }: { data: PlayData }) {
                 </span>
                 <span className="block truncate text-[12px] leading-4 text-[#5d675f]">{fb.isCorrect ? 'Continua assim.' : `A certa é a ${correctLetter}. ${WRONG_LINES[item.position % WRONG_LINES.length]}`}</span>
               </span>
-              {hasExplanation ? (
-                <button type="button" onClick={() => setSheet(true)} className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-white px-3 text-[13px] font-semibold text-[#1d4d41]"><Lightbulb size={14} aria-hidden />Ver explicação</button>
-              ) : (
-                <Link href="/jonas" className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-white px-3 text-[13px] font-semibold text-[#1d4d41]"><MessageCircle size={14} aria-hidden />Jonas</Link>
-              )}
+              <button type="button" onClick={() => setSheet(true)} className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-br from-[#2f7260] to-[#1d4d41] px-3.5 text-[13px] font-semibold text-white shadow-[0_2px_6px_rgba(29,77,65,0.25)] transition active:scale-[0.98] hover:from-[#2a6858] hover:to-[#183f35]"><Sparkles size={14} aria-hidden />Ver explicação</button>
             </div>
           )}
           {fb ? (
@@ -212,21 +209,8 @@ export function SessionPlayer({ data }: { data: PlayData }) {
         </div>
       </footer>
 
-      {/* Explicação: folha por cima, para a página não crescer nem saltar. */}
-      {sheet && fb && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/25" onClick={() => setSheet(false)}>
-          <div role="dialog" aria-label="Explicação" onClick={(event) => event.stopPropagation()} className="max-h-[75dvh] w-full max-w-[640px] overflow-y-auto rounded-t-3xl bg-white px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4">
-            <div className="flex items-center justify-between">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#1d4d41]">Explicação</p>
-              <button type="button" onClick={() => setSheet(false)} aria-label="Fechar" className="flex size-9 items-center justify-center rounded-full text-[#68716a] hover:bg-[#eef0e9]"><X size={18} aria-hidden /></button>
-            </div>
-            <div className="mt-2 text-[15px] leading-7 text-[#2b332d]">
-              {fb.explanation && <MathText text={fb.explanation} />}
-              {fb.images.length > 0 && <div className="mt-3 space-y-3">{fb.images.map((image, i) => <QuestionImage key={image.url + i} image={image} />)}</div>}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Explicação: o Jonas explica aqui mesmo, numa folha por cima (a página não cresce nem salta). */}
+      {fb && <JonasExplainSheet key={`${data.id}-${item.position}`} attemptId={data.id} position={item.position} open={sheet} onClose={closeSheet} officialExplanation={fb.explanation} images={fb.images} />}
     </main>
   )
 }

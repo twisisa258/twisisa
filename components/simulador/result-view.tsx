@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Check, ChevronDown, Clock, X } from 'lucide-react'
 import { MathText, plainExcerpt } from '@/lib/math-text'
+import { ExplainButton } from '@/components/simulador/jonas-explain'
 import { QuestionImage } from '@/components/simulador/question-image'
 import { RestartButton } from '@/components/simulador/restart-button'
 import { MODE_META, formatDuration, formatGrade, formatPoints, percent, verdict, type PlayItem } from '@/lib/simulator-shared'
@@ -20,7 +21,7 @@ function Ring({ pct }: { pct: number }) {
   )
 }
 
-function Review({ item }: { item: PlayItem }) {
+function Review({ item, attemptId }: { item: PlayItem; attemptId: string }) {
   const fb = item.feedback
   return (
     <div className="space-y-3 border-t border-black/[0.05] px-4 py-4">
@@ -43,8 +44,7 @@ function Review({ item }: { item: PlayItem }) {
         })}
       </ul>
       {!item.selectedOptionId && <p className="text-xs font-semibold text-[#805f19]">Não respondeste a esta questão.</p>}
-      {fb?.explanation && <div className="rounded-xl bg-[#f8f8f5] p-3 text-sm leading-6 text-[#38423b]"><p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#1d4d41]">Explicação</p><MathText text={fb.explanation} /></div>}
-      {fb?.images.map((image, i) => <QuestionImage key={image.url + i} image={image} />)}
+      {item.selectedOptionId && fb && <ExplainButton attemptId={attemptId} position={item.position} officialExplanation={fb.explanation} images={fb.images} />}
     </div>
   )
 }
@@ -115,7 +115,7 @@ export function ResultView({ result }: { result: Result }) {
                     <span className="min-w-0 flex-1 truncate text-sm"><span className="font-semibold">{item.position + 1}.</span> {plainExcerpt(item.statement, 90)}</span>
                     <ChevronDown size={18} className="shrink-0 text-[#9aa29b] transition-transform group-open:rotate-180" aria-hidden />
                   </summary>
-                  <Review item={item} />
+                  <Review item={item} attemptId={result.id} />
                 </details>
               </li>
             )

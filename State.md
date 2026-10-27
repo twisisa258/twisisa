@@ -428,3 +428,25 @@ Especificação completa em `SIMULADOR.md`, secção «Lógica única».
 | 160 | P2 | PENDENTE | Ranking continua fictício; rede social (reações próprias) por desenhar | Ver #4 e `SIMULADOR.md` L7. |
 
 Testes: `tests/quiz-engine.test.ts` (10 testes, Node) — pesos 2–4, decaimento, nota /20, escolha sem repetição, anos repartidos, erradas com espera, baralhar sem padrões. Ficheiros alterados: sintaxe TS conferida. NÃO EXECUTADO: `pnpm install`, tipos completos, build, `pnpm migrate` (0018), consultas SQL numa base PostgreSQL real, ecrãs no telemóvel.
+
+
+## Jonas com histórico, Groq e explicação no Simulador (27/10/2026)
+
+Especificação em `JONAS.md`.
+
+| # | Prio | Estado | Alteração | Notas |
+|---|------|--------|-----------|-------|
+| 161 | P1 | PENDENTE (feito; falta `pnpm migrate`, `GROQ_API_KEY` e teste) | Jonas passa a usar a **Groq** (antes: AI Gateway com `openai/gpt-oss-120b`) | `lib/groq.ts` (fetch, sem dependências). `GROQ_MODEL` opcional (lista por vírgulas). Por omissão tenta `openai/gpt-oss-120b` → `openai/gpt-oss-20b` → `llama-3.1-8b-instant` e passa ao seguinte se um não existir na conta ou estiver com o limite cheio (o Llama falhou no plano gratuito). Limites do plano gratuito da Groq são por organização (cerca de 30 pedidos/min e 1000/dia no gpt-oss-120b, com tokens/min baixos): confirmar na página de limites da conta. |
+| 162 | P1 | PENDENTE (feito; falta teste visual) | Página `/jonas` redesenhada: ecrã inteiro, histórico numa barra que fecha, nova conversa contextualizada (percurso + disciplina) | `components/jonas-chat.tsx`, `components/jonas/*`, `app/jonas/page.tsx` e `loading.tsx`. |
+| 163 | P1 | PENDENTE (feito; falta `pnpm migrate`) | Conversas e mensagens guardadas | `0019_jonas.sql`. Rotas em `app/api/jonas/**`. O Jonas recebe percurso, disciplina e assuntos recentes como referência. |
+| 164 | P1 | PENDENTE (feito; testado com Node) | Respostas com `**negrito**`, listas, tabelas e KaTeX | `lib/jonas-markdown.ts` (16 casos testados). Sem HTML do modelo. |
+| 165 | P1 | PENDENTE (feito; falta teste com a Groq real) | «Ver explicação» = Jonas explica no próprio Simulador, passo a passo, com atalhos e perguntas | `components/simulador/jonas-explain.tsx`; também na revisão do resultado. Só depois de responder. Sem Jonas: explicação da equipa. |
+| 166 | P2 | PENDENTE (feito; falta teste visual) | «Modo rápido», «Prática» e cartões de variante parecem botões | `components/simulador/styles.ts` (degradê verde suave, sombra, seta em círculo). |
+| 167 | P2 | PENDENTE (decisão tua) | **Sem limites** de produto por agora; só travão de 25 mensagens/min | `checkAllowance` em `lib/jonas.ts` é o ponto para limites por plano. Propostas em `JONAS.md` §7. |
+| 168 | P2 | PENDENTE | Política de dados da Groq | Confirmar nos termos da Groq antes de abrir a menores e acrescentar às conversas guardadas aos Termos do Twisisa. |
+| 169 | P3 | PENDENTE | Sem classificador antes do modelo | Âmbito e segurança só no prompt (`lib/jonas-prompts.ts`). Medir abuso e decidir. |
+| 170 | P3 | PENDENTE | Pacotes `ai` e `@ai-sdk/react` ficaram sem uso | Não removidos de propósito (mexer no `package.json` quebra `pnpm install --frozen-lockfile` sem atualizar o lock). Retirar com `pnpm remove ai @ai-sdk/react` e fazer commit do lock. |
+| 171 | P3 | PENDENTE (feito) | `pnpm test` não corria (imports sem extensão) | `tests/register.mjs` + `tests/resolve-ts.mjs`; script `test` atualizado. |
+
+Testes: `tests/jonas.test.ts` (17 testes, com um servidor Groq falso: fluxo em pedaços partidos, erros 429 e chave em falta, cancelar a meio guarda o texto) + os 10 de `quiz-engine`. NÃO EXECUTADO: `pnpm migrate` (0019), `pnpm build` (sem dependências instaladas aqui), consultas SQL do Jonas contra PostgreSQL, ecrãs no navegador e no telemóvel, Groq real.
+
