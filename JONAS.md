@@ -72,3 +72,15 @@ Propostas para estudar (nada está decidido):
 1. `GROQ_API_KEY` no ambiente (`.env.example` e Vercel). `GROQ_MODEL` é opcional: sem ele, o Jonas tenta `openai/gpt-oss-120b`, depois `openai/gpt-oss-20b` e por fim `llama-3.1-8b-instant`, passando ao seguinte quando um modelo não existe na conta ou tem o limite cheio. Os modelos `gpt-oss` pensam antes de responder: o servidor pede esforço baixo e dá margem de tokens para o pensamento não cortar a resposta.
 2. `pnpm migrate` (aplica `0019_jonas.sql`).
 3. `pnpm test` (inclui o fluxo da Groq com um servidor falso).
+
+## 9. Painel do admin (`/admin/jonas`)
+
+Só para administradores (`ADMIN_EMAILS`); revisores não o veem.
+
+- **Estado**: chave da Groq (configurada ou em falta; a chave nunca é mostrada nem guardada na base de dados), Jonas ligado ou em pausa, modelos em uso e de onde vêm, uso agregado (conversas, mensagens e alunos ativos nos últimos 7 dias, explicações no Simulador) e «Testar ligação» (pedido mínimo a cada modelo).
+- **Modelo**: ligar ou pôr em pausa; até 3 modelos por ordem (principal e alternativos), escolhidos da lista real da conta da Groq (`GET /models`) ou escritos à mão se a lista não estiver disponível; esforço de raciocínio (baixo, médio, alto) para os modelos gpt-oss.
+- **Prioridade dos modelos**: painel, depois `GROQ_MODEL`, depois a lista predefinida. Tudo vazio no painel = automático.
+- **Dados**: tabela `jonas_settings` (migração `0020_jonas_settings.sql`, uma linha). As definições têm cache de 15 s no servidor. Sem a migração, ou se a base falhar, o Jonas funciona com as predefinições.
+- **Pausa**: `/api/jonas` e `/api/jonas/explicar` respondem 503 com «O Jonas está em pausa neste momento.» (o aviso aparece no chat e na folha de explicação).
+- **Privacidade**: o admin só vê números agregados, nunca o texto das conversas dos alunos.
+- **Auditoria**: cada alteração fica em `admin_audit_log` (`jonas.update`).

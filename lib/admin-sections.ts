@@ -1,4 +1,4 @@
-import { BookOpen, BookOpenCheck, Copy, GraduationCap, Landmark, Layers, LayoutDashboard, LayoutGrid, ListTree, Tags, Users, type LucideIcon } from 'lucide-react'
+import { BookOpen, BookOpenCheck, Copy, GraduationCap, Landmark, Layers, LayoutDashboard, LayoutGrid, ListTree, Sparkles, Tags, Users, type LucideIcon } from 'lucide-react'
 
 export type AdminSection = {
   href: string
@@ -65,6 +65,12 @@ export const adminSections: AdminSection[] = [
     label: 'Módulos',
     description: 'Estado dos módulos da página Exames por percurso: ativo, em breve ou oculto.',
     icon: LayoutGrid,
+  },
+  {
+    href: '/admin/jonas',
+    label: 'Jonas',
+    description: 'Chave da Groq, modelo, estado do explicador e uso pelos alunos.',
+    icon: Sparkles,
   },
   {
     href: '/admin/equipa',

@@ -1,4 +1,5 @@
 import { GroqError, openGroqStream, type ChatMessage } from '@/lib/groq'
+import type { JonasRuntime } from '@/lib/jonas-settings'
 
 // Resposta em fluxo do Jonas (só servidor). Falhas ANTES do primeiro texto viram uma resposta JSON com o estado certo;
 // o texto que chegou é sempre guardado (mesmo que o aluno cancele a meio).
@@ -23,6 +24,21 @@ export function studentMessage(error: unknown): { status: number; message: strin
   return { status: 500, message: 'O Jonas não conseguiu responder. Tenta de novo.' }
 }
 
+export const PAUSED_MESSAGE = 'O Jonas está em pausa neste momento. Volta mais tarde.'
+
+// As definições do admin (modelo, esforço, pausa) vêm da base de dados. Sem DATABASE_URL (testes) ou se a leitura falhar,
+// o Jonas funciona com as predefinições: nunca fica parado por causa das definições.
+async function loadRuntime(): Promise<JonasRuntime | null> {
+  if (!process.env.DATABASE_URL) return null
+  try {
+    const { getJonasRuntime } = await import('@/lib/jonas-settings')
+    return await getJonasRuntime()
+  } catch (error) {
+    console.error('[JONAS] definições', error)
+    return null
+  }
+}
+
 export async function streamReply(options: {
   messages: ChatMessage[]
   signal: AbortSignal
@@ -32,9 +48,20 @@ export async function streamReply(options: {
   /** Chamado uma vez com o texto completo (ou o que chegou, se o aluno cancelou). */
   onComplete: (text: string) => Promise<void>
 }): Promise<Response> {
+  const runtime = await loadRuntime()
+  if (runtime && !runtime.enabled) return jsonResponse({ error: PAUSED_MESSAGE }, 503, options.headers)
+
   let source: AsyncGenerator<string>
   try {
-    source = await openGroqStream({ messages: options.messages, temperature: options.temperature, maxTokens: options.maxTokens, signal: options.signal })
+    source = await openGroqStream({
+      messages: options.messages,
+      temperature: options.temperature,
+      maxTokens: options.maxTokens,
+      signal: options.signal,
+      // Só a lista escolhida no painel é passada; sem ela, o cliente da Groq usa GROQ_MODEL ou a predefinição.
+      models: runtime?.modelSource === 'admin' ? runtime.models : undefined,
+      reasoningEffort: runtime?.reasoningEffort,
+    })
   } catch (error) {
     const { status, message } = studentMessage(error)
     return jsonResponse({ error: message }, status, options.headers)
