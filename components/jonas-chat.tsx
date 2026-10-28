@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { ArrowDown, ArrowLeft, ArrowUp, CalendarDays, Lightbulb, ListChecks, PanelLeft, RotateCcw, Square, SquarePen, Target, X } from 'lucide-react'
+import { ArrowDown, ArrowLeft, ArrowUp, PanelLeft, RotateCcw, Square, SquarePen, X } from 'lucide-react'
 import { HistorySidebar } from '@/components/jonas/history-sidebar'
 import { RichText } from '@/components/jonas/rich-text'
 import { CopyButton, JonasAvatar, TypingDots } from '@/components/jonas/ui'
@@ -19,14 +19,12 @@ type Props = {
   initialConversation: { summary: ConversationSummary; messages: ChatMessage[] } | null
 }
 
-const STARTERS: { icon: typeof Lightbulb; title: string; text: string; prefill: (subject: string | null) => string }[] = [
-  { icon: Lightbulb, title: 'Explicar um conceito', text: 'Percebe a matéria com exemplos', prefill: (s) => `Explica-me ${s ? `um tema de ${s}` : 'um conceito'}: ` },
-  { icon: ListChecks, title: 'Resolver um exercício', text: 'Passo a passo, com as contas', prefill: () => 'Ajuda-me a resolver este exercício passo a passo:\n' },
-  { icon: CalendarDays, title: 'Plano de estudo', text: 'Organiza as próximas semanas', prefill: (s) => `Faz-me um plano de estudo de 2 semanas para ${s ?? 'o meu exame'}.` },
-  { icon: Target, title: 'Dúvida de um exame', text: 'Tira dúvidas de anos anteriores', prefill: () => 'Tenho uma dúvida numa questão de exame: ' },
+// Exemplos simples e práticos: tocar preenche a caixa de texto (não envia), para o aluno completar.
+const STARTERS: { text: string; prefill: (subject: string | null) => string }[] = [
+  { text: 'Explica-me um conceito com um exemplo simples', prefill: (s) => `Explica-me ${s ? `um tema de ${s}` : 'um conceito'} com um exemplo simples: ` },
+  { text: 'Ajuda-me a resolver um exercício passo a passo', prefill: () => 'Ajuda-me a resolver este exercício passo a passo:\n' },
+  { text: 'Faz-me um plano de estudo de 2 semanas', prefill: (s) => `Faz-me um plano de estudo de 2 semanas para ${s ?? 'o meu exame'}.` },
 ]
-
-const tap = 'bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_2px_6px_rgba(29,77,65,0.10)] ring-1 ring-[#1d4d41]/10 transition active:scale-[0.99] hover:from-[#e2eee7] hover:to-[#cbe0d3]'
 
 export function JonasChat({ firstName, trackLabel, subjects, initialConversations, loadFailed, initialConversation }: Props) {
   const [conversations, setConversations] = useState(initialConversations)
@@ -300,33 +298,24 @@ export function JonasChat({ firstName, trackLabel, subjects, initialConversation
               </div>
             ) : empty ? (
               <div className="flex min-h-[52vh] flex-col justify-center py-6">
-                <JonasAvatar size={46} />
-                <h2 className="mt-4 text-[27px] font-semibold leading-[1.15] tracking-[-0.03em]">Olá, {firstName}. O que vamos estudar hoje?</h2>
-                <p className="mt-2 text-[14.5px] leading-6 text-[#68716a]">{trackLabel ? `Estás a preparar ${trackLabel}. ` : ''}O Jonas explica passo a passo e guarda as tuas conversas.</p>
+                <h2 className="text-[22px] font-semibold leading-[1.2] tracking-[-0.02em]">Olá, {firstName}. O que queres estudar?</h2>
+                {trackLabel && <p className="mt-1 text-[13.5px] text-[#7d887f]">{trackLabel}</p>}
                 {subjects.length > 0 && (
-                  <div className="mt-5">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#1d4d41]">Disciplina (opcional)</p>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {subjects.map((subject) => {
-                        const on = subject.id === subjectId
-                        return (
-                          <button key={subject.id} type="button" aria-pressed={on} onClick={() => setSubjectId(on ? null : subject.id)} className={`h-9 rounded-full px-3.5 text-[13.5px] font-semibold transition ${on ? 'bg-gradient-to-br from-[#2f7260] to-[#1d4d41] text-white shadow-[0_2px_6px_rgba(29,77,65,0.25)]' : `${tap} text-[#1d4d41]`}`}>{subject.name}</button>
-                        )
-                      })}
-                    </div>
-                  </div>
+                  <label className="mt-5 block">
+                    <span className="sr-only">Disciplina (opcional)</span>
+                    <select value={subjectId ?? ''} onChange={(event) => setSubjectId(event.target.value || null)} className="h-10 w-full max-w-xs rounded-xl border border-[#dfe3d9] bg-white px-3 text-[14px] text-[#202321] outline-none focus:border-[#1d4d41]">
+                      <option value="">Todas as disciplinas</option>
+                      {subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name}</option>)}
+                    </select>
+                  </label>
                 )}
-                <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
-                  {STARTERS.map(({ icon: Icon, title, text, prefill }) => (
-                    <button key={title} type="button" onClick={() => fill(prefill(subjects.find((item) => item.id === subjectId)?.name ?? null))} className={`flex items-center gap-3 rounded-2xl p-3.5 text-left ${tap}`}>
-                      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white/80 text-[#1d4d41]"><Icon size={18} aria-hidden="true" /></span>
-                      <span className="min-w-0">
-                        <span className="block text-[14.5px] font-semibold leading-5 text-[#1d4d41]">{title}</span>
-                        <span className="block text-[12.5px] leading-5 text-[#5d6f64]">{text}</span>
-                      </span>
-                    </button>
+                <ul className="mt-5 space-y-2">
+                  {STARTERS.map(({ text, prefill }) => (
+                    <li key={text}>
+                      <button type="button" onClick={() => fill(prefill(subjects.find((item) => item.id === subjectId)?.name ?? null))} className="w-full rounded-xl border border-[#e1e4db] bg-white px-4 py-3 text-left text-[14.5px] leading-5 text-[#202321] transition hover:border-[#1d4d41]/40 active:scale-[0.99]">{text}</button>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
             ) : (
               <ul className="space-y-7">
