@@ -18,7 +18,7 @@ export const EXAM_MODULES = [
   { key: 'revisar-erros', label: 'Revisar erros', description: 'Refazer as questões erradas.', phase: 5, ready: true },
   { key: 'estudo-tematico', label: 'Estudo temático', description: 'Estudar pelos temas mais fracos.', phase: 7, ready: false },
   { key: 'modo-duelo', label: 'Modo duelo', description: 'Desafio entre dois estudantes em tempo real.', phase: 9, ready: false },
-  { key: 'teste-vocacional', label: 'Teste vocacional', description: 'Sugere cursos pelo perfil do aluno.', phase: 9, ready: false },
+  { key: 'teste-vocacional', label: 'Descobre o teu curso', description: 'Responde a perguntas curtas e vê cursos que combinam contigo.', phase: 9, ready: false },
   { key: 'historico', label: 'Histórico', description: 'Resultados e progresso do aluno.', phase: 4, ready: true },
 ] as const
 

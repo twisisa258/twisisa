@@ -16,12 +16,12 @@ import { StudentSidebar } from '@/components/student-sidebar'
 import { UrlFeedback } from '@/components/url-feedback'
 import { AlunoMenuButton } from '@/components/aluno/aluno-menu-button'
 import { Ic } from '@/components/aluno/icons'
+import { ContinuarCard, DescobreCursoCard, ErrosCard, ProgressoPorDisciplina } from '@/components/aluno/inicio-cards'
+import { getInicioAluno, type ResumeItem } from '@/lib/aluno-inicio'
 
 export const dynamic = 'force-dynamic'
 
-const DASH = '—'
 const fileHref = (id: string) => `/api/biblioteca/${encodeURIComponent(id)}/ficheiro`
-const days = (n: number) => (n === 1 ? '1 dia' : `${n} dias`)
 
 // Sem bordas pesadas: a separação vem de uma sombra suave e de degradês na mesma família verde da plataforma.
 const soft = 'shadow-[0_1px_2px_rgba(20,50,40,0.04),0_10px_26px_-14px_rgba(20,50,40,0.18)]'
@@ -88,6 +88,16 @@ export default async function StudentPage() {
   // Primeiro acesso: o aluno escolhe o percurso. A administração fica de fora para poder criar as instituições antes de escolher.
   if (!track && !isAdmin) redirect('/aluno/percurso')
 
+  // O Início do Simulador e a orientação de curso correm ao mesmo tempo que o resto; se falharem, essas secções não aparecem (nunca um zero inventado).
+  const inicioPromise = track
+    ? getInicioAluno({ userId: session.user.id, track, institutionId: profile?.institutionId ?? null }).then(
+        (value) => ({ ok: true as const, value }),
+        (error: unknown) => {
+          console.error('[ALUNO] início', error)
+          return { ok: false as const }
+        },
+      )
+    : Promise.resolve(null)
   const { progress, unread, downloads, saved, recent, savedItems, institution, simulador } = await getAlunoOverview({
     userId: session.user.id,
     track,
@@ -102,9 +112,12 @@ export default async function StudentPage() {
         : 'Admissão'
       : (trackLabel(track) ?? 'Escolher percurso')
   const week = progress.ok ? progress.value : null
-  const weekPercent = week ? Math.min(100, Math.max(0, week.weekly)) : 0
   // O cartão «Continuar» só existe quando há mesmo algo para continuar.
   const last = recent.ok ? recent.value[0] : undefined
+  const inicio = await inicioPromise
+  // Ordem: orientação a meio, sessão do Simulador a meio, último material aberto.
+  const resume: ResumeItem | null =
+    (inicio?.ok ? inicio.value.resume : null) ?? (last ? { kind: 'material', title: last.title, at: last.at, href: fileHref(last.id) } : null)
   const greeting = getGreeting({ name: session.user.name, userId: session.user.id, createdAt: session.user.createdAt, streak: week?.streak ?? null })
 
   return (
@@ -137,7 +150,7 @@ export default async function StudentPage() {
             </div>
           </header>
 
-          <div className="mx-auto flex w-full max-w-[560px] flex-col gap-[16px] px-[16px] pb-[24px] pt-[12px] lg:grid lg:max-w-[1040px] lg:grid-cols-2 lg:items-start lg:gap-x-6 lg:px-8 lg:pb-12 lg:pt-8">
+          <div className="mx-auto flex w-full max-w-[560px] flex-col gap-[16px] px-[16px] pb-[24px] pt-[12px] lg:px-8 lg:pb-12 lg:pt-8">
             <div className="flex min-w-0 flex-col gap-[16px]">
               <div className="flex h-[32px] items-center justify-between">
                 <span className="min-w-0 line-clamp-2 text-[13px] font-bold leading-[16px] text-[#1d4d41]">{greeting}</span>
@@ -151,33 +164,16 @@ export default async function StudentPage() {
                 </Link>
               </div>
 
-              {last && (
-                <section aria-label="Continuar" className={cn('rounded-[20px] bg-gradient-to-br from-[#2f7260] via-[#1d4d41] to-[#12362d] p-[16px] text-white', soft)}>
-                  <div className="flex items-center gap-[12px]">
-                    <span className="flex size-[44px] flex-none items-center justify-center rounded-[14px] bg-white/[0.16] text-white">
-                      <Ic name="file" />
-                    </span>
-                    <div className="min-w-0">
-                      <p className="text-[11px] font-semibold tracking-[0.12em] text-white/70">CONTINUAR</p>
-                      <p className="mt-[2px] truncate text-[16px] font-semibold">{last.title}</p>
-                      <p className="mt-[2px] text-[12px] text-white/70">{relativeTime(last.at)}</p>
-                    </div>
-                  </div>
-                  <a href={fileHref(last.id)} target="_blank" rel="noopener" className="mt-[14px] flex h-[48px] items-center justify-center gap-[8px] rounded-[24px] bg-white text-[15px] font-semibold text-[#1d4d41] no-underline">
-                    Abrir <Ic name="up" size={16} />
-                  </a>
-                </section>
-              )}
+              {resume && <ContinuarCard resume={resume} />}
 
-              <section aria-label="O que queres fazer?" className={cn('rounded-[20px] bg-white p-[14px] lg:hidden', soft)}>
-                <h2 className={cn(sectionLabel, 'mb-[12px] ml-[4px] font-black')}>O que queres fazer?</h2>
+              <section aria-label="O que queres fazer?" className={cn('rounded-[20px] bg-white p-[14px]', soft)}>
                 <div className="flex flex-col gap-[10px]">
-                  <Link href="/biblioteca" className={cn(rowBase, 'bg-gradient-to-br from-[#2f7260] to-[#1d4d41] text-white')}>
-                    <span className={cn(iconBox, 'bg-white/[0.16]')}>
+                  <Link href="/biblioteca" className={cn(rowBase, 'bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] text-[#1d4d41]')}>
+                    <span className={cn(iconBox, 'bg-white/[0.7]')}>
                       <Ic name="book" />
                     </span>
                     Biblioteca
-                    <Ic name="up" className="ml-auto opacity-[.65]" />
+                    <Ic name="up" className="ml-auto opacity-[.55]" />
                   </Link>
                   <Link href="/aluno/simulador" className={cn(rowBase, 'bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] text-[#1d4d41]')}>
                     <span className={cn(iconBox, 'bg-white/[0.7]')}>
@@ -186,38 +182,26 @@ export default async function StudentPage() {
                     Simulador
                     <Ic name="up" className={'ml-auto opacity-[.55]'} />
                   </Link>
-                  <Link href="/jonas" className={cn(rowBase, 'bg-gradient-to-br from-[#4a8a76] to-[#2a6a57] text-white')}>
-                    <span className={cn(iconBox, 'bg-white/[0.16]')}>
+                  <Link href="/jonas" className={cn(rowBase, 'bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] text-[#1d4d41]')}>
+                    <span className={cn(iconBox, 'bg-white/[0.7]')}>
                       <Ic name="spark" />
                     </span>
                     Jonas
-                    <Ic name="up" className="ml-auto opacity-[.65]" />
+                    <Ic name="up" className="ml-auto opacity-[.55]" />
                   </Link>
                 </div>
               </section>
             </div>
 
             <div className="flex min-w-0 flex-col gap-[16px]">
-              <dl aria-label="Resumo" className="m-0 grid grid-cols-2 gap-[10px]">
-                <div className={cn('grid h-[76px] grid-cols-[1fr_auto] content-between rounded-[16px] bg-gradient-to-br from-white to-[#f1f5ef] p-[14px]', soft)}>
-                  <dt className="flex items-center gap-[6px] text-[12px] font-medium text-[#5f6a63]">
-                    <Ic name="target" size={14} />
-                    Semana
-                  </dt>
-                  <dd className="text-[18px] font-semibold text-[#202321]">{week ? `${week.weekly}%` : DASH}</dd>
-                  <dd aria-hidden="true" className="col-span-2 h-[6px] rounded-[3px] bg-[#e3e9df]">
-                    <div className="h-full rounded-[3px] bg-gradient-to-r from-[#4a8a76] to-[#1d4d41]" style={{ width: `${weekPercent}%` }} />
-                  </dd>
-                </div>
-                <div className="grid h-[76px] content-between rounded-[16px] bg-gradient-to-br from-[#fbefe2] to-[#f1d8bd] p-[14px] text-[#8a4f26]">
-                  <dt className="flex items-center gap-[6px] text-[12px] font-medium">
-                    <Ic name="flame" size={14} />
-                    Sequência
-                  </dt>
-                  <dd className="text-[18px] font-semibold">{week ? days(week.streak) : DASH}</dd>
-                </div>
-                              </dl>
-
+              {inicio?.ok && inicio.value.practice && (
+                <>
+                  <ProgressoPorDisciplina subjects={inicio.value.practice.subjects.slice(0, 5)} />
+                  {inicio.value.practice.showErrors && <ErrosCard count={inicio.value.practice.errorCount} href={inicio.value.practice.errorsHref} />}
+                </>
+              )}
+              {inicio?.ok && inicio.value.orientacao && <DescobreCursoCard data={inicio.value.orientacao} />}
+              {(!savedItems.ok || savedItems.value.length > 0) && (
               <section aria-label="Guardados">
                 <h2 className={cn(sectionLabel, 'mb-[8px] ml-[4px] flex items-center gap-[6px] font-bold')}>
                   <Ic name="mark" size={14} />
@@ -225,6 +209,7 @@ export default async function StudentPage() {
                 </h2>
                 <MaterialCard tone="sand" items={savedItems} emptyTitle="Ainda sem materiais guardados" emptyText="Os materiais que guardares aparecem aqui." />
               </section>
+              )}
             </div>
           </div>
         </div>
