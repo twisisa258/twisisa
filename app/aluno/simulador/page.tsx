@@ -65,7 +65,7 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
   return (
     <StudentFeatureShell firstName={firstName} eyebrow="Simulador" title="Simulador" hideTitle hideBackLink>
       <div className="max-w-[640px] space-y-6">
-        <SimHeader hint="Treina com questões do teu percurso" />
+        <SimHeader />
 
         {failed || !hub ? (
           <div role="alert" className={cn(card, 'px-5 py-8 text-center')}>
@@ -91,13 +91,13 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
 
             {/* 1 · Disciplina (sempre primeiro) */}
             <section aria-label="Escolher a disciplina" className="space-y-2">
-              <h2 className={label}>1 · Disciplina</h2>
+              <h2 className={label}>Disciplina</h2>
               <SubjectSelect subjects={subjects} current={chosen?.id ?? null} basePath="/aluno/simulador" />
             </section>
 
             {/* 2 · Modo: só abre depois de escolher a disciplina */}
             <section aria-label="Escolher como treinar" className="space-y-2">
-              <h2 className={label}>2 · Como queres treinar?</h2>
+              <h2 className={label}>Como queres treinar?</h2>
               {!chosen && <p className="px-1 text-[13px] text-[#6b756e]">Escolhe primeiro a disciplina.</p>}
               <div className="space-y-2">
                 {enabled.map((mode) => {

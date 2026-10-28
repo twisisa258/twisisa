@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { ArrowRight } from 'lucide-react'
+import { Spinner } from '@/components/ui/spinner'
 import { useFeedback } from '@/components/feedback-provider'
 import { startSession } from '@/app/aluno/simulador/actions'
 import { tapCard } from '@/components/simulador/styles'
@@ -47,7 +48,7 @@ export function VariantCard({ mode = 'pratica', subjectId, variant, topicId = nu
           )}
         </span>
       </span>
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#1d4d41] text-white"><ArrowRight size={18} aria-hidden /></span>
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#1d4d41] text-white">{busy ? <Spinner /> : <ArrowRight size={18} aria-hidden />}</span>
     </button>
   )
 }
@@ -57,7 +58,7 @@ export function StartButton({ mode, subjectId, label, disabled = false }: { mode
   const { start, busy } = useStart(mode, subjectId, null)
   return (
     <button type="button" onClick={start} disabled={busy || disabled} className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1d4d41] text-[15px] font-semibold text-white transition-colors hover:bg-[#163e34] disabled:opacity-60">
-      {busy ? 'A preparar as questões…' : <>{label}<ArrowRight size={18} aria-hidden /></>}
+      {busy ? <><Spinner />A preparar…</> : <>{label}<ArrowRight size={18} aria-hidden /></>}
     </button>
   )
 }

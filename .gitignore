@@ -5,6 +5,7 @@
 !.env.example
 .vercel/
 .backup-*
+.ux-backup-*
 # Dependências e build
 node_modules
 .next/

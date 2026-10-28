@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
 import { useFeedback } from '@/components/feedback-provider'
 import { track } from '@/lib/analytics'
+import { Spinner } from '@/components/ui/spinner'
 
 export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   const router = useRouter()
@@ -50,7 +51,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
       <label className="flex flex-col gap-2 text-sm font-medium">Email<input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="rounded-xl border border-[#dfe1d9] bg-white px-4 py-3 outline-none focus:border-[#1d4d41]" placeholder="tu@email.com" /></label>
       <label className="flex flex-col gap-2 text-sm font-medium">Palavra-passe<input required minLength={8} type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="rounded-xl border border-[#dfe1d9] bg-white px-4 py-3 outline-none focus:border-[#1d4d41]" placeholder="Mínimo 8 caracteres" /></label>
       {mode === 'sign-in' && <Link href="/esqueci-a-senha" className="-mt-2 self-end text-sm font-semibold text-[#1d4d41]">Esqueceste a palavra-passe?</Link>}
-      <button disabled={loading} className="rounded-full bg-[#1d4d41] px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#153e34] disabled:opacity-60">{loading ? 'Aguarda...' : mode === 'sign-up' ? 'Criar a minha conta' : 'Entrar na minha conta'}</button>
+      <button type="submit" disabled={loading} aria-busy={loading} className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1d4d41] px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#153e34] disabled:opacity-60">{loading ? <><Spinner />{mode === 'sign-up' ? 'A criar a conta…' : 'A entrar…'}</> : mode === 'sign-up' ? 'Criar a minha conta' : 'Entrar na minha conta'}</button>
     </form>
   )
 }

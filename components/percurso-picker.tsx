@@ -6,6 +6,7 @@ import { BookOpen, Check, ChevronRight, GraduationCap } from 'lucide-react'
 import { useFeedback } from '@/components/feedback-provider'
 import { savePercurso } from '@/app/aluno/percurso/actions'
 import { TRACKS, type Track } from '@/lib/percurso'
+import { Spinner } from '@/components/ui/spinner'
 
 export type PickerInstitution = {
   id: string
@@ -59,7 +60,6 @@ export function PercursoPicker({ initialTrack, initialInstitutionId, institution
     <div className="flex flex-col gap-6">
       <section aria-labelledby="percurso-titulo">
         <h2 id="percurso-titulo" className="text-base font-semibold">O que estás a preparar?</h2>
-        <p className="mt-1 text-sm text-[#737c75]">Podes mudar a qualquer momento. O teu histórico e os teus pontos mantêm-se.</p>
         <div role="radiogroup" aria-labelledby="percurso-titulo" className="mt-4 grid gap-3 sm:grid-cols-3">
           {TRACKS.map((item) => {
             const selected = track === item.value
@@ -76,7 +76,6 @@ export function PercursoPicker({ initialTrack, initialInstitutionId, institution
                 <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-[#e6f0e9] text-[#1d4d41]"><Icon size={21} aria-hidden="true" /></span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-semibold">{item.label}</span>
-                  <span className="mt-1 block text-xs leading-5 text-[#737c75]">{item.description}</span>
                 </span>
                 {selected && <Check size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-[#1d4d41]" />}
               </button>
@@ -124,9 +123,9 @@ export function PercursoPicker({ initialTrack, initialInstitutionId, institution
         type="button"
         onClick={save}
         disabled={!canSave}
-        className="flex h-12 w-full items-center justify-center rounded-xl bg-[#1d4d41] text-sm font-semibold text-white shadow-sm hover:bg-[#163e34] disabled:cursor-not-allowed disabled:opacity-50 sm:w-fit sm:px-10"
+        className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#1d4d41] text-sm font-semibold text-white shadow-sm hover:bg-[#163e34] disabled:cursor-not-allowed disabled:opacity-50 sm:w-fit sm:px-10"
       >
-        {pending ? 'A guardar…' : 'Guardar percurso'}
+        {pending ? <><Spinner />A guardar…</> : 'Guardar percurso'}
       </button>
     </div>
   )

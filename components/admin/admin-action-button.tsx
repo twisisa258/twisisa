@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useFeedback } from '@/components/feedback-provider'
 import type { ActionResult } from '@/lib/action-result'
+import { Spinner } from '@/components/ui/spinner'
 
 type Props = {
   action: (formData: FormData) => Promise<ActionResult>
@@ -50,8 +51,8 @@ export function AdminActionButton({ action, fields, ariaLabel, children, confirm
   if (confirm && confirming) {
     return (
       <div className="flex items-center gap-1.5">
-        <button type="button" onClick={run} disabled={pending} className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold text-white disabled:opacity-60 ${tone === 'danger' ? 'bg-[#9a3030] hover:bg-[#7f2626]' : 'bg-[#1d4d41] hover:bg-[#163e34]'}`}>
-          {pending ? 'A processar…' : confirm.label}
+        <button type="button" onClick={run} disabled={pending} className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-white disabled:opacity-60 ${tone === 'danger' ? 'bg-[#9a3030] hover:bg-[#7f2626]' : 'bg-[#1d4d41] hover:bg-[#163e34]'}`}>
+          {pending ? <><Spinner className="size-3.5" />A processar…</> : confirm.label}
         </button>
         <button type="button" onClick={() => setConfirming(false)} disabled={pending} className="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-[#526057] hover:bg-[#f1f4ef] disabled:opacity-60">Cancelar</button>
       </div>
@@ -67,7 +68,7 @@ export function AdminActionButton({ action, fields, ariaLabel, children, confirm
       onClick={confirm ? () => setConfirming(true) : run}
       className={`rounded-lg p-2 disabled:cursor-not-allowed disabled:opacity-35 ${color}`}
     >
-      {children}
+      {pending ? <Spinner className="size-4" /> : children}
     </button>
   )
 }

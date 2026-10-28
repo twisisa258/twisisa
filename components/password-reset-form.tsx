@@ -5,9 +5,10 @@ import { FormEvent, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
 import { useFeedback } from '@/components/feedback-provider'
+import { Spinner } from '@/components/ui/spinner'
 
 const input = 'rounded-xl border border-[#dfe1d9] bg-white px-4 py-3 outline-none focus:border-[#1d4d41]'
-const button = 'rounded-full bg-[#1d4d41] px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#153e34] disabled:opacity-60'
+const button = 'inline-flex items-center justify-center gap-2 rounded-full bg-[#1d4d41] px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#153e34] disabled:opacity-60'
 
 // Passo 1: pedir a ligação. A resposta é sempre a mesma, exista a conta ou não.
 export function RequestResetForm() {
@@ -43,7 +44,7 @@ export function RequestResetForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <label className="flex flex-col gap-2 text-sm font-medium">Email<input required type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className={input} placeholder="tu@email.com" /></label>
-      <button disabled={loading} className={button}>{loading ? 'Aguarda...' : 'Enviar ligação'}</button>
+      <button disabled={loading} className={button}>{loading ? <><Spinner />A enviar…</> : 'Enviar ligação'}</button>
     </form>
   )
 }
@@ -83,7 +84,7 @@ export function NewPasswordForm({ token }: { token: string }) {
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <label className="flex flex-col gap-2 text-sm font-medium">Nova palavra-passe<input required minLength={8} type="password" autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} className={input} placeholder="Mínimo 8 caracteres" /></label>
       <label className="flex flex-col gap-2 text-sm font-medium">Repetir palavra-passe<input required minLength={8} type="password" autoComplete="new-password" value={repeat} onChange={(event) => setRepeat(event.target.value)} className={input} placeholder="Repete a palavra-passe" /></label>
-      <button disabled={loading} className={button}>{loading ? 'Aguarda...' : 'Guardar palavra-passe'}</button>
+      <button disabled={loading} className={button}>{loading ? <><Spinner />A guardar…</> : 'Guardar palavra-passe'}</button>
     </form>
   )
 }
