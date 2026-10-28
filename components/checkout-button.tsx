@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useFeedback } from '@/components/feedback-provider'
+import { track } from '@/lib/analytics'
 
 export function CheckoutButton({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(false)
@@ -9,6 +10,7 @@ export function CheckoutButton({ productId }: { productId: string }) {
 
   async function startCheckout() {
     setLoading(true)
+    track('begin_checkout', { items: [{ item_id: productId }] })
     try {
       const response = await fetch('/api/checkout', {
         method: 'POST',

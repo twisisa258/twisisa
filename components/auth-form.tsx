@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
 import { useFeedback } from '@/components/feedback-provider'
+import { track } from '@/lib/analytics'
 
 export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   const router = useRouter()
@@ -38,6 +39,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
       feedback.error(failure, mode === 'sign-up' ? 'Não foi possível criar a conta' : 'Não foi possível entrar')
       return
     }
+    track(mode === 'sign-up' ? 'sign_up' : 'login', { method: 'email' })
     router.push('/aluno')
     router.refresh()
   }

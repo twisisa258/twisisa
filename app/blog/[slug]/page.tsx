@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { JsonLd } from '@/components/json-ld'
 import { articles, getArticle } from '@/lib/blog'
-import { OG_IMAGE, SITE_LOCALE, SITE_NAME, SITE_URL } from '@/lib/seo'
+import { OG_IMAGE, SITE_LOCALE, SITE_NAME, SITE_URL, breadcrumbJsonLd } from '@/lib/seo'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -48,21 +48,30 @@ export default async function ArticlePage({ params }: Props) {
   const url = `${SITE_URL}/blog/${article.slug}`
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: article.title,
-    description: article.description,
-    articleSection: article.category,
-    inLanguage: 'pt-MZ',
-    url,
-    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
-    image: `${SITE_URL}${OG_IMAGE.url}`,
-    author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
-    publisher: {
-      '@type': 'Organization',
-      name: SITE_NAME,
-      url: SITE_URL,
-      logo: { '@type': 'ImageObject', url: `${SITE_URL}/icons/icon-512.png` },
-    },
+    '@graph': [
+      {
+        '@type': 'BlogPosting',
+        headline: article.title,
+        description: article.description,
+        articleSection: article.category,
+        inLanguage: 'pt-MZ',
+        url,
+        mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+        image: `${SITE_URL}${OG_IMAGE.url}`,
+        author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+        publisher: {
+          '@type': 'Organization',
+          name: SITE_NAME,
+          url: SITE_URL,
+          logo: { '@type': 'ImageObject', url: `${SITE_URL}/icons/icon-512.png` },
+        },
+      },
+      breadcrumbJsonLd([
+        { name: 'Início', path: '/' },
+        { name: 'Blog', path: '/blog' },
+        { name: article.title, path: `/blog/${article.slug}` },
+      ]),
+    ],
   }
 
   return (

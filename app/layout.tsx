@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { JsonLd } from '@/components/json-ld'
 import { FeedbackProvider } from '@/components/feedback-provider'
+import { GoogleAnalytics } from '@/components/google-analytics'
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_LOCALE, SITE_NAME, SITE_TITLE, SITE_URL, siteJsonLd } from '@/lib/seo'
 import './globals.css'
 
@@ -63,6 +64,7 @@ export default function RootLayout({
         <JsonLd data={siteJsonLd} />
         <FeedbackProvider>{children}</FeedbackProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
+        <GoogleAnalytics />
       </body>
     </html>
   )

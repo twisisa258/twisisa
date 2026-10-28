@@ -68,6 +68,7 @@ export const siteJsonLd = {
       name: SITE_NAME,
       url: SITE_URL,
       description: SITE_DESCRIPTION,
+      areaServed: { '@type': 'Country', name: 'Moçambique' },
       logo: {
         '@type': 'ImageObject',
         url: `${SITE_URL}/icons/icon-512.png`,
@@ -85,4 +86,17 @@ export const siteJsonLd = {
       publisher: { '@id': `${SITE_URL}/#organization` },
     },
   ],
+}
+
+// Trilho de navegação (BreadcrumbList) para juntar ao @graph de uma página.
+export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
+  return {
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: `${SITE_URL}${item.path}`,
+    })),
+  }
 }
