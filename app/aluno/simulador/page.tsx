@@ -1,49 +1,39 @@
 import Link from 'next/link'
-import { ArrowRight, ClipboardCheck, Compass, History, ListTree, Lock, RotateCcw, Swords, Target, Timer } from 'lucide-react'
+import { ArrowRight, BookOpen, History, ShieldCheck } from 'lucide-react'
 import { getVisibleModules, type ModuleKey } from '@/lib/exam-modules'
 import { listStudentInstitutions } from '@/lib/institutions'
 import { trackLabel } from '@/lib/percurso'
-import { getSimulatorHub } from '@/lib/simulator'
+import { getSimulatorHub, getVariants, getWeakTopics } from '@/lib/simulator'
 import { requireSimulatorScope } from '@/lib/simulator-scope'
-import { MODE_META, SLUG_BY_MODE, formatPoints, percent, type AttemptMode } from '@/lib/simulator-shared'
+import { getSimPrefs } from '@/lib/simulator-prefs-server'
+import { sessionSize } from '@/lib/simulator-prefs'
+import { MODE_META, ROUND_SIZE, clock, isAttemptMode, percent, type AttemptMode } from '@/lib/simulator-shared'
 import { cn } from '@/lib/utils'
-import { tapCard } from '@/components/simulador/styles'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
 import { EmptyState } from '@/components/states/empty-state'
 import { SimHeader } from '@/components/simulador/sim-header'
+import { SimTabs } from '@/components/simulador/sim-tabs'
+import { Step } from '@/components/simulador/step'
 import { SubjectSelect } from '@/components/simulador/subject-select'
+import { ModePicker } from '@/components/simulador/mode-picker'
+import { StartCard } from '@/components/simulador/start-actions'
 
 export const dynamic = 'force-dynamic'
-export const metadata = { title: 'Simulador | Twisisa', description: 'Treina com prática, modo rápido e revisão de erros para o teu percurso.' }
+export const metadata = { title: 'Simulador | Twisisa', description: 'Escolhe a disciplina e treina com questões de exames.' }
 
-// Sem bordas pesadas: sombra suave e degradês na família verde, como a Visão geral e a Biblioteca.
-const soft = 'shadow-[0_1px_2px_rgba(20,50,40,0.05)]'
-const card = `rounded-2xl bg-gradient-to-br from-white to-[#f4f6f1] ${soft}`
-const label = 'px-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#1d4d41]'
-
-// Os ícones são desenhados aqui, na página de servidor: nunca se passam como propriedade a componentes de cliente.
-const ICONS: Record<ModuleKey, React.ComponentType<{ size?: number; 'aria-hidden'?: boolean }>> = {
-  simulados: ClipboardCheck,
-  pratica: Target,
-  'modo-rapido': Timer,
-  'revisar-erros': RotateCcw,
-  'estudo-tematico': ListTree,
-  'modo-duelo': Swords,
-  'teste-vocacional': Compass,
-  historico: History,
-}
 const MODE_BY_MODULE: Partial<Record<ModuleKey, AttemptMode>> = { pratica: 'pratica', 'modo-rapido': 'rapido', 'revisar-erros': 'revisao' }
-const MODE_ICON: Record<AttemptMode, React.ComponentType<{ size?: number; 'aria-hidden'?: boolean }>> = { pratica: Target, rapido: Timer, revisao: RotateCcw }
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`
 
-export default async function SimuladorPage({ searchParams }: { searchParams: Promise<{ d?: string }> }) {
+export default async function SimuladorPage({ searchParams }: { searchParams: Promise<{ d?: string; m?: string }> }) {
   const { scope, firstName } = await requireSimulatorScope()
-  const { d } = await searchParams
+  const { d, m } = await searchParams
   const { track, institutionId } = scope
 
   let modules: Awaited<ReturnType<typeof getVisibleModules>> = []
   let hub: Awaited<ReturnType<typeof getSimulatorHub>> | null = null
   let institutionName: string | null = null
   let failed = false
+  const prefs = await getSimPrefs()
   try {
     ;[modules, hub] = await Promise.all([getVisibleModules(track), getSimulatorHub(scope)])
     if (track === 'admissao' && institutionId) institutionName = (await listStudentInstitutions()).find((item) => item.id === institutionId)?.shortName ?? null
@@ -51,24 +41,35 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
     failed = true
     console.error('[SIMULADOR]', error)
   }
+
   const context = track === 'admissao' ? (institutionName ? `Admissão · ${institutionName}` : 'Admissão ao ensino superior') : trackLabel(track)
-
-  const live = modules.filter((item) => item.status === 'active' && MODE_BY_MODULE[item.key])
-  const enabled = live.flatMap((item) => (MODE_BY_MODULE[item.key] ? [MODE_BY_MODULE[item.key]!] : []))
-  const upcoming = modules.filter((item) => !(item.status === 'active' && (MODE_BY_MODULE[item.key] || item.key === 'historico')))
+  const enabled = modules.flatMap((item) => (item.status === 'active' && MODE_BY_MODULE[item.key] ? [MODE_BY_MODULE[item.key]!] : []))
   const hasHistory = modules.some((item) => item.key === 'historico' && item.status === 'active')
+  const mode: AttemptMode = isAttemptMode(m) && enabled.includes(m) ? m : (enabled[0] ?? 'pratica')
 
-  // Disciplina escolhida (na ligação `?d=`); com uma só disciplina, fica escolhida sozinha.
   const subjects = hub?.subjects ?? []
   const chosen = subjects.find((item) => item.id === d) ?? (subjects.length === 1 ? subjects[0] : null)
+  const size = sessionSize(mode, prefs, ROUND_SIZE)
+
+  const needsVariant = mode !== 'revisao'
+  const [catalog, weak] =
+    chosen && hub && needsVariant
+      ? await Promise.all([getVariants(scope, chosen.id), mode === 'pratica' ? getWeakTopics(scope, chosen.id) : Promise.resolve([])])
+      : [null, []]
+  const named = catalog?.variants ?? []
+  const freshTotal = named.reduce((sum, item) => sum + item.fresh, 0)
+  const freshLabel = (fresh?: number) => (fresh === undefined ? '' : fresh === 0 ? ' · Já viste tudo' : ` · ${fresh} por ver`)
+
+  const modeLine = mode === 'pratica' ? `${size} questões · sem limite de tempo` : mode === 'rapido' ? `${size} questões · ${clock(prefs.quickSeconds)} cada` : hub && hub.errorCount > 0 ? `${plural(hub.errorCount, 'questão', 'questões')} para rever` : 'Ainda não tens erros para rever'
 
   return (
     <StudentFeatureShell firstName={firstName} eyebrow="Simulador" title="Simulador" hideTitle hideBackLink>
       <div className="max-w-[640px] space-y-6">
         <SimHeader />
+        <SimTabs active="principal" />
 
         {failed || !hub ? (
-          <div role="alert" className={cn(card, 'px-5 py-8 text-center')}>
+          <div role="alert" className="rounded-2xl bg-gradient-to-br from-white to-[#f4f6f1] px-5 py-8 text-center shadow-[0_1px_2px_rgba(20,50,40,0.05)]">
             <h2 className="text-base font-semibold">Não foi possível carregar o Simulador</h2>
             <p className="mx-auto mt-1.5 max-w-sm text-sm leading-6 text-[#68736a]">Verifica a ligação e tenta de novo.</p>
             <Link href="/aluno/simulador" className="mt-4 inline-flex h-11 items-center justify-center rounded-full bg-[#1d4d41] px-5 text-sm font-semibold text-white hover:bg-[#163e34]">Tentar de novo</Link>
@@ -78,9 +79,9 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
         ) : (
           <>
             {hub.open.filter((item) => enabled.includes(item.mode)).map((item) => (
-              <Link key={item.id} href={`/aluno/simulador/sessao/${item.id}`} className="flex items-center gap-3 rounded-2xl bg-gradient-to-br from-[#235a4b] to-[#1d4d41] p-4 text-white">
+              <Link key={item.id} href={`/aluno/simulador/sessao/${item.id}`} className="flex items-center gap-3 rounded-2xl bg-gradient-to-br from-[#235a4b] to-[#1d4d41] p-4 text-white shadow-[0_8px_18px_-10px_rgba(29,77,65,0.7)] transition active:scale-[0.99]">
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-white/65">Continuar de onde paraste</span>
+                  <span className="block text-[12px] font-medium text-white/70">Continuar de onde paraste</span>
                   <span className="mt-0.5 block truncate text-[15px] font-semibold">{MODE_META[item.mode].label}{item.subject ? ` · ${item.subject}` : ''}</span>
                   <span className="mt-2 block h-1 overflow-hidden rounded-full bg-white/20"><span className="block h-full rounded-full bg-white" style={{ width: `${percent(item.answered, item.total)}%` }} /></span>
                 </span>
@@ -89,65 +90,56 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
               </Link>
             ))}
 
-            {/* 1 · Disciplina (sempre primeiro) */}
-            <section aria-label="Escolher a disciplina" className="space-y-2">
-              <h2 className={label}>Disciplina</h2>
-              <SubjectSelect subjects={subjects} current={chosen?.id ?? null} basePath="/aluno/simulador" />
-            </section>
-
-            {/* 2 · Modo: só abre depois de escolher a disciplina */}
-            <section aria-label="Escolher como treinar" className="space-y-2">
-              <h2 className={label}>Como queres treinar?</h2>
-              {!chosen && <p className="px-1 text-[13px] text-[#6b756e]">Escolhe primeiro a disciplina.</p>}
-              <div className="space-y-2">
-                {enabled.map((mode) => {
-                  const Icon = MODE_ICON[mode]
-                  const meta = MODE_META[mode]
-                  const noErrors = mode === 'revisao' && hub.errorCount === 0
-                  const locked = !chosen || noErrors
-                  const hint = noErrors ? 'Ainda não tens erros para rever' : mode === 'revisao' ? `${hub.errorCount} ${hub.errorCount === 1 ? 'questão para rever' : 'questões para rever'}` : meta.tagline
-                  const body = (
-                    <>
-                      <span className={cn('flex size-10 shrink-0 items-center justify-center rounded-xl', locked ? 'bg-[#eef0ea] text-[#9aa29b]' : 'bg-white/85 text-[#1d4d41]')}><Icon size={18} aria-hidden /></span>
-                      <span className="min-w-0 flex-1">
-                        <span className={cn('block text-[15px] font-semibold leading-5', !locked && 'text-[#1d4d41]')}>{meta.label}</span>
-                        <span className={cn('block truncate text-[12.5px] leading-5', locked ? 'text-[#6b756e]' : 'text-[#5d6f64]')}>{hint}</span>
-                      </span>
-                      {locked ? <Lock size={15} className="shrink-0 text-[#b3b9b2]" aria-hidden /> : <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#1d4d41] text-white"><ArrowRight size={16} aria-hidden /></span>}
-                    </>
-                  )
-                  return locked ? (
-                    <div key={mode} aria-disabled="true" className="flex items-center gap-3 rounded-2xl bg-white/60 p-3.5 opacity-70">{body}</div>
-                  ) : (
-                    <Link key={mode} href={`/aluno/simulador/${SLUG_BY_MODE[mode]}?d=${encodeURIComponent(chosen!.id)}`} className={cn(tapCard, 'flex items-center gap-3 rounded-2xl p-3.5')}>{body}</Link>
-                  )
-                })}
+            <Step n={1} title="Que disciplina queres treinar?" done={!!chosen}>
+              <div className="relative">
+                <BookOpen size={18} aria-hidden className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 text-[#1d4d41]" />
+                <div className="[&_button]:pl-11"><SubjectSelect subjects={subjects} current={chosen?.id ?? null} mode={mode} /></div>
               </div>
-            </section>
+            </Step>
 
-            {hub.stats.answered > 0 && (
-              <section aria-label="O teu progresso" className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <h2 className={label}>O teu progresso</h2>
-                  {hasHistory && <Link href="/aluno/simulador/historico" className="inline-flex items-center gap-1 text-xs font-semibold text-[#1d4d41] hover:underline"><History size={14} aria-hidden />Histórico</Link>}
-                </div>
-                <dl className={cn(card, 'grid grid-cols-1 gap-1 p-3 text-center')}>
-                  {[
-                    ['Acertos', `${percent(hub.stats.correct, hub.stats.answered)}%`],
-                  ].map(([name, value]) => (
-                    <div key={name} className="py-1">
-                      <dd className="text-[18px] font-semibold tracking-[-0.02em]">{value}</dd>
-                      <dt className="text-[11px] text-[#7d857e]">{name}</dt>
+            {chosen && (
+              <>
+                <Step n={2} title="Como queres treinar?" done>
+                  <ModePicker modes={enabled} current={mode} subjectId={chosen.id} />
+                  <p className="flex items-center justify-between gap-3 px-1 text-[12.5px] text-[#6b756e]">
+                    <span>{modeLine}</span>
+                    {mode !== 'revisao' && <Link href="/aluno/simulador/configuracoes" className="shrink-0 font-semibold text-[#1d4d41] hover:underline">Ajustar</Link>}
+                  </p>
+                </Step>
+
+                <Step key={`${chosen.id}-${mode}`} n={3} title={mode === 'revisao' ? 'Pronto para rever?' : named.length > 0 ? 'Escolhe a variante e começa' : 'Toca para começar'}>
+                  <div className="space-y-2.5">
+                    {mode === 'revisao' && (
+                      <StartCard mode="revisao" subjectId={chosen.id} title="Rever os meus erros" caption={hub.errorCount > 0 ? `${plural(Math.min(size, hub.errorCount), 'questão', 'questões')} · só as que já erraste` : 'Faz uma prática primeiro'} disabled={hub.errorCount === 0} />
+                    )}
+                    {needsVariant && named.map((item) => (
+                      <StartCard key={item.name} mode={mode} subjectId={chosen.id} variant={item.name} title={item.name} caption={`${plural(Math.min(size, item.count), 'questão', 'questões')}${freshLabel(item.fresh)}`} />
+                    ))}
+                    {needsVariant && named.length > 1 && (
+                      <StartCard mode={mode} subjectId={chosen.id} title="Todas as variantes" caption={`${plural(Math.min(size, catalog?.total ?? 0), 'questão', 'questões')}${freshLabel(freshTotal)}`} />
+                    )}
+                    {needsVariant && named.length === 0 && (
+                      <StartCard mode={mode} subjectId={chosen.id} title={`Todas as questões de ${chosen.name}`} caption={plural(Math.min(size, catalog?.total ?? 0), 'questão', 'questões')} disabled={(catalog?.total ?? 0) === 0} />
+                    )}
+                  </div>
+                  <p className="flex items-center gap-2 px-1 text-[12.5px] text-[#6b756e]"><ShieldCheck size={15} className="shrink-0 text-[#1d4d41]" aria-hidden />O teu progresso fica guardado. Podes sair e continuar depois.</p>
+                </Step>
+
+                {weak.length > 0 && (
+                  <Step n={4} title="Ou reforça um tema fraco">
+                    <div className="space-y-2.5">
+                      {weak.map((topic) => (
+                        <StartCard key={topic.id} mode="pratica" subjectId={chosen.id} topicId={topic.id} title={topic.name} caption={`Acertas ${topic.accuracy}% · ${plural(topic.answered, 'resposta', 'respostas')}`} />
+                      ))}
                     </div>
-                  ))}
-                </dl>
-              </section>
+                  </Step>
+                )}
+              </>
             )}
 
-            {/* O percurso vem no fim: é informação, não um convite a mexer. */}
-            <p className="flex items-center justify-between gap-3 px-1 text-[13px]">
-              <span className="min-w-0 truncate"><span className="text-[#7d857e]">A preparar </span><span className="font-semibold">{context}</span></span>
-              <Link href="/aluno/percurso" className="shrink-0 font-semibold text-[#1d4d41] hover:underline">Mudar percurso</Link>
+            <p className={cn('flex items-center justify-between gap-3 px-1 text-[13px]')}>
+              <span className="min-w-0 truncate"><span className="text-[#7d857e]">A preparar </span><span className="font-semibold">{context}</span> <Link href="/aluno/percurso" className="font-semibold text-[#1d4d41] hover:underline">Mudar</Link></span>
+              {hasHistory && <Link href="/aluno/simulador/historico" className="inline-flex shrink-0 items-center gap-1.5 font-semibold text-[#1d4d41] hover:underline"><History size={14} aria-hidden />Histórico</Link>}
             </p>
           </>
         )}

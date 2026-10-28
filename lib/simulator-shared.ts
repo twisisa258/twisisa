@@ -11,8 +11,8 @@ export const POINTS_MIN = 2
 export const POINTS_MAX = 4
 // Modo rápido: 1:30 por questão.
 export const QUICK_SECONDS_PER_QUESTION = 90
-// Limite duro da sessão no servidor: o relógio de cada questão é do ecrã; isto trava quem tente ganhar tempo.
-export const QUICK_SERVER_SECONDS_PER_QUESTION = 110
+// Folga por questão no servidor: o relógio de cada questão é do ecrã; isto trava quem tente ganhar tempo.
+export const QUICK_SERVER_MARGIN_SECONDS = 20
 export const TIME_GRACE_MS = 5000
 
 export const MODE_META: Record<AttemptMode, { label: string; tagline: string; meta: string; cta: string; moduleKey: 'pratica' | 'modo-rapido' | 'revisar-erros' }> = {
@@ -40,6 +40,7 @@ export type PlayData = {
   subject: string | null
   variant: string | null
   endsAt: number | null
+  secondsPerQuestion: number | null
   serverNow: number
   items: PlayItem[]
 }

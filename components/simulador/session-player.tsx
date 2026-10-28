@@ -6,17 +6,18 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowRight, Check, Clock, Flame, Sparkles, X } from 'lucide-react'
 import { MathText } from '@/lib/math-text'
 import { finishSession, saveAnswer } from '@/app/aluno/simulador/actions'
+import { cue } from '@/lib/sim-cue'
 import { JonasExplainSheet } from '@/components/simulador/jonas-explain'
 import { QuestionImage } from '@/components/simulador/question-image'
 import { MODE_META, QUICK_SECONDS_PER_QUESTION, clock, formatPoints, percent, type PlayData, type PlayItem } from '@/lib/simulator-shared'
 
 const LETTERS = ['A', 'B', 'C', 'D', 'E']
-const QUESTION_MS = QUICK_SECONDS_PER_QUESTION * 1000
 const WRONG_LINES = ['Não faz mal, é assim que se aprende.', 'Lê a explicação e segue.', 'Um erro hoje é um acerto amanhã.']
 
 // Tudo cabe num ecrã (100dvh): cabeçalho, pergunta, opções, aviso e botão. Só a zona do meio rola, e só se o enunciado for muito longo.
-export function SessionPlayer({ data }: { data: PlayData }) {
+export function SessionPlayer({ data, cues }: { data: PlayData; cues: { sound: boolean; haptics: boolean } }) {
   const router = useRouter()
+  const questionMs = (data.secondsPerQuestion ?? QUICK_SECONDS_PER_QUESTION) * 1000
   const timed = data.mode === 'rapido'
   const [items, setItems] = useState<PlayItem[]>(data.items)
   const firstOpen = data.items.findIndex((item) => item.selectedOptionId === null)
@@ -26,7 +27,7 @@ export function SessionPlayer({ data }: { data: PlayData }) {
   const [finishing, setFinishing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [sheet, setSheet] = useState(false)
-  const [msLeft, setMsLeft] = useState(QUESTION_MS)
+  const [msLeft, setMsLeft] = useState(questionMs)
   const [timeout, setTimeoutFlash] = useState(false)
 
   const itemsRef = useRef(items)
@@ -77,9 +78,9 @@ export function SessionPlayer({ data }: { data: PlayData }) {
     setPicked(null)
     setSheet(false)
     setTimeoutFlash(false)
-    setMsLeft(QUESTION_MS)
-    deadline.current = Date.now() + QUESTION_MS
-  }, [index])
+    setMsLeft(questionMs)
+    deadline.current = Date.now() + questionMs
+  }, [index, questionMs])
 
   // Verificar: só aqui a resposta é enviada e corrigida no servidor.
   const verify = useCallback(async () => {
@@ -94,6 +95,7 @@ export function SessionPlayer({ data }: { data: PlayData }) {
       if (res.ok && res.data.feedback) {
         const feedback = res.data.feedback
         setItems((list) => list.map((i) => (i.position === current.position ? { ...i, selectedOptionId: optionId, feedback } : i)))
+        cue(feedback.isCorrect, cues)
       } else {
         if (!res.ok && res.timeUp) router.refresh()
         setError(res.ok ? 'Não foi possível guardar a resposta.' : res.message)
@@ -104,7 +106,7 @@ export function SessionPlayer({ data }: { data: PlayData }) {
       busyRef.current = false
       setBusy(false)
     }
-  }, [data.id, index, router])
+  }, [data.id, index, router, cues])
 
   useEffect(() => {
     if (!timed) return

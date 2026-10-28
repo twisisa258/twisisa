@@ -3,7 +3,7 @@ import { AppError } from '@/lib/action-result'
 import { pool } from '@/lib/db'
 import type { Track } from '@/lib/percurso'
 import { gradeOutOf20, itemWeight, OptionShuffler, pickQuestions, type Candidate } from '@/lib/quiz-engine'
-import { PRACTICE_SIZE, QUICK_SERVER_SECONDS_PER_QUESTION, ROUND_SIZE, TIME_GRACE_MS, type AttemptMode, type PlayData, type PlayFeedback, type PlayImage, type PlayItem } from '@/lib/simulator-shared'
+import { PRACTICE_SIZE, QUICK_SECONDS_PER_QUESTION, QUICK_SERVER_MARGIN_SECONDS, ROUND_SIZE, TIME_GRACE_MS, type AttemptMode, type PlayData, type PlayFeedback, type PlayImage, type PlayItem } from '@/lib/simulator-shared'
 
 // Motor de tentativas (só servidor). A resposta certa e a explicação só saem daqui quando a regra do modo o permite.
 
@@ -169,7 +169,7 @@ type PoolRow = { id: string; exam_year: number | null; topic_id: string | null; 
  *  • o que o aluno nunca viu vem primeiro, repartido pelos anos; o que errou pode voltar (até 30 %); o que acertou só no fim;
  *  • as questões ficam marcadas como vistas no momento em que a sessão é criada.
  */
-export async function startAttempt(scope: StudentScope, mode: AttemptMode, subjectId: string | null, variant: string | null = null, topicId: string | null = null) {
+export async function startAttempt(scope: StudentScope, mode: AttemptMode, subjectId: string | null, variant: string | null = null, topicId: string | null = null, options: { size?: number; quickSeconds?: number } = {}) {
   const recent = await pool.query(`SELECT count(*)::int AS n FROM attempts WHERE user_id = $1 AND started_at > now() - interval '1 hour'`, [scope.userId])
   if (recent.rows[0].n >= 30) throw new AppError('Começaste muitas sessões seguidas. Espera um pouco e tenta de novo.')
 
@@ -186,7 +186,8 @@ export async function startAttempt(scope: StudentScope, mode: AttemptMode, subje
   // «Todas as variantes»: só quando a disciplina tem variantes com questões para este aluno.
   const wantsVariant = !variant && !!subjectId && (await getVariants(scope, subjectId)).variants.length > 0
 
-  const size = mode === 'pratica' ? PRACTICE_SIZE : ROUND_SIZE
+  const size = options.size ?? (mode === 'pratica' ? PRACTICE_SIZE : ROUND_SIZE)
+  const secondsPerQuestion = (options.quickSeconds ?? QUICK_SECONDS_PER_QUESTION) + QUICK_SERVER_MARGIN_SECONDS
   const params = [...scopeParams(scope), scope.userId, subjectId, variant, topicId]
   const poolRows = (
     await pool.query<PoolRow>(
@@ -238,7 +239,7 @@ export async function startAttempt(scope: StudentScope, mode: AttemptMode, subje
     }
     await client.query(
       `INSERT INTO attempts (id, user_id, mode, subject_id, variant, topic_id, total, ends_at) VALUES ($1, $2, $3, $4, $7, $8, $5, CASE WHEN $3 = 'rapido' THEN now() + make_interval(secs => $6::int) END)`,
-      [attemptId, scope.userId, mode, subjectId, questionIds.length, questionIds.length * QUICK_SERVER_SECONDS_PER_QUESTION, variant, topicId],
+      [attemptId, scope.userId, mode, subjectId, questionIds.length, questionIds.length * secondsPerQuestion, variant, topicId],
     )
     for (const [position, questionId] of questionIds.entries()) {
       const row = byId.get(questionId)!
@@ -331,7 +332,9 @@ export async function loadPlay(userId: string, attemptId: string) {
   if (attempt.status !== 'em_curso') return { state: 'done' as const }
   const subject = attempt.subject_id ? (await pool.query(`SELECT name FROM library_subjects WHERE id = $1`, [attempt.subject_id])).rows[0]?.name ?? null : null
   const items = await loadContent(attemptId, (row) => row.answer_option_id !== null)
-  const data: PlayData = { id: attempt.id, mode: attempt.mode, total: attempt.total, subject, variant: attempt.variant, endsAt: attempt.ends_at ? new Date(attempt.ends_at).getTime() : null, serverNow: Date.now(), items }
+  const endsAt = attempt.ends_at ? new Date(attempt.ends_at).getTime() : null
+  const secondsPerQuestion = endsAt && attempt.total > 0 ? Math.round((endsAt - new Date(attempt.started_at).getTime()) / 1000 / attempt.total) - QUICK_SERVER_MARGIN_SECONDS : null
+  const data: PlayData = { id: attempt.id, mode: attempt.mode, total: attempt.total, subject, variant: attempt.variant, endsAt, secondsPerQuestion, serverNow: Date.now(), items }
   return { state: 'play' as const, data }
 }
 

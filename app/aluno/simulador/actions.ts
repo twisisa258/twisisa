@@ -1,6 +1,6 @@
 'use server'
 
-import { headers } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { eq } from 'drizzle-orm'
 import { AppError } from '@/lib/action-result'
 import { auth } from '@/lib/auth'
@@ -8,7 +8,9 @@ import { db } from '@/lib/db'
 import { studentProfiles } from '@/lib/db/schema'
 import { isTrack } from '@/lib/percurso'
 import { finishAttempt, startAttempt, submitAnswer, TimeUpError, type StudentScope } from '@/lib/simulator'
-import { isAttemptMode, type PlayFeedback } from '@/lib/simulator-shared'
+import { isAttemptMode, ROUND_SIZE, type PlayFeedback } from '@/lib/simulator-shared'
+import { PREFS_COOKIE, parsePrefs, sessionSize, type SimPrefs } from '@/lib/simulator-prefs'
+import { getSimPrefs } from '@/lib/simulator-prefs-server'
 
 // As ações devolvem o resultado em vez de lançar (em produção o Next.js esconde as mensagens de erro lançadas).
 type Result<T> = { ok: true; data: T } | { ok: false; message: string; timeUp?: boolean }
@@ -36,7 +38,8 @@ export async function startSession(input: { mode: string; subjectId: string | nu
     const subjectId = typeof input.subjectId === 'string' && input.subjectId.length > 0 && input.subjectId.length <= 100 ? input.subjectId : null
     const variant = typeof input.variant === 'string' && input.variant.length > 0 && input.variant.length <= 60 ? input.variant : null
     const topicId = typeof input.topicId === 'string' && input.topicId.length > 0 && input.topicId.length <= 120 ? input.topicId : null
-    return { id: await startAttempt(scope, input.mode, subjectId, variant, topicId) }
+    const prefs = await getSimPrefs()
+    return { id: await startAttempt(scope, input.mode, subjectId, variant, topicId, { size: sessionSize(input.mode, prefs, ROUND_SIZE), quickSeconds: prefs.quickSeconds }) }
   })
 }
 
@@ -52,5 +55,13 @@ export async function finishSession(input: { attemptId: string }) {
     if (typeof input.attemptId !== 'string') throw new AppError('Sessão inválida.')
     await finishAttempt(scope.userId, input.attemptId)
     return { done: true }
+  })
+}
+
+export async function savePrefs(input: SimPrefs): Promise<Result<SimPrefs>> {
+  return run('Não foi possível guardar.', async () => {
+    const prefs = parsePrefs(input)
+    ;(await cookies()).set(PREFS_COOKIE, JSON.stringify(prefs), { path: '/aluno', maxAge: 60 * 60 * 24 * 365, sameSite: 'lax', httpOnly: true, secure: process.env.NODE_ENV === 'production' })
+    return prefs
   })
 }
