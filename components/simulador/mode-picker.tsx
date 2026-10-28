@@ -11,7 +11,7 @@ const MODES: Record<AttemptMode, { label: string; icon: typeof Target }> = {
 
 export function ModePicker({ modes, current, subjectId }: { modes: AttemptMode[]; current: AttemptMode; subjectId: string }) {
   return (
-    <div role="tablist" aria-label="Modo" className="grid gap-2" style={{ gridTemplateColumns: `repeat(${modes.length}, minmax(0, 1fr))` }}>
+    <div role="tablist" aria-label="Modo" className="grid gap-1 rounded-2xl bg-[#eceee7] p-1" style={{ gridTemplateColumns: `repeat(${modes.length}, minmax(0, 1fr))` }}>
       {modes.map((mode) => {
         const { label, icon: Icon } = MODES[mode]
         const active = mode === current
@@ -23,14 +23,9 @@ export function ModePicker({ modes, current, subjectId }: { modes: AttemptMode[]
             replace
             scroll={false}
             href={`/aluno/simulador?d=${encodeURIComponent(subjectId)}&m=${mode}`}
-            className={cn(
-              'flex h-[72px] flex-col items-center justify-center gap-1.5 rounded-2xl text-[13px] font-semibold transition-all duration-200 active:scale-[0.98]',
-              active
-                ? 'bg-gradient-to-br from-[#2f7260] to-[#1d4d41] text-white shadow-[0_6px_14px_-6px_rgba(29,77,65,0.55)]'
-                : 'bg-white text-[#5d675f] shadow-[0_1px_2px_rgba(20,50,40,0.06)] hover:text-[#1d4d41]',
-            )}
+            className={cn('flex h-11 items-center justify-center gap-2 rounded-xl text-[14px] font-medium transition-all duration-200', active ? 'bg-white text-[#1d4d41] shadow-[0_2px_6px_rgba(20,50,40,0.10)]' : 'text-[#68716a]')}
           >
-            <Icon size={20} aria-hidden />
+            <Icon size={16} aria-hidden />
             {label}
           </Link>
         )
