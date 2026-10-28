@@ -111,41 +111,6 @@ export default function Page({ signedIn = false }: { signedIn?: boolean }) {
         </div>
       </div></section>
 
-      {/* A DOR */}
-      <section className="tw-sec"><div className="tw-w">
-        <span className="tw-tag tw-rv">A dor de todo estudante</span>
-        <h2 className="tw-h2 tw-rv">Estuda horas.<br />Esquece em dias.</h2>
-        <p className="tw-sub tw-rv">Decorar dá a sensação de progresso, mas a matéria que não se compreende desaparece quando mais precisas dela.</p>
-        <div className="tw-chart tw-rv">
-          <svg viewBox="0 0 600 250" role="img" aria-label="Decorar esquece-se depressa; perceber permanece">
-            <path className="a" pathLength={1} d="M30 30 C120 170 220 215 560 225" /><path className="b" pathLength={1} d="M30 30 C200 45 380 55 560 62" />
-            <text x="30" y="246">Hoje</text><text x="490" y="246">Dias depois</text><text x="470" y="212">Decorar</text><text className="tg" x="470" y="48">Perceber</text>
-          </svg>
-        </div>
-        <div className="tw-grid3">
-          {[['↻', 'Estudo e esqueço', 'Memorizar sem entender não dura. O Jonas explica o porquê de cada passo.'],
-            ['?', 'Não sei por onde começar', 'Escolhes o teu percurso (10ª, 12ª ou Admissão) e o conteúdo fica filtrado para ti.'],
-            ['◔', 'Falta de tempo e de confiança', 'Sessões curtas de prática e o histórico mostram, sem exagero, o que já melhoraste.']].map(([i, h, p], n) =>
-            <div className="tw-card tw-rv" key={h} style={{ ['--d' as string]: `${n * 0.1}s` }}><i>{i}</i><h3>{h}</h3><p>{p}</p></div>)}
-        </div>
-      </div></section>
-
-      {/* PROVA INTERATIVA */}
-      <section className="tw-sec" style={{ paddingTop: 0 }}><div className="tw-w">
-        <span className="tw-tag tw-rv">Vê a diferença</span>
-        <h2 className="tw-h2 tw-rv">Não é truque.<br />É equilíbrio.</h2>
-        <div className="tw-lab tw-rv">
-          <div className="tw-eq">{divided ? 'x = 5' : '2x = 10'}</div>
-          <div className="tw-scale"><div className="tw-beam" />
-            <div className="tw-pans">
-              <div className="tw-pan"><div className="tw-bx">x</div><div className={`tw-bx ${divided ? 'tw-gone' : ''}`}>x</div></div>
-              <div className="tw-pan">{Array.from({ length: 10 }, (_, i) => <div key={i} className={`tw-dt ${divided && i >= 5 ? 'tw-gone' : ''}`} />)}</div>
-            </div><div className="tw-base" /></div>
-          <div className="tw-cta"><button className="tw-btn" onClick={() => setDivided(true)}>÷ 2 nos dois lados</button><button className="tw-btn ol" onClick={() => setDivided(false)}>Repor</button></div>
-          <small>O que fazes de um lado, fazes do outro. Percebido isto, não há regra para decorar.</small>
-        </div>
-      </div></section>
-
       {/* COMO FUNCIONA */}
       <section className="tw-sec" id="metodo" style={{ paddingTop: 0 }}><div className="tw-w">
         <span className="tw-tag tw-rv">Como funciona</span>
@@ -157,18 +122,6 @@ export default function Page({ signedIn = false }: { signedIn?: boolean }) {
             <div className="tw-chips"><span>Biblioteca</span><span>Jonas</span><span>Simulador</span></div></div>
           <div className="tw-card tw-step tw-rv" style={{ ['--d' as string]: '.2s' }}><b>03</b><h3 style={{ marginTop: 8 }}>Revê e evolui</h3><p>Refaz os erros, acompanha o histórico e estuda em conjunto com a comunidade.</p>
             <div className="tw-chips"><span>Revisar erros</span><span>Histórico</span><span>Comunidade</span></div></div>
-        </div>
-      </div></section>
-
-      {/* POR DENTRO */}
-      <section className="tw-sec" style={{ paddingTop: 0 }}><div className="tw-w">
-        <span className="tw-tag tw-rv">Por dentro da Twisisa</span>
-        <h2 className="tw-h2 tw-rv">Tudo num só lugar.</h2>
-        <div className="tw-tabs tw-rv" role="tablist">{tabs.map((x, i) => <button key={x.key} role="tab" aria-selected={tab === i} className={tab === i ? 'on' : ''} onClick={() => setTab(i)}>{x.key}</button>)}</div>
-        <div className="tw-in-win" key={t.key}>
-          <div className="tw-tx"><h3>{t.title}</h3><p>{t.text}</p><ul>{t.items.map((it) => <li key={it}>{it}</li>)}</ul>
-            <Link className="tw-btn" href={t.href}>Abrir {t.key}</Link></div>
-          <div className="tw-vis" aria-hidden="true"><Visual k={t.key} /></div>
         </div>
       </div></section>
 
@@ -186,7 +139,7 @@ export default function Page({ signedIn = false }: { signedIn?: boolean }) {
         <p className="tw-sub tw-rv">Desbloqueia ferramentas para praticar melhor e acompanha a tua evolução.</p>
         <div className="tw-plan tw-rv">
           <strong>Plano mensal</strong>
-          <div className="pr">197 MT <small>/ mês</small></div>
+          <div className="pr">$9.99 <small>/ mês</small></div>
           <ul><li>Simulados premium</li><li>Desafios</li><li>Materiais avançados</li><li>Cancela quando quiseres</li></ul>
           <Link href="/planos" className="tw-btn">Ver o plano</Link>
           <p className="fn">Pagamento processado com segurança pela Stripe.</p>

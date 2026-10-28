@@ -105,7 +105,6 @@ export default async function StudentPage() {
   const weekPercent = week ? Math.min(100, Math.max(0, week.weekly)) : 0
   // O cartão «Continuar» só existe quando há mesmo algo para continuar.
   const last = recent.ok ? recent.value[0] : undefined
-  const simuladorSoon = simulador.ok && simulador.value.soon
   const greeting = getGreeting({ name: session.user.name, userId: session.user.id, createdAt: session.user.createdAt, streak: week?.streak ?? null })
 
   return (
@@ -170,7 +169,7 @@ export default async function StudentPage() {
                 </section>
               )}
 
-              <section aria-label="O que queres fazer?" className={cn('rounded-[20px] bg-white p-[14px]', soft)}>
+              <section aria-label="O que queres fazer?" className={cn('rounded-[20px] bg-white p-[14px] lg:hidden', soft)}>
                 <h2 className={cn(sectionLabel, 'mb-[12px] ml-[4px] font-black')}>O que queres fazer?</h2>
                 <div className="flex flex-col gap-[10px]">
                   <Link href="/biblioteca" className={cn(rowBase, 'bg-gradient-to-br from-[#2f7260] to-[#1d4d41] text-white')}>
@@ -185,8 +184,7 @@ export default async function StudentPage() {
                       <Ic name="test" />
                     </span>
                     Simulador
-                    {simuladorSoon && <span className="ml-auto rounded-[12px] bg-white/70 px-[10px] py-[4px] text-[11px] font-semibold text-[#1d4d41]">Em breve</span>}
-                    <Ic name="up" className={cn('opacity-[.55]', !simuladorSoon && 'ml-auto')} />
+                    <Ic name="up" className={'ml-auto opacity-[.55]'} />
                   </Link>
                   <Link href="/jonas" className={cn(rowBase, 'bg-gradient-to-br from-[#4a8a76] to-[#2a6a57] text-white')}>
                     <span className={cn(iconBox, 'bg-white/[0.16]')}>
@@ -218,29 +216,7 @@ export default async function StudentPage() {
                   </dt>
                   <dd className="text-[18px] font-semibold">{week ? days(week.streak) : DASH}</dd>
                 </div>
-                <div className="grid h-[76px] content-between rounded-[16px] bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] p-[14px] text-[#1d4d41]">
-                  <dt className="flex items-center gap-[6px] text-[12px] font-medium">
-                    <Ic name="down" size={14} />
-                    Descarregados
-                  </dt>
-                  <dd className="text-[18px] font-semibold">{downloads.ok ? downloads.value : DASH}</dd>
-                </div>
-                <div className={cn('grid h-[76px] content-between rounded-[16px] bg-gradient-to-br from-white to-[#f4f0e2] p-[14px] text-[#805f19]', soft)}>
-                  <dt className="flex items-center gap-[6px] text-[12px] font-medium">
-                    <Ic name="mark" size={14} />
-                    Guardados
-                  </dt>
-                  <dd className="text-[18px] font-semibold text-[#202321]">{saved.ok ? saved.value : DASH}</dd>
-                </div>
-              </dl>
-
-              <section aria-label="Recentes">
-                <h2 className={cn(sectionLabel, 'mb-[8px] ml-[4px] flex items-center gap-[6px] font-semibold')}>
-                  <Ic name="hist" size={14} />
-                  Recentes
-                </h2>
-                <MaterialCard tone="white" items={recent} emptyTitle="Ainda sem materiais recentes" emptyText="Os materiais que descarregares aparecem aqui." />
-              </section>
+                              </dl>
 
               <section aria-label="Guardados">
                 <h2 className={cn(sectionLabel, 'mb-[8px] ml-[4px] flex items-center gap-[6px] font-bold')}>

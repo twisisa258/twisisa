@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { BookOpen, ChevronRight, Library } from 'lucide-react'
+import { BookOpen, ChevronRight } from 'lucide-react'
 import { auth } from '@/lib/auth'
 import { getHub, getSavedIds } from '@/lib/library'
 import { withParams } from '@/lib/library-shared'
@@ -35,12 +35,6 @@ export default async function BibliotecaPage({ searchParams }: { searchParams: P
     <StudentFeatureShell firstName={firstName} eyebrow="Biblioteca" title="Biblioteca" hideTitle hideBackLink>
       <UrlFeedback />
       <div className="space-y-8">
-        <header className="flex items-center gap-3">
-          <span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#2f7260] to-[#1d4d41] text-white">
-            <Library size={20} aria-hidden="true" />
-          </span>
-          <h1 className="text-[15px] font-bold uppercase tracking-[0.16em] text-[#1d4d41]">Biblioteca</h1>
-        </header>
 
         <LibrarySearch />
 

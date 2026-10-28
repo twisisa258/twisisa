@@ -131,12 +131,9 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
                   <h2 className={label}>O teu progresso</h2>
                   {hasHistory && <Link href="/aluno/simulador/historico" className="inline-flex items-center gap-1 text-xs font-semibold text-[#1d4d41] hover:underline"><History size={14} aria-hidden />Histórico</Link>}
                 </div>
-                <dl className={cn(card, 'grid grid-cols-4 gap-1 p-3 text-center')}>
+                <dl className={cn(card, 'grid grid-cols-1 gap-1 p-3 text-center')}>
                   {[
-                    ['Respondidas', String(hub.stats.answered)],
                     ['Acertos', `${percent(hub.stats.correct, hub.stats.answered)}%`],
-                    ['Sessões', String(hub.stats.rounds)],
-                    ['Pontos', formatPoints(hub.stats.points)],
                   ].map(([name, value]) => (
                     <div key={name} className="py-1">
                       <dd className="text-[18px] font-semibold tracking-[-0.02em]">{value}</dd>
@@ -144,27 +141,6 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
                     </div>
                   ))}
                 </dl>
-              </section>
-            )}
-
-            {upcoming.length > 0 && (
-              <section aria-label="Em breve" className="space-y-2">
-                <h2 className={label}>Em breve</h2>
-                <ul className={cn(card, 'divide-y divide-black/[0.05] overflow-hidden')}>
-                  {upcoming.map((item) => {
-                    const Icon = ICONS[item.key]
-                    return (
-                      <li key={item.key} className="flex items-center gap-3 px-3.5 py-3">
-                        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#eef0ea] text-[#7d857e]"><Icon size={16} aria-hidden /></span>
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-[14px] font-semibold leading-5">{item.label}</p>
-                          <p className="truncate text-xs text-[#7d857e]">{item.description}</p>
-                        </div>
-                        <span className="shrink-0 rounded-full bg-[#f4eddb] px-2.5 py-1 text-[11px] font-semibold text-[#805f19]">Em breve</span>
-                      </li>
-                    )
-                  })}
-                </ul>
               </section>
             )}
 
