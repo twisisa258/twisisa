@@ -13,3 +13,5 @@ node_modules
 .vercel
 .env*
 *.tsbuildinfo
+#configs
+prompt-csv-questoes.md
