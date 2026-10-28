@@ -54,7 +54,7 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
   return (
     <StudentFeatureShell firstName={firstName} eyebrow="Simulador" title="Simulador" hideTitle hideBackLink>
       <div className="max-w-[640px] space-y-6">
-        <SimHeader context={context} />
+        <SimHeader context={context ?? undefined} />
         <SimTabs active="principal" />
 
         {failed || !hub ? (
