@@ -1,18 +1,18 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Archive, ArchiveRestore, CheckCircle2, CircleHelp, Copy, Download, Eye, Pencil, Trash2 } from 'lucide-react'
+import { Archive, ArchiveRestore, Check, CheckCircle2, CircleHelp, Copy, Download, Eye, Pencil, Trash2 } from 'lucide-react'
 import { getStaffAccess } from '@/lib/staff'
 import { listInstitutions, type InstitutionRow } from '@/lib/institutions'
 import { listSubjects, type SubjectRow } from '@/lib/subjects'
 import { listTopics, type TopicRow } from '@/lib/classification'
 import { listVariants, type VariantRow } from '@/lib/variants'
-import { ANSWER_SOURCES, answerSourceLabel, countByStatus, DIFFICULTIES, difficultyLabel, getQuestion, listQuestions, ORIGINS, originLabel, STATUSES, type QuestionDetail, type QuestionListItem, type QuestionStatus } from '@/lib/questions'
+import { ANSWER_SOURCES, answerSourceLabel, countByStatus, countDraftReview, DIFFICULTIES, difficultyLabel, getQuestion, listQuestions, ORIGINS, originLabel, STATUSES, type QuestionDetail, type QuestionListItem, type QuestionStatus, type ReviewCounts } from '@/lib/questions'
 import { examYearOptions } from '@/lib/years'
 import { MathText, plainExcerpt } from '@/lib/math-text'
 import { getOpenDraft, listOpenDrafts, type OpenDraft } from '@/lib/question-drafts'
 import { relativeTime } from '@/lib/relative-time'
 import { bulkManageQuestions, deleteQuestion, discardQuestionDraft, duplicateQuestion, importQuestionsCsv, saveQuestion, setQuestionStatus } from './actions'
-import { QuestionBulkForm } from '@/components/admin/question-bulk-form'
+import { QuestionBulkForm, SelectableRow } from '@/components/admin/question-bulk-form'
 import { QuestionForm, type EditorValue } from './question-form'
 import { RowMenu } from '@/components/admin/row-menu'
 import { FormModal, RouteModal } from '@/components/admin/form-modal'
@@ -56,8 +56,18 @@ function toEditorValue(question: QuestionDetail): EditorValue {
   }
 }
 
-function MaybeBulk({ enabled, status, children }: { enabled: boolean; status: QuestionStatus; children: React.ReactNode }) {
-  return enabled ? <QuestionBulkForm status={status} action={bulkManageQuestions}>{children}</QuestionBulkForm> : <>{children}</>
+// Estado da revisão de um rascunho: «por rever» (resposta ainda sugerida) ou «revista» (confirmada ou gabarito oficial).
+function reviewLabel(item: QuestionListItem) {
+  if (item.status !== 'rascunho') return answerSourceLabel(item.answerSource)
+  return item.answerSource === 'sugestao' ? 'Por rever' : item.answerSource === 'oficial' ? 'Gabarito oficial' : 'Revista'
+}
+
+// Item do menu ⋯ para marcar um rascunho como revisto (ou desfazer); o gabarito oficial não se mexe.
+function reviewMenuItems(item: QuestionListItem) {
+  if (item.status !== 'rascunho') return []
+  if (item.answerSource === 'sugestao') return [{ label: 'Marcar como revista', icon: <Check size={16} />, action: bulkManageQuestions, fields: { id: item.id, mode: 'revista' } }]
+  if (item.answerSource === 'confirmada') return [{ label: 'Voltar a por rever', icon: <CircleHelp size={16} />, action: bulkManageQuestions, fields: { id: item.id, mode: 'por_rever' } }]
+  return []
 }
 
 export default async function AdminQuestoesPage({ searchParams }: { searchParams: Promise<{ estado?: string; q?: string; pagina?: string; editar?: string; ver?: string; continuar?: string }> }) {
@@ -72,6 +82,7 @@ export default async function AdminQuestoesPage({ searchParams }: { searchParams
   const requested = Math.max(1, Number.parseInt(params.pagina ?? '1', 10) || 1)
 
   let list: { total: number; page: number; items: QuestionListItem[] } | null = null
+  let review: ReviewCounts = { pending: 0, revised: 0 }
   let counts: Record<QuestionStatus, number> | null = null
   let subjects: SubjectRow[] = []
   let topics: TopicRow[] = []
@@ -82,13 +93,14 @@ export default async function AdminQuestoesPage({ searchParams }: { searchParams
   let drafts: OpenDraft[] = []
   let resumed: OpenDraft | null = null
   try {
-    ;[list, counts, subjects, topics, variants, institutions] = await Promise.all([
+    ;[list, counts, subjects, topics, variants, institutions, review] = await Promise.all([
       listQuestions({ status: tab.value, term: normalizeSearch(q), page: requested, pageSize: PAGE_SIZE }),
       countByStatus(),
       listSubjects(),
       listTopics(),
       listVariants(),
       listInstitutions(),
+      tab.value === 'rascunho' ? countDraftReview(normalizeSearch(q)) : Promise.resolve<ReviewCounts>({ pending: 0, revised: 0 }),
     ])
     if (params.editar) editing = await getQuestion(params.editar)
     if (params.ver) preview = await getQuestion(params.ver)
@@ -222,41 +234,55 @@ export default async function AdminQuestoesPage({ searchParams }: { searchParams
             )}
           </div>
         ) : (
-          <MaybeBulk enabled={canManage} status={tab.value}>
-          <ul className="min-h-0 flex-1 divide-y divide-[#edf0e9] overflow-y-auto px-4 sm:px-5">
-            {list.items.map((item) => (
-              <li key={item.id} className="flex items-center gap-3 py-3">
-                {canManage && <input type="checkbox" value={item.id} data-question-select aria-label={`Seleccionar questão: ${plainExcerpt(item.statement).slice(0, 70)}`} className="size-4 shrink-0 accent-[#1d4d41]" />}
-                <div className="min-w-0 flex-1">
+          <QuestionBulkForm
+            key={`${tab.tab}-${page}-${q}`}
+            status={tab.value}
+            q={q}
+            rows={list.items.map((item) => ({ id: item.id, revised: item.answerSource !== 'sugestao' }))}
+            pending={review.pending}
+            revised={review.revised}
+            canManage={canManage}
+            action={bulkManageQuestions}
+          >
+            <ul className="min-h-0 flex-1 divide-y divide-[#edf0e9] overflow-y-auto px-4 sm:px-5">
+              {list.items.map((item) => (
+                <SelectableRow
+                  key={item.id}
+                  id={item.id}
+                  label={plainExcerpt(item.statement).slice(0, 70)}
+                  state={item.status === 'rascunho' ? (item.answerSource === 'sugestao' ? 'pending' : 'revised') : null}
+                  menu={
+                    <RowMenu
+                      label="Ações da questão"
+                      items={[
+                        { label: 'Editar', icon: <Pencil size={16} />, href: href(tab.tab, q, page, `editar=${item.id}`) },
+                        { label: 'Pré-visualizar', icon: <Eye size={16} />, href: href(tab.tab, q, page, `ver=${item.id}`) },
+                        ...reviewMenuItems(item),
+                        ...(canManage ? [{ label: 'Duplicar', icon: <Copy size={16} />, action: duplicateQuestion, fields: { id: item.id } }] : []),
+                        ...(item.status === 'rascunho'
+                          ? [
+                              { label: 'Publicar', icon: <CheckCircle2 size={16} />, action: setQuestionStatus, fields: { id: item.id, to: 'publicada' } },
+                              ...(canManage ? [{ label: 'Eliminar', icon: <Trash2 size={16} />, action: deleteQuestion, fields: { id: item.id }, confirm: 'Eliminar', tone: 'danger' as const }] : []),
+                            ]
+                          : item.status === 'publicada'
+                            ? [{ label: 'Arquivar', icon: <Archive size={16} />, action: setQuestionStatus, fields: { id: item.id, to: 'arquivada' }, confirm: 'Arquivar' }]
+                            : [{ label: 'Restaurar', icon: <ArchiveRestore size={16} />, action: setQuestionStatus, fields: { id: item.id, to: 'rascunho' } }]),
+                      ]}
+                    />
+                  }
+                >
                   <p className="line-clamp-2 text-sm font-medium leading-5">{plainExcerpt(item.statement)}</p>
                   <p className="mt-1 truncate text-xs text-[#737c75]">{item.subjectName} · {item.scopeLabel} · {difficultyLabel(item.difficulty)}{item.examYear ? ` · ${item.examYear}` : ''}</p>
                   {/* Marcas internas: só aqui, no admin. */}
                   <p className="mt-1.5 flex flex-wrap gap-1.5">
                     <span className="rounded-full bg-[#eef0ea] px-2 py-0.5 text-[10px] font-semibold text-[#5f6d63]">{originLabel(item.origin)}</span>
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${item.answerSource === 'sugestao' ? 'bg-[#f4eddb] text-[#805f19]' : 'bg-[#e6f0e9] text-[#1d4d41]'}`}>{answerSourceLabel(item.answerSource)}</span>
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${item.answerSource === 'sugestao' ? 'bg-[#f4eddb] text-[#805f19]' : 'bg-[#e6f0e9] text-[#1d4d41]'}`}>{reviewLabel(item)}</span>
                     {item.version > 1 && <span className="rounded-full bg-[#eef0ea] px-2 py-0.5 text-[10px] font-semibold text-[#5f6d63]">v{item.version}</span>}
                   </p>
-                </div>
-                <RowMenu
-                  label="Ações da questão"
-                  items={[
-                    { label: 'Editar', icon: <Pencil size={16} />, href: href(tab.tab, q, page, `editar=${item.id}`) },
-                    { label: 'Pré-visualizar', icon: <Eye size={16} />, href: href(tab.tab, q, page, `ver=${item.id}`) },
-                    ...(canManage ? [{ label: 'Duplicar', icon: <Copy size={16} />, action: duplicateQuestion, fields: { id: item.id } }] : []),
-                    ...(item.status === 'rascunho'
-                      ? [
-                          { label: 'Publicar', icon: <CheckCircle2 size={16} />, action: setQuestionStatus, fields: { id: item.id, to: 'publicada' } },
-                          ...(canManage ? [{ label: 'Eliminar', icon: <Trash2 size={16} />, action: deleteQuestion, fields: { id: item.id }, confirm: 'Eliminar', tone: 'danger' as const }] : []),
-                        ]
-                      : item.status === 'publicada'
-                        ? [{ label: 'Arquivar', icon: <Archive size={16} />, action: setQuestionStatus, fields: { id: item.id, to: 'arquivada' }, confirm: 'Arquivar' }]
-                        : [{ label: 'Restaurar', icon: <ArchiveRestore size={16} />, action: setQuestionStatus, fields: { id: item.id, to: 'rascunho' } }]),
-                  ]}
-                />
-              </li>
-            ))}
-          </ul>
-          </MaybeBulk>
+                </SelectableRow>
+              ))}
+            </ul>
+          </QuestionBulkForm>
         )}
         {list && list.total > 0 && <AdminPager page={page} pages={pages} prevHref={href(tab.tab, q, page - 1)} nextHref={href(tab.tab, q, page + 1)} />}
       </AdminListPanel>

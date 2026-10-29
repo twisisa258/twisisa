@@ -100,6 +100,35 @@ export async function listQuestions({ status, term, page, pageSize }: { status: 
   return { total, page: safePage, items }
 }
 
+/** Rascunhos por rever (resposta ainda «sugestão») e já revistos (resposta confirmada ou gabarito oficial), com a mesma pesquisa da lista. */
+export type ReviewCounts = { pending: number; revised: number }
+
+function draftSearch(term: string) {
+  const like = term ? `%${term.replace(/[\\%_]/g, '\\$&')}%` : null
+  const from = `FROM questions q
+    JOIN library_subjects s ON s.id = q.subject_id
+    LEFT JOIN topics t ON t.id = q.topic_id
+    WHERE q.status = 'rascunho' AND ($1::text IS NULL OR ${NORMALIZED('q.statement')} LIKE $1 OR ${NORMALIZED('s.name')} LIKE $1 OR ${NORMALIZED("coalesce(t.name, '')")} LIKE $1)`
+  return { like, from }
+}
+
+export async function countDraftReview(term: string): Promise<ReviewCounts> {
+  const { like, from } = draftSearch(term)
+  const result = await pool.query(
+    `SELECT count(*) FILTER (WHERE q.answer_source = 'sugestao')::int AS pending, count(*) FILTER (WHERE q.answer_source <> 'sugestao')::int AS revised ${from}`,
+    [like],
+  )
+  return { pending: result.rows[0].pending as number, revised: result.rows[0].revised as number }
+}
+
+/** Ids dos rascunhos por rever (`pending`) ou já revistos (`revised`) que correspondem à pesquisa. */
+export async function listDraftIdsByReview(review: 'pending' | 'revised', term: string, limit: number): Promise<string[]> {
+  const { like, from } = draftSearch(term)
+  const condition = review === 'pending' ? `q.answer_source = 'sugestao'` : `q.answer_source <> 'sugestao'`
+  const result = await pool.query(`SELECT q.id ${from} AND ${condition} ORDER BY q.updated_at DESC, q.id LIMIT ${Math.floor(limit)}`, [like])
+  return result.rows.map((row) => row.id as string)
+}
+
 export async function countByStatus(): Promise<Record<QuestionStatus, number>> {
   const result = await pool.query('SELECT status, count(*)::int AS n FROM questions GROUP BY status')
   const counts: Record<QuestionStatus, number> = { rascunho: 0, publicada: 0, arquivada: 0 }

@@ -11,7 +11,7 @@ import { AppError, runAction, type ActionResult } from '@/lib/action-result'
 import { parseCsv } from '@/lib/csv'
 import { CSV_EXAMPLE_MARK } from '@/lib/question-csv-template'
 import { finishDraft } from '@/lib/question-drafts'
-import { ANSWER_SOURCES, DIFFICULTIES, ORIGINS, optionsProblem, subjectHasScope, type OptionInput } from '@/lib/questions'
+import { ANSWER_SOURCES, DIFFICULTIES, ORIGINS, listDraftIdsByReview, optionsProblem, subjectHasScope, type OptionInput } from '@/lib/questions'
 
 async function requireAdmin() {
   const admin = await getAdminUser()
@@ -235,7 +235,7 @@ export async function setQuestionStatus(formData: FormData): Promise<ActionResul
       const options = await pool.query('SELECT body, is_correct, is_fixed FROM question_options WHERE question_id = $1 ORDER BY position', [id])
       const problem = optionsProblem(options.rows.map((o) => ({ body: o.body ?? '', isCorrect: o.is_correct, isFixed: o.is_fixed })))
       if (problem) throw new AppError(problem)
-      if (!isConfirmed(question.answer_source)) throw new AppError('Antes de publicar, confirma a resposta: abre a questão e muda a origem da resposta.')
+      if (!isConfirmed(question.answer_source)) throw new AppError('Antes de publicar, marca a questão como revista (menu ⋯) ou confirma a resposta ao editá-la.')
       await assertClassification(pool, { subjectId: question.subject_id, track: question.track, institutionId: question.institution_id, topicId: question.topic_id, variant: question.variant ?? null, publishing: true, currentVariant: question.variant ?? null })
     } else if (!((to === 'arquivada' && question.status === 'publicada') || (to === 'rascunho' && question.status === 'arquivada'))) {
       throw new AppError('Essa mudança de estado não é permitida.')
@@ -415,35 +415,110 @@ function summarize(errors: string[]) {
   return `Importação cancelada; nada foi guardado. ${errors.slice(0, 6).join(' ')}${errors.length > 6 ? ` (+${errors.length - 6} erros).` : ''}`
 }
 
-// Operações em lote: valida todas as publicações antes de alterar qualquer questão.
+// ---------- Operações em lote ----------
+
+const BULK_LIMIT = 500
+const plainSearch = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().slice(0, 100)
+
+// Revisão e publicação em lote.
+//   revista    rascunho «por rever» → resposta confirmada (o revisor declara que verificou a opção certa)
+//   por_rever  rascunho revisto → volta a «por rever»
+//   publicada  rascunho revisto → publicado; as que tiverem problemas ficam em rascunho e vêm listadas na resposta
+//   arquivada / rascunho (restaurar) / eliminar: como antes
+// As questões vêm por `id` (seleção) ou por `scope` (`por-rever` | `revistas`), que apanha todas as que correspondem à pesquisa `q`.
+// Eliminar é só do admin; o resto é também da revisão (o mesmo que já podiam fazer uma a uma).
 export async function bulkManageQuestions(formData: FormData): Promise<ActionResult> {
   return runAction(async () => {
-    const admin = await requireAdmin()
-    const ids = [...new Set(formData.getAll('id').map((value) => String(value).trim()).filter(Boolean))]
     const mode = text(formData, 'mode')
-    if (!ids.length) throw new AppError('Selecciona pelo menos uma questão.')
-    if (ids.length > 100) throw new AppError('Podes seleccionar no máximo 100 questões de cada vez.')
-    if (!['publicada', 'arquivada', 'rascunho', 'eliminar'].includes(mode)) throw new AppError('Operação inválida.')
+    if (!['revista', 'por_rever', 'publicada', 'arquivada', 'rascunho', 'eliminar'].includes(mode)) throw new AppError('Operação inválida.')
+    const admin = mode === 'eliminar' ? await requireAdmin() : await requireReviewer()
+
+    let ids = [...new Set(formData.getAll('id').map((value) => String(value).trim()).filter(Boolean))]
+    const byScope = ids.length === 0
+    let more = false
+    if (byScope) {
+      const scope = text(formData, 'scope')
+      if (scope !== 'por-rever' && scope !== 'revistas') throw new AppError('Seleciona pelo menos uma questão.')
+      ids = await listDraftIdsByReview(scope === 'por-rever' ? 'pending' : 'revised', plainSearch(text(formData, 'q')), BULK_LIMIT + 1)
+      if (ids.length > BULK_LIMIT) { ids = ids.slice(0, BULK_LIMIT); more = true }
+      if (!ids.length) throw new AppError(scope === 'por-rever' ? 'Não há questões por rever.' : 'Não há questões revistas para publicar.')
+    }
+    if (ids.length > BULK_LIMIT) throw new AppError(`Podes selecionar no máximo ${BULK_LIMIT} questões de cada vez.`)
+    const rest = more ? ' Ainda há mais: repete a operação para continuar.' : ''
 
     const found = await pool.query('SELECT * FROM questions WHERE id = ANY($1::text[])', [ids])
-    if (found.rows.length !== ids.length) throw new AppError('Uma ou mais questões já não existem. Actualiza a lista e tenta novamente.')
+    if (!byScope && found.rows.length !== ids.length) throw new AppError('Uma ou mais questões já não existem. Atualiza a lista e tenta novamente.')
+
+    if (mode === 'revista') {
+      const changed = await pool.query(
+        `UPDATE questions SET answer_source = 'confirmada', answer_confirmed_by = $1, answer_confirmed_at = now(), updated_by = $1, updated_at = now()
+         WHERE id = ANY($2::text[]) AND status = 'rascunho' AND answer_source = 'sugestao' RETURNING id`,
+        [admin.id, ids],
+      )
+      if (!changed.rowCount) throw new AppError('Estas questões já estavam revistas.')
+      for (const row of changed.rows) await logAdminAction(admin, 'question.review', 'question', row.id)
+      refresh()
+      return `${changed.rowCount} ${changed.rowCount === 1 ? 'questão marcada como revista' : 'questões marcadas como revistas'}.${rest}`
+    }
+
+    if (mode === 'por_rever') {
+      const changed = await pool.query(
+        `UPDATE questions SET answer_source = 'sugestao', answer_confirmed_by = NULL, answer_confirmed_at = NULL, updated_by = $1, updated_at = now()
+         WHERE id = ANY($2::text[]) AND status = 'rascunho' AND answer_source = 'confirmada' RETURNING id`,
+        [admin.id, ids],
+      )
+      if (!changed.rowCount) throw new AppError('Só se pode tirar a revisão a rascunhos marcados como revistos (o gabarito oficial não muda).')
+      for (const row of changed.rows) await logAdminAction(admin, 'question.unreview', 'question', row.id)
+      refresh()
+      return `${changed.rowCount} ${changed.rowCount === 1 ? 'questão voltou' : 'questões voltaram'} a «por rever».`
+    }
 
     if (mode === 'publicada') {
+      const optionRows = await pool.query('SELECT question_id, body, is_correct, is_fixed FROM question_options WHERE question_id = ANY($1::text[]) ORDER BY question_id, position', [ids])
+      const optionsOf = new Map<string, OptionInput[]>()
+      for (const row of optionRows.rows) {
+        const list = optionsOf.get(row.question_id) ?? []
+        list.push({ body: row.body ?? '', isCorrect: row.is_correct, isFixed: row.is_fixed })
+        optionsOf.set(row.question_id, list)
+      }
+      // Muitas questões partilham a mesma classificação: valida-se uma vez por combinação.
+      const classification = new Map<string, Promise<string | null>>()
+      const checkClassification = (q: Record<string, string | null>) => {
+        const key = [q.subject_id, q.track, q.institution_id, q.topic_id, q.variant].join('|')
+        let result = classification.get(key)
+        if (!result) {
+          result = assertClassification(pool, { subjectId: q.subject_id as string, track: q.track as string, institutionId: q.institution_id, topicId: q.topic_id, variant: q.variant ?? null, publishing: true, currentVariant: q.variant ?? null })
+            .then(() => null)
+            .catch((error) => (error instanceof Error ? error.message : 'classificação inválida.'))
+          classification.set(key, result)
+        }
+        return result
+      }
+
+      const ready: string[] = []
       const problems: string[] = []
       for (const question of found.rows) {
-        const label = String(question.statement).replace(/\s+/g, ' ').slice(0, 90)
-        if (question.status !== 'rascunho') { problems.push(`“${label}”: só é possível publicar rascunhos.`); continue }
-        const options = await pool.query('SELECT body, is_correct, is_fixed FROM question_options WHERE question_id = $1 ORDER BY position', [question.id])
-        const problem = optionsProblem(options.rows.map((o) => ({ body: o.body ?? '', isCorrect: o.is_correct, isFixed: o.is_fixed })))
-        if (problem) { problems.push(`“${label}”: ${problem}`); continue }
-        if (!isConfirmed(question.answer_source)) { problems.push(`“${label}”: a resposta ainda não está confirmada. Abre a questão e confirma a resposta ou indica o gabarito oficial.`); continue }
-        try {
-          await assertClassification(pool, { subjectId: question.subject_id, track: question.track, institutionId: question.institution_id, topicId: question.topic_id, variant: question.variant ?? null, publishing: true, currentVariant: question.variant ?? null })
-        } catch (error) {
-          problems.push(`“${label}”: ${error instanceof Error ? error.message : 'classificação inválida.'}`)
-        }
+        const label = String(question.statement).replace(/\s+/g, ' ').slice(0, 80)
+        if (question.status !== 'rascunho') { problems.push(`“${label}”: já não é um rascunho.`); continue }
+        const optionsProblemText = optionsProblem(optionsOf.get(question.id) ?? [])
+        if (optionsProblemText) { problems.push(`“${label}”: ${optionsProblemText}`); continue }
+        if (!isConfirmed(question.answer_source)) { problems.push(`“${label}”: a resposta ainda não foi revista.`); continue }
+        const classificationProblem = await checkClassification(question)
+        if (classificationProblem) { problems.push(`“${label}”: ${classificationProblem}`); continue }
+        ready.push(question.id)
       }
-      if (problems.length) throw new AppError(`Nenhuma questão foi publicada. Corrige estes problemas:\n${problems.slice(0, 8).join('\n')}${problems.length > 8 ? `\nE mais ${problems.length - 8} problema(s).` : ''}`)
+      const listed = problems.length ? `\n${problems.slice(0, 6).map((item) => `- ${item}`).join('\n')}${problems.length > 6 ? `\nE mais ${problems.length - 6}.` : ''}` : ''
+      if (!ready.length) throw new AppError(`Nenhuma questão foi publicada. Corrige:${listed}`)
+
+      const published = await pool.query(
+        `UPDATE questions SET status = 'publicada', updated_by = $1, updated_at = now()
+         WHERE id = ANY($2::text[]) AND status = 'rascunho' AND answer_source <> 'sugestao' RETURNING id`,
+        [admin.id, ready],
+      )
+      for (const row of published.rows) await logAdminAction(admin, 'question.publicada', 'question', row.id)
+      refresh()
+      const done = `${published.rowCount} ${published.rowCount === 1 ? 'questão publicada' : 'questões publicadas'}.`
+      return problems.length ? `${done} ${problems.length} ficaram em rascunho por corrigir:${listed}${rest}` : `${done}${rest}`
     }
 
     if (mode === 'eliminar') {
@@ -462,16 +537,16 @@ export async function bulkManageQuestions(formData: FormData): Promise<ActionRes
       return `${ids.length} ${ids.length === 1 ? 'rascunho eliminado' : 'rascunhos eliminados'}.`
     }
 
-    const allowed = mode === 'publicada' ? 'rascunho' : mode === 'arquivada' ? 'publicada' : 'arquivada'
+    const allowed = mode === 'arquivada' ? 'publicada' : 'arquivada'
     const client = await pool.connect()
     try {
       await client.query('BEGIN')
       const changed = await client.query('UPDATE questions SET status = $1, updated_by = $2, updated_at = now() WHERE id = ANY($3::text[]) AND status = $4 RETURNING id', [mode, admin.id, ids, allowed])
-      if (changed.rowCount !== ids.length) throw new AppError('O estado de uma ou mais questões mudou. Actualiza a lista e tenta novamente.')
+      if (changed.rowCount !== ids.length) throw new AppError('O estado de uma ou mais questões mudou. Atualiza a lista e tenta novamente.')
       await client.query('COMMIT')
     } catch (error) { await client.query('ROLLBACK'); throw error } finally { client.release() }
     for (const id of ids) await logAdminAction(admin, `question.${mode}`, 'question', id)
     refresh()
-    return `${ids.length} ${ids.length === 1 ? 'questão actualizada' : 'questões actualizadas'}.`
+    return `${ids.length} ${ids.length === 1 ? 'questão atualizada' : 'questões atualizadas'}.`
   }, 'Não foi possível concluir a operação em lote. Tenta novamente.')
 }
