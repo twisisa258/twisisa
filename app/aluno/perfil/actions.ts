@@ -8,12 +8,25 @@ import { db } from '@/lib/db'
 import { studentProfiles, user } from '@/lib/db/schema'
 import { AppError, runAction, type ActionResult } from '@/lib/action-result'
 import { isUniqueViolation } from '@/lib/pg-errors'
+import { AVATAR_FOLDER, isProvince } from '@/lib/perfil'
 
-// O percurso e a instituição guardam-se em /aluno/percurso; aqui só os dados pessoais e, na admissão, o curso e a meta.
-export async function saveProfile(formData: FormData): Promise<ActionResult> {
+// Cada secção do perfil guarda-se sozinha: um erro numa não perde o que está nas outras.
+// O percurso e a instituição guardam-se em /aluno/percurso.
+
+async function requireUser() {
+  const session = await auth.api.getSession({ headers: await headers() })
+  if (!session?.user) throw new AppError('A tua sessão expirou. Inicia sessão outra vez.')
+  return session.user
+}
+
+function refresh() {
+  revalidatePath('/aluno')
+  revalidatePath('/aluno/perfil')
+}
+
+export async function savePersonal(formData: FormData): Promise<ActionResult> {
   return runAction(async () => {
-    const session = await auth.api.getSession({ headers: await headers() })
-    if (!session?.user) throw new AppError('A tua sessão expirou. Inicia sessão outra vez.')
+    const current = await requireUser()
 
     const displayName = String(formData.get('displayName') ?? '').trim().replace(/\s+/g, ' ')
     if (displayName.length < 2 || displayName.length > 80) throw new AppError('O nome de exibição deve ter entre 2 e 80 caracteres.')
@@ -27,30 +40,75 @@ export async function saveProfile(formData: FormData): Promise<ActionResult> {
     }
     const nickname = rawNickname || null
 
-    // Os campos de candidato só vêm no formulário de quem está na admissão; sem eles, não se mexe nos valores guardados.
-    let candidate: { targetCourse: string | null; targetScore: number } | null = null
-    if (formData.has('targetCourse')) {
-      const parsedScore = Number(formData.get('targetScore'))
-      candidate = {
-        targetCourse: String(formData.get('targetCourse') ?? '').trim().slice(0, 160) || null,
-        targetScore: Number.isInteger(parsedScore) && parsedScore >= 0 && parsedScore <= 20 ? parsedScore : 12,
-      }
-    }
-
     try {
       await db
         .insert(studentProfiles)
-        .values({ userId: session.user.id, phone, nickname, ...candidate })
-        .onConflictDoUpdate({ target: studentProfiles.userId, set: { phone, nickname, ...candidate, updatedAt: new Date() } })
+        .values({ userId: current.id, phone, nickname })
+        .onConflictDoUpdate({ target: studentProfiles.userId, set: { phone, nickname, updatedAt: new Date() } })
     } catch (error) {
       if (isUniqueViolation(error)) throw new AppError('Esse @nickname já está a ser usado. Escolhe outro.')
       throw error
     }
+    await db.update(user).set({ name: displayName, updatedAt: new Date() }).where(eq(user.id, current.id))
 
-    await db.update(user).set({ name: displayName, updatedAt: new Date() }).where(eq(user.id, session.user.id))
+    refresh()
+    return 'Guardado.'
+  }, 'Não foi possível guardar. Tenta outra vez.')
+}
 
-    revalidatePath('/aluno')
-    revalidatePath('/aluno/perfil')
-    return 'Perfil guardado.'
-  }, 'Não foi possível guardar o perfil. Tenta outra vez.')
+export async function saveSchool(formData: FormData): Promise<ActionResult> {
+  return runAction(async () => {
+    const current = await requireUser()
+
+    const rawProvince = String(formData.get('province') ?? '').trim()
+    if (rawProvince && !isProvince(rawProvince)) throw new AppError('Escolhe uma província da lista.')
+    const province = rawProvince || null
+    const school = String(formData.get('school') ?? '').trim().replace(/\s+/g, ' ').slice(0, 120) || null
+
+    await db
+      .insert(studentProfiles)
+      .values({ userId: current.id, province, school })
+      .onConflictDoUpdate({ target: studentProfiles.userId, set: { province, school, updatedAt: new Date() } })
+
+    refresh()
+    return 'Guardado.'
+  }, 'Não foi possível guardar. Tenta outra vez.')
+}
+
+export async function saveCandidate(formData: FormData): Promise<ActionResult> {
+  return runAction(async () => {
+    const current = await requireUser()
+
+    const targetCourse = String(formData.get('targetCourse') ?? '').trim().replace(/\s+/g, ' ').slice(0, 160) || null
+    const parsedScore = Number(formData.get('targetScore'))
+    const targetScore = Number.isInteger(parsedScore) && parsedScore >= 0 && parsedScore <= 20 ? parsedScore : 12
+
+    await db
+      .insert(studentProfiles)
+      .values({ userId: current.id, targetCourse, targetScore })
+      .onConflictDoUpdate({ target: studentProfiles.userId, set: { targetCourse, targetScore, updatedAt: new Date() } })
+
+    refresh()
+    return 'Guardado.'
+  }, 'Não foi possível guardar. Tenta outra vez.')
+}
+
+// Guarda (ou remove, com texto vazio) o URL da foto. Só aceita ficheiros do Cloudinary da conta, na pasta e com o nome do próprio aluno.
+export async function saveAvatar(url: string): Promise<ActionResult> {
+  return runAction(async () => {
+    const current = await requireUser()
+    let image: string | null = null
+
+    if (url) {
+      const cloudName = process.env.CLOUDINARY_CLOUD_NAME
+      const prefix = `https://res.cloudinary.com/${cloudName}/image/upload/`
+      const valid = !!cloudName && url.length < 500 && url.startsWith(prefix) && url.includes(`/${AVATAR_FOLDER}/${current.id}`)
+      if (!valid) throw new AppError('Esta foto não é válida. Tenta outra vez.')
+      image = url
+    }
+
+    await db.update(user).set({ image, updatedAt: new Date() }).where(eq(user.id, current.id))
+    refresh()
+    return image ? 'Foto atualizada.' : 'Foto removida.'
+  }, 'Não foi possível guardar a foto. Tenta outra vez.')
 }
