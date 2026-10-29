@@ -1,16 +1,16 @@
-'use client'
-
 import Link from 'next/link'
+import { headers } from 'next/headers'
 import { ArrowLeft, Bell } from 'lucide-react'
 import { StudentMenu } from '@/components/student-menu'
 import { StudentSidebar } from '@/components/student-sidebar'
+import { auth } from '@/lib/auth'
 import { Brand } from '@/components/brand'
 import { SignOutButton } from '@/components/sign-out-button'
 
 // Estrutura comum das páginas do estudante (menu, cabeçalho, botão de voltar).
 // `backHref`/`backLabel`: para onde volta o botão (por omissão, a visão geral).
 // `hideTitle`: a página desenha o seu próprio cabeçalho (ex.: Biblioteca).
-export function StudentFeatureShell({
+export async function StudentFeatureShell({
   firstName,
   eyebrow,
   title,
@@ -30,15 +30,18 @@ export function StudentFeatureShell({
   backHref?: string
   backLabel?: string
 }) {
+  // A foto vem da sessão: assim todas as páginas do estudante mostram-na sem cada uma a ter de a passar.
+  const session = await auth.api.getSession({ headers: await headers() }).catch(() => null)
+  const image = session?.user.image ?? null
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f8f8f5] text-[#202321]">
       <div className="flex min-h-screen">
-        <StudentSidebar firstName={firstName} />
+        <StudentSidebar firstName={firstName} image={image} />
         <div className="min-w-0 flex-1">
           <header className="sticky top-0 z-40 border-b border-[#eceee7] bg-[#f8f8f5]/95 px-5 py-3 backdrop-blur sm:px-8">
             <div className="mx-auto flex min-h-10 max-w-[1050px] items-center justify-between gap-4">
               <div className="flex min-w-0 items-center gap-3">
-                <StudentMenu firstName={firstName} />
+                <StudentMenu firstName={firstName} image={image} />
                 <span className="lg:hidden"><Brand href="/aluno" /></span>
                 <div className="hidden min-w-0 lg:block"><p className="truncate text-[11px] font-semibold uppercase tracking-[0.16em] text-[#1d4d41]">{eyebrow}</p></div>
               </div>

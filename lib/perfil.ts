@@ -57,3 +57,11 @@ export function profileSteps(input: {
   }
   return steps
 }
+
+// Nome público: primeiro nome e inicial do último («Amélia M.»). Nunca o nome completo.
+export function publicName(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return 'Estudante'
+  if (parts.length === 1) return parts[0]
+  return `${parts[0]} ${parts[parts.length - 1].slice(0, 1).toUpperCase()}.`
+}

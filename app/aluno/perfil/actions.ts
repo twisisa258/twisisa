@@ -39,12 +39,13 @@ export async function savePersonal(formData: FormData): Promise<ActionResult> {
       throw new AppError('O @nickname deve ter 3 a 20 caracteres: letras, números, _ ou ponto, sem espaços.')
     }
     const nickname = rawNickname || null
+    const showInRanking = formData.get('showInRanking') === 'on'
 
     try {
       await db
         .insert(studentProfiles)
-        .values({ userId: current.id, phone, nickname })
-        .onConflictDoUpdate({ target: studentProfiles.userId, set: { phone, nickname, updatedAt: new Date() } })
+        .values({ userId: current.id, phone, nickname, showInRanking })
+        .onConflictDoUpdate({ target: studentProfiles.userId, set: { phone, nickname, showInRanking, updatedAt: new Date() } })
     } catch (error) {
       if (isUniqueViolation(error)) throw new AppError('Esse @nickname já está a ser usado. Escolhe outro.')
       throw error

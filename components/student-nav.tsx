@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { BookOpen, ClipboardCheck, LayoutDashboard, Sparkles, UserRound } from 'lucide-react'
+import { BookOpen, ClipboardCheck, LayoutDashboard, Sparkles, Trophy, UserRound } from 'lucide-react'
 
 // Menu único do estudante: o computador (StudentSidebar) e o telemóvel (StudentMobileSidebar) usam esta mesma lista,
 // por isso todas as páginas do estudante têm as mesmas ligações, na mesma ordem e com a página atual marcada.
@@ -10,6 +10,7 @@ const MAIN = [
   { href: '/aluno', label: 'Visão geral', icon: LayoutDashboard, exact: true },
   { href: '/biblioteca', label: 'Biblioteca', icon: BookOpen },
   { href: '/aluno/simulador', label: 'Simulador', icon: ClipboardCheck },
+  { href: '/aluno/ranking', label: 'Ranking', icon: Trophy },
   { href: '/jonas', label: 'Jonas', icon: Sparkles },
 ] as const
 

@@ -84,6 +84,7 @@ export function ResultView({ result }: { result: Result }) {
         <div className="mt-5 flex flex-col gap-2.5 sm:flex-row">
           <RestartButton mode={result.mode === 'revisao' ? 'pratica' : result.mode} subjectId={result.subjectId} variant={result.variant} topicId={result.topicId} label="Nova ronda" primary />
           {wrong > 0 && <RestartButton mode="revisao" subjectId={result.subjectId} label="Rever os meus erros" />}
+          <Link href="/aluno/ranking" className="inline-flex h-12 items-center justify-center rounded-full px-5 text-sm font-semibold text-[#1d4d41] hover:underline">Ver ranking</Link>
           <Link href="/aluno/simulador" className="inline-flex h-12 items-center justify-center rounded-full px-5 text-sm font-semibold text-[#68716a] hover:text-[#1d4d41]">Voltar ao Simulador</Link>
         </div>
       </section>

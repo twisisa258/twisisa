@@ -5,9 +5,10 @@ import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { SignOutButton } from '@/components/sign-out-button'
+import { Avatar } from '@/components/aluno/avatar'
 import { StudentNavGroups } from '@/components/student-nav'
 
-export function StudentMobileSidebar({ firstName, open, onClose }: { firstName: string; open: boolean; onClose: () => void }) {
+export function StudentMobileSidebar({ firstName, image = null, open, onClose }: { firstName: string; image?: string | null; open: boolean; onClose: () => void }) {
   useEffect(() => {
     if (!open) return
     const previousBodyOverflow = document.body.style.overflow
@@ -42,7 +43,7 @@ export function StudentMobileSidebar({ firstName, open, onClose }: { firstName: 
         </div>
         <div className="mt-5 flex items-center justify-between border-t border-[#e3e6dc] pt-4">
           <Link href="/aluno" onClick={onClose} className="flex min-w-0 items-center gap-2">
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#e1ece5] to-[#cfe0d5] text-xs font-semibold text-[#1d4d41]">{firstName.slice(0, 1)}</span>
+            <Avatar name={firstName} image={image} size={32} />
             <span className="truncate text-xs font-medium text-[#48534b]">{firstName}</span>
           </Link>
           <SignOutButton />

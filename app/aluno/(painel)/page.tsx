@@ -124,11 +124,11 @@ export default async function StudentPage() {
     <main className="min-h-screen max-w-full overflow-x-hidden bg-[#f8f8f5] text-[#202321]" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
       <UrlFeedback />
       <div className="flex min-h-screen">
-        <StudentSidebar firstName={firstName} />
+        <StudentSidebar firstName={firstName} image={session.user.image ?? null} />
         <div className="w-0 min-w-0 flex-1 overflow-x-clip leading-[normal]">
           <header className="flex h-[60px] items-center justify-between border-b border-[#eceee7] px-[16px] lg:px-8">
             <div className="flex items-center gap-[8px]">
-              <AlunoMenuButton firstName={firstName} />
+              <AlunoMenuButton firstName={firstName} image={session.user.image ?? null} />
               <Link href="/aluno" className="text-[18px] font-semibold tracking-[-0.04em] lg:hidden">
                 Twisisa
               </Link>

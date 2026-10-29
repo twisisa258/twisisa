@@ -1,12 +1,12 @@
 import { Skeleton } from './skeleton'
 
-/** Menu lateral do estudante (9 + 3 ligações), igual em todas as páginas: /aluno e as que usam StudentFeatureShell. */
+/** Menu lateral do estudante (5 + 1 ligações), igual em todas as páginas: /aluno e as que usam StudentFeatureShell. */
 export function StudentSidebarSkeleton() {
   return (
     <aside aria-hidden="true" className="hidden w-[252px] shrink-0 flex-col border-r border-[#eceee7] bg-[#f3f4ef] px-4 py-5 lg:flex">
       <Skeleton className="mx-3 h-6 w-24" />
       <div className="mt-10 flex flex-1 flex-col gap-8">
-        {[9, 3].map((count, group) => (
+        {[5, 1].map((count, group) => (
           <div key={group}>
             <Skeleton className="mx-3 h-2.5 w-20" />
             <div className="mt-3 flex flex-col gap-1">

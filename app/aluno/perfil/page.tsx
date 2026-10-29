@@ -9,6 +9,8 @@ import { institutions, studentProfiles } from '@/lib/db/schema'
 import { trackLabel } from '@/lib/percurso'
 import { PROVINCES, profileSteps } from '@/lib/perfil'
 import { getSubscription, isSubscriptionActive } from '@/lib/subscription'
+import { getRanking } from '@/lib/ranking'
+import { formatPoints } from '@/lib/simulator-shared'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
 import { SelectField } from '@/components/ui/select-field'
 import { AvatarUploader } from '@/components/aluno/perfil/avatar-uploader'
@@ -29,6 +31,10 @@ export default async function PerfilPage() {
     db.select().from(studentProfiles).where(eq(studentProfiles.userId, session.user.id)),
     getSubscription(session.user.id),
   ])
+  // Posição desta semana (só se pontuou e está visível). Se falhar, o cabeçalho segue sem ela.
+  const rank = current?.track && current.showInRanking
+    ? await getRanking({ userId: session.user.id, track: current.track, period: 'semana', limit: 0 }).then((data) => data.me, () => null)
+    : null
   const institution = current?.institutionId
     ? (await db.select({ shortName: institutions.shortName, name: institutions.name }).from(institutions).where(eq(institutions.id, current.institutionId)))[0]
     : undefined
@@ -80,6 +86,10 @@ export default async function PerfilPage() {
           <Field label="Email">
             <input value={session.user.email} readOnly aria-readonly="true" className={fieldClass} />
           </Field>
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-[#f8f8f5] p-3 text-sm">
+            <input type="checkbox" name="showInRanking" defaultChecked={current?.showInRanking ?? true} className="mt-0.5 size-4 accent-[#1d4d41]" />
+            <span><span className="font-medium text-[#202321]">Aparecer no ranking</span><span className="block text-xs text-[#737c75]">Mostramos só o teu nome abreviado e o @nickname.</span></span>
+          </label>
         </SectionForm>
       ),
     },
@@ -171,6 +181,9 @@ export default async function PerfilPage() {
                   <>{doneCount} de {steps.length} · falta {missing.slice(0, 2).join(' e ')}{missing.length > 2 ? '…' : ''}</>
                 )}
               </p>
+              {rank && (
+                <Link href="/aluno/ranking" className="mt-1 inline-block text-xs font-semibold text-[#1d4d41] hover:underline">#{rank.position} no ranking da semana · {formatPoints(rank.points)} pts</Link>
+              )}
             </div>
           </div>
         </div>

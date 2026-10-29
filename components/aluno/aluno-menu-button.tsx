@@ -5,7 +5,7 @@ import { StudentMobileSidebar } from '@/components/student-mobile-sidebar'
 import { Ic } from '@/components/aluno/icons'
 
 // Botão do menu do desenho (44 px). Só recebe texto: nunca ícones como propriedade (ver State.md #84).
-export function AlunoMenuButton({ firstName }: { firstName: string }) {
+export function AlunoMenuButton({ firstName, image = null }: { firstName: string; image?: string | null }) {
   const [open, setOpen] = useState(false)
   return (
     <>
@@ -18,7 +18,7 @@ export function AlunoMenuButton({ firstName }: { firstName: string }) {
       >
         <Ic name="menu" />
       </button>
-      <StudentMobileSidebar firstName={firstName} open={open} onClose={() => setOpen(false)} />
+      <StudentMobileSidebar firstName={firstName} image={image} open={open} onClose={() => setOpen(false)} />
     </>
   )
 }
