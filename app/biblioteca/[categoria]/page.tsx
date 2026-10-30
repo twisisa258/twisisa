@@ -1,11 +1,10 @@
-import { headers } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'
-import { auth } from '@/lib/auth'
 import { getCategoryName } from '@/lib/library'
 import { MAIN_SECTIONS, parseListParams } from '@/lib/library-shared'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
 import { UrlFeedback } from '@/components/url-feedback'
 import { Listing } from '@/components/biblioteca/listing'
+import { requireStudent } from '@/lib/require-student'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,8 +21,7 @@ export default async function CategoriaPage({ params, searchParams }: Props) {
   const { categoria } = await params
   if (!/^[a-z0-9-]{1,40}$/.test(categoria)) notFound()
 
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) redirect('/sign-in')
+  const session = await requireStudent()
 
   const main = MAIN_SECTIONS.find((section) => section.slug === categoria)
   const name = main?.title ?? (await getCategoryName(categoria).catch(() => null))

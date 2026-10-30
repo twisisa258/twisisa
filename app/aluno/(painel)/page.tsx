@@ -1,8 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { headers } from 'next/headers'
 import { eq } from 'drizzle-orm'
-import { auth } from '@/lib/auth'
 import { isAdminEmail } from '@/lib/admin'
 import { getStaffRole } from '@/lib/staff'
 import { getGreeting } from '@/lib/greeting'
@@ -18,6 +16,7 @@ import { AlunoMenuButton } from '@/components/aluno/aluno-menu-button'
 import { Ic } from '@/components/aluno/icons'
 import { ContinuarCard, DescobreCursoCard, ErrosCard, ProgressoPorDisciplina } from '@/components/aluno/inicio-cards'
 import { getInicioAluno, type ResumeItem } from '@/lib/aluno-inicio'
+import { requireStudent } from '@/lib/require-student'
 
 export const dynamic = 'force-dynamic'
 
@@ -70,11 +69,10 @@ const iconBox = 'flex size-[40px] flex-none items-center justify-center rounded-
 const sectionLabel = 'text-[11px] uppercase tracking-[0.12em] text-[#202321] [font-family:inherit]'
 
 export default async function StudentPage() {
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) redirect('/sign-in')
+  const session = await requireStudent('/aluno')
 
   const [profile] = await db
-    .select({ track: studentProfiles.track, institutionId: studentProfiles.institutionId })
+    .select({ track: studentProfiles.track, institutionId: studentProfiles.institutionId, birthDate: studentProfiles.birthDate, dailyGoal: studentProfiles.dailyGoal })
     .from(studentProfiles)
     .where(eq(studentProfiles.userId, session.user.id))
     .limit(1)
@@ -118,7 +116,13 @@ export default async function StudentPage() {
   // Ordem: orientação a meio, sessão do Simulador a meio, último material aberto.
   const resume: ResumeItem | null =
     (inicio?.ok ? inicio.value.resume : null) ?? (last ? { kind: 'material', title: last.title, at: last.at, href: fileHref(last.id) } : null)
-  const greeting = getGreeting({ name: session.user.name, userId: session.user.id, createdAt: session.user.createdAt, streak: week?.streak ?? null })
+  const greeting = getGreeting({ name: session.user.name, userId: session.user.id, createdAt: session.user.createdAt, birthDate: profile?.birthDate ?? null, streak: week?.streak ?? null })
+  // Linha discreta com dados reais de study_days (sem cartão): «Hoje 4/10 · 3 dias seguidos». Sem dados, não aparece.
+  const goal = profile?.dailyGoal ?? null
+  const activityParts: string[] = []
+  if (week && (goal || week.today > 0)) activityParts.push(goal ? `Hoje ${week.today}/${goal}` : `Hoje ${week.today}`)
+  if (week && week.streak >= 2) activityParts.push(`${week.streak} dias seguidos`)
+  const activity = activityParts.join(' · ')
 
   return (
     <main className="min-h-screen max-w-full overflow-x-hidden bg-[#f8f8f5] text-[#202321]" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
@@ -152,8 +156,11 @@ export default async function StudentPage() {
 
           <div className="mx-auto flex w-full max-w-[560px] flex-col gap-[16px] px-[16px] pb-[24px] pt-[12px] lg:px-8 lg:pb-12 lg:pt-8">
             <div className="flex min-w-0 flex-col gap-[16px]">
-              <div className="flex h-[32px] items-center justify-between">
-                <span className="min-w-0 line-clamp-2 text-[13px] font-bold leading-[16px] text-[#1d4d41]">{greeting}</span>
+              <div className="flex min-h-[32px] items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <span className={cn('block text-[13px] font-bold leading-[16px] text-[#1d4d41]', activity ? 'truncate' : 'line-clamp-2')}>{greeting}</span>
+                  {activity && <span title={week ? `${week.week} questões esta semana` : undefined} className="block truncate text-[11px] leading-[14px] text-[#6b756e]">{activity}</span>}
+                </div>
                 <Link
                   href="/aluno/percurso"
                   aria-label={`Mudar percurso: ${chipLabel}`}

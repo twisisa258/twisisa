@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { activeSubjectId, addMessage, checkAllowance, createConversation, deleteTrailing, getStudyContext, lastMessageRole, lastMessages, ownsConversation } from '@/lib/jonas'
 import { MAX_HISTORY_MESSAGES, MAX_MESSAGE_CHARS, buildChatSystem } from '@/lib/jonas-prompts'
 import { jsonResponse, streamReply } from '@/lib/jonas-stream'
+import { recordStudy } from '@/lib/study-days'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -48,6 +49,8 @@ export async function POST(request: Request) {
       if ((await lastMessageRole(conversationId)) !== 'user') return jsonResponse({ error: 'Não há nenhuma pergunta por responder.' }, 400)
     } else {
       await addMessage(conversationId, 'user', message)
+      // Dia de estudo: uma mensagem ao Jonas conta (não conta «Responder de novo»).
+      await recordStudy(userId, 'jonas')
     }
 
     const [history, context] = await Promise.all([lastMessages(conversationId, MAX_HISTORY_MESSAGES), getStudyContext(userId, conversationId, subjectId)])

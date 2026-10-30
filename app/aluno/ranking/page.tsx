@@ -1,9 +1,6 @@
 import Link from 'next/link'
-import { headers } from 'next/headers'
-import { redirect } from 'next/navigation'
 import { Trophy } from 'lucide-react'
 import { eq } from 'drizzle-orm'
-import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { studentProfiles } from '@/lib/db/schema'
 import { isTrack, trackLabel } from '@/lib/percurso'
@@ -13,6 +10,7 @@ import { StudentFeatureShell } from '@/components/student-feature-shell'
 import { Avatar } from '@/components/aluno/avatar'
 import { EmptyState } from '@/components/states/empty-state'
 import { ErrorState } from '@/components/states/error-state'
+import { requireStudent } from '@/lib/require-student'
 
 export const metadata = { title: 'Ranking | Twisisa', description: 'Os pontos do Simulador, entre estudantes do teu percurso.' }
 export const dynamic = 'force-dynamic'
@@ -38,8 +36,7 @@ function Row({ row }: { row: RankingData['rows'][number] }) {
 }
 
 export default async function RankingPage({ searchParams }: { searchParams: Promise<{ p?: string }> }) {
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) redirect('/sign-in')
+  const session = await requireStudent('/aluno/ranking')
   const period: RankingPeriod = parsePeriod((await searchParams).p)
 
   const [profile] = await db

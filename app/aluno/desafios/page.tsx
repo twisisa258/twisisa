@@ -1,13 +1,10 @@
-import { headers } from 'next/headers'
-import { redirect } from 'next/navigation'
 import { Flame, Trophy, Users } from 'lucide-react'
-import { auth } from '@/lib/auth'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
 import { ChallengeBoard } from '@/components/challenge-board'
+import { requireStudent } from '@/lib/require-student'
 
 export default async function DesafiosPage() {
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) redirect('/sign-in')
+  const session = await requireStudent('/aluno/desafios')
 
   const stats = [
     { icon: Flame, value: '4', label: 'dias seguidos' },

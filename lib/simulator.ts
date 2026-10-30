@@ -4,6 +4,7 @@ import { pool } from '@/lib/db'
 import type { Track } from '@/lib/percurso'
 import { gradeOutOf20, itemWeight, OptionShuffler, pickQuestions, type Candidate } from '@/lib/quiz-engine'
 import { PRACTICE_SIZE, QUICK_SECONDS_PER_QUESTION, QUICK_SERVER_MARGIN_SECONDS, ROUND_SIZE, TIME_GRACE_MS, type AttemptMode, type PlayData, type PlayFeedback, type PlayImage, type PlayItem } from '@/lib/simulator-shared'
+import { recordStudy } from '@/lib/study-days'
 
 // Motor de tentativas (só servidor). A resposta certa e a explicação só saem daqui quando a regra do modo o permite.
 
@@ -381,6 +382,8 @@ export async function submitAnswer(userId: string, attemptId: string, position: 
          last_result = $5, last_answered_at = now()`,
       [userId, item.question_id, right ? 1 : 0, right ? 0 : 1, right ? 'right' : 'wrong'],
     )
+    // Dia de estudo: só a primeira resposta a cada questão conta (é a que fica gravada).
+    await recordStudy(userId, 'question')
   }
   const stored = (await pool.query(`SELECT answer_option_id, points::float8 AS points FROM attempt_items WHERE attempt_id = $1 AND position = $2`, [attemptId, position])).rows[0]
   return { feedback: await buildFeedback(item.question_id as string, stored.answer_option_id as string, Number(stored.points)) }

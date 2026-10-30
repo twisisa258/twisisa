@@ -1,7 +1,6 @@
-import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { eq } from 'drizzle-orm'
-import { auth } from '@/lib/auth'
+import { requireStudent } from '@/lib/require-student'
 import { db } from '@/lib/db'
 import { studentProfiles } from '@/lib/db/schema'
 import { isTrack } from '@/lib/percurso'
@@ -9,8 +8,7 @@ import type { StudentScope } from '@/lib/simulator'
 
 /** Sessão + percurso do aluno para as páginas do Simulador (só servidor). Sem sessão ou percurso, redireciona. */
 export async function requireSimulatorScope() {
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) redirect('/sign-in')
+  const session = await requireStudent()
   const [profile] = await db.select({ track: studentProfiles.track, institutionId: studentProfiles.institutionId }).from(studentProfiles).where(eq(studentProfiles.userId, session.user.id)).limit(1)
   if (!isTrack(profile?.track)) redirect('/aluno/percurso')
   const scope: StudentScope = { userId: session.user.id, track: profile.track, institutionId: profile.institutionId ?? null }

@@ -1,15 +1,12 @@
-import { headers } from 'next/headers'
-import { redirect } from 'next/navigation'
-import { auth } from '@/lib/auth'
 import { getConversation, getStudyContext, listConversations, listStudySubjects, type ConversationSummary } from '@/lib/jonas'
 import { JonasChat } from '@/components/jonas-chat'
+import { requireStudent } from '@/lib/require-student'
 
 export const dynamic = 'force-dynamic'
 
 // O Jonas ocupa o ecrã todo (sem menu do estudante) para nada distrair a conversa: histórico à esquerda, chat ao centro.
 export default async function JonasPage({ searchParams }: { searchParams: Promise<{ c?: string }> }) {
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) redirect('/sign-in')
+  const session = await requireStudent('/jonas')
   const { c } = await searchParams
   const userId = session.user.id
   const firstName = session.user.name.split(' ')[0]

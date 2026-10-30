@@ -1,12 +1,10 @@
 import Link from 'next/link'
-import { headers } from 'next/headers'
-import { redirect } from 'next/navigation'
 import { ArrowLeft, ArrowRight, RotateCcw, Target, Timer } from 'lucide-react'
-import { auth } from '@/lib/auth'
 import { getHistory } from '@/lib/simulator'
 import { MODE_META, formatGrade, percent, type AttemptMode } from '@/lib/simulator-shared'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
 import { EmptyState } from '@/components/states/empty-state'
+import { requireStudent } from '@/lib/require-student'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Histórico | Simulador | Twisisa' }
@@ -15,8 +13,7 @@ const ICONS: Record<AttemptMode, React.ComponentType<{ size?: number; 'aria-hidd
 const formatDate = (iso: string) => new Intl.DateTimeFormat('pt-PT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Maputo' }).format(new Date(iso))
 
 export default async function HistoricoPage() {
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) redirect('/sign-in')
+  const session = await requireStudent('/aluno/simulador/historico')
 
   const history = await getHistory(session.user.id).catch((error) => {
     console.error('[HISTORICO]', error)

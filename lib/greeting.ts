@@ -1,5 +1,7 @@
 // Saudação da página /aluno: usa a hora de Maputo (CAT), datas moçambicanas e o percurso da conta.
 // Só devolve texto; os emojis ficam aqui de propósito (só esta saudação os usa).
+import { isBirthday, parseIsoDate } from '@/lib/identity'
+
 const TZ = 'Africa/Maputo'
 
 type Part = 'madrugada' | 'manha' | 'tarde' | 'noite'
@@ -52,7 +54,7 @@ function pick<T>(items: T[], seed: string): T {
   return items[h % items.length]
 }
 
-export function getGreeting(input: { name: string; userId: string; createdAt?: Date | string | null; streak?: number | null; now?: Date }): string {
+export function getGreeting(input: { name: string; userId: string; createdAt?: Date | string | null; birthDate?: string | null; streak?: number | null; now?: Date }): string {
   const now = input.now ?? new Date()
   const name = input.name.trim().split(/\s+/)[0] || 'estudante'
   const fill = (text: string) => text.replace('{n}', name)
@@ -63,6 +65,10 @@ export function getGreeting(input: { name: string; userId: string; createdAt?: D
 
   const created = input.createdAt ? new Date(input.createdAt) : null
   const createdOk = created && !Number.isNaN(created.getTime()) ? created : null
+
+  // 0. Aniversário do estudante (dia e mês da data de nascimento, em Maputo): tem prioridade sobre tudo o resto.
+  const birth = parseIsoDate(input.birthDate)
+  if (birth && isBirthday(birth, { year: t.year, month: Number(t.month), day: Number(t.day) })) return fill('Parabéns, {n}! 🎂')
 
   // 1. Conta nova (primeiras 48 horas).
   if (createdOk && now.getTime() - createdOk.getTime() < 48 * 60 * 60 * 1000) return fill('Boas-vindas, {n} 🎊')

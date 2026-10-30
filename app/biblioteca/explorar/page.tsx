@@ -1,12 +1,10 @@
 import Link from 'next/link'
-import { headers } from 'next/headers'
-import { redirect } from 'next/navigation'
 import { BookMarked, BookOpen, ChevronRight, FileText, FolderOpen, GraduationCap, Layers } from 'lucide-react'
-import { auth } from '@/lib/auth'
 import { getCategoryCounts } from '@/lib/library'
 import { MAIN_SECTIONS } from '@/lib/library-shared'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
 import { EmptyState } from '@/components/states/empty-state'
+import { requireStudent } from '@/lib/require-student'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,8 +23,7 @@ const tile = 'flex min-h-[88px] items-center gap-3 rounded-2xl p-4 shadow-[0_1px
 
 // Segunda página da Biblioteca: todas as categorias com o número de materiais. Cada uma abre a sua própria lista.
 export default async function ExplorarPage() {
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) redirect('/sign-in')
+  const session = await requireStudent('/biblioteca/explorar')
   const firstName = session.user.name.split(' ')[0]
 
   let categories: Awaited<ReturnType<typeof getCategoryCounts>> | null = null

@@ -1,20 +1,17 @@
-import { headers } from 'next/headers'
-import { redirect } from 'next/navigation'
 import { eq } from 'drizzle-orm'
-import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { studentProfiles } from '@/lib/db/schema'
 import { listStudentInstitutions } from '@/lib/institutions'
 import { isTrack } from '@/lib/percurso'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
 import { PercursoPicker } from '@/components/percurso-picker'
+import { requireStudent } from '@/lib/require-student'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'O teu percurso | Twisisa', description: 'Escolhe o que estás a preparar: 10ª classe, 12ª classe ou admissão ao ensino superior.' }
 
 export default async function PercursoPage() {
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) redirect('/sign-in')
+  const session = await requireStudent('/aluno/percurso')
 
   const [[profile], institutions] = await Promise.all([
     db.select({ track: studentProfiles.track, institutionId: studentProfiles.institutionId }).from(studentProfiles).where(eq(studentProfiles.userId, session.user.id)).limit(1),

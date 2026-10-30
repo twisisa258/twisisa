@@ -1,9 +1,6 @@
 import Link from 'next/link'
-import { headers } from 'next/headers'
-import { redirect } from 'next/navigation'
 import { BookOpen, GraduationCap, Lock, School, Sparkles, UserRound, Check } from 'lucide-react'
 import { eq } from 'drizzle-orm'
-import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { institutions, studentProfiles } from '@/lib/db/schema'
 import { trackLabel } from '@/lib/percurso'
@@ -19,14 +16,14 @@ import { PasswordForm } from '@/components/aluno/perfil/password-form'
 import { ProfileAccordion, type AccordionItem } from '@/components/aluno/perfil/profile-accordion'
 import { SectionForm } from '@/components/aluno/perfil/section-form'
 import { saveCandidate, savePersonal, saveSchool } from './actions'
+import { requireStudent } from '@/lib/require-student'
 
 export const metadata = { title: 'O meu perfil | Twisisa', description: 'Gere as tuas informações pessoais e preferências.' }
 
 const linkButton = 'inline-flex h-10 items-center rounded-xl border border-[#dfe3d9] bg-white px-4 text-sm font-semibold text-[#1d4d41] transition-colors hover:bg-[#f1f4ef]'
 
 export default async function PerfilPage() {
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) redirect('/sign-in')
+  const session = await requireStudent('/aluno/perfil')
   const [[current], subscription] = await Promise.all([
     db.select().from(studentProfiles).where(eq(studentProfiles.userId, session.user.id)),
     getSubscription(session.user.id),

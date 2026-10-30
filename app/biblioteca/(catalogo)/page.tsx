@@ -1,8 +1,6 @@
 import Link from 'next/link'
-import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { BookOpen, ChevronRight } from 'lucide-react'
-import { auth } from '@/lib/auth'
 import { getHub, getSavedIds } from '@/lib/library'
 import { withParams } from '@/lib/library-shared'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
@@ -11,6 +9,7 @@ import { LibraryProvider } from '@/components/biblioteca/library-provider'
 import { LibrarySearch } from '@/components/biblioteca/library-search'
 import { SectionRow } from '@/components/biblioteca/section-row'
 import { EmptyState } from '@/components/states/empty-state'
+import { requireStudent } from '@/lib/require-student'
 
 export const metadata = {
   title: 'Biblioteca académica | Twisisa',
@@ -24,8 +23,7 @@ export default async function BibliotecaPage({ searchParams }: { searchParams: P
   // Endereços antigos (/biblioteca?q=...) passam para a página de resultados.
   if (q.trim()) redirect(withParams('/biblioteca/pesquisa', { q: q.trim().slice(0, 80) }))
 
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) redirect('/sign-in')
+  const session = await requireStudent('/biblioteca')
 
   const firstName = session.user.name.split(' ')[0]
   const [hub, savedIds] = await Promise.all([getHub(), getSavedIds(session.user.id).catch(() => [] as string[])])

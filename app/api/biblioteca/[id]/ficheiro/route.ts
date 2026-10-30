@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { Pool } from 'pg'
 import { auth } from '@/lib/auth'
 import { DeliveryError, fetchMaterialFile } from '@/lib/cloudinary-server'
+import { recordStudy } from '@/lib/study-days'
 
 export const dynamic = 'force-dynamic'
 
@@ -51,6 +52,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const detail = error instanceof DeliveryError ? error.detail : undefined
     return fail(request, 'documento', 'Não foi possível obter o documento. Tenta outra vez mais tarde.', 502, detail)
   }
+
+  // Dia de estudo: abrir ou descarregar um material conta (só depois de o documento estar disponível).
+  await recordStudy(session.user.id, 'material')
 
   if (download) {
     // O registo do download não pode impedir a entrega do ficheiro.

@@ -20,10 +20,11 @@ Estados: FEITO E TESTADO · FEITO, FALTA TESTE · FICTÍCIO (dados inventados) �
 
 | Página | Estado | Nota |
 |---|---|---|
-| `/sign-up`, `/sign-in` | FEITO, FALTA TESTE | Nome, e-mail, palavra-passe. Sem idade, sem aceitação dos Termos, sem Google, sem validação em tempo real. |
+| `/sign-up`, `/sign-in` | FEITO, FALTA TESTE | Registo de 1 ecrã: e-mail, palavra-passe, caixa dos Termos (versão e data em `account_consents`). Validação em tempo real e repetida no servidor (`hooks.before` em `lib/auth.ts`). Botão Google desactivado até existirem `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`. Sessão de 30 dias; «Computador partilhado» na entrada (`rememberMe: false`, a confirmar em ensaio); depois de entrar volta ao sítio de origem (`?next=`). Limite de pedidos na base de dados (tabela `rateLimit`). |
+| `/aluno/bem-vindo` (onboarding) | FEITO, FALTA TESTE | 3 ecrãs: Sobre ti (nome, data de nascimento, Termos se faltarem), O que preparas (percurso, instituição, meta diária), Lembretes (e-mail ou nada; telemóvel «Em breve»). Cada passo guarda-se ao avançar. Menor de 13 anos: conta apagada e ecrã de recusa. Menores de 18: ranking oculto por omissão. No fim abre uma Prática com o tamanho da meta diária (se houver questões). Critério nº 1: o ecrã 2 caber em 360x640 sem scroll (não testado em aparelho). |
 | `/esqueci-a-senha`, `/redefinir-senha` | FEITO, FALTA TESTE | Depende do domínio no Resend (`docs/EMAIL.md`). |
 | `/aluno/percurso` | FEITO, FALTA TESTE | 10ª, 12ª ou admissão (com instituição). |
-| `/aluno` (painel) | FEITO, FALTA TESTE | "Semana" e "Sequência" mostram "—": nada escreve em `study_progress`. |
+| `/aluno` (painel) | FEITO, FALTA TESTE | Linha discreta «Hoje 4/10 · 3 dias seguidos» com dados reais de `study_days` (escritos pelo simulador, pela Biblioteca e pelo Jonas). Parabéns no aniversário (dia e mês, fuso de Maputo; 29/02 celebra a 28/02 nos anos não bissextos). |
 | `/aluno/simulador` (+ sessão, histórico, configurações) | FEITO, FALTA TESTE | Servidor avalia respostas, valida o dono da tentativa, fecha o tempo do modo rápido, limita inícios por hora. Testes de unidade só do motor (`tests/quiz-engine.test.ts`). Precisa de questões publicadas. |
 | `/biblioteca` (+ categoria, explorar, pesquisa) | FEITO, FALTA TESTE | Entrega de PDF pelo Cloudinary por confirmar (Definições, Segurança, "Allow delivery of PDF and ZIP files"). |
 | `/aluno/perfil` | FEITO, FALTA TESTE | Foto no Cloudinary com upload assinado. |
@@ -63,19 +64,19 @@ P0 (antes de receber estudantes)
 5. Retirar do menu o que é FICTÍCIO, ou terminá-lo.
 
 P1
-6. Registo: idade, aceitação dos Termos, validação em tempo real, Google (em desenho).
-7. Guarda de sessão única (não existe `middleware` nem `proxy`; cada página repete `getSession`).
-8. Ranking oculto por omissão e política para menores (ver Decisões).
+6. Registo: FEITO (idade, Termos, validação). Falta ligar o Google: criar as credenciais, registar `<BETTER_AUTH_URL>/api/auth/callback/google`, preencher as duas variáveis e passar a aplicação a «In production» na Google.
+7. FEITO: guarda única `requireStudent()` (`lib/require-student.ts`) nas páginas do estudante, `/jonas`, `/biblioteca` e `/comunidade`. Faltam as acções de servidor e rotas de API, que continuam a validar a sessão uma a uma.
+8. FEITO: ranking oculto por omissão para menores de 18 (decisão: idade mínima 13).
 9. Ligação à base com pooler; monitorização de erros; eventos de utilização (primeiro simulado, primeira mensagem ao Jonas).
 10. Jonas: limites por plano, tecto diário, estado quando a Groq recusa por quota, política de dados da Groq nos Termos.
 11. Testar fluxo Stripe de ponta a ponta, ou trocar o meio de pagamento.
 
 P2
-12. Escrever em `study_progress` (alimenta "Semana" e "Sequência").
+12. FEITO por outra via: `study_days` (`lib/study-days.ts`). A tabela `study_progress` ficou sem leitura nem escrita: remover (ver 16).
 13. Criar notificações reais (e ligá-las ao e-mail).
 14. Ligar `/aluno/favoritos` a `library_favorites`.
 15. Remover as dependências sem uso (`ai`, `@ai-sdk/react`, `@stripe/stripe-js`, `@base-ui/react`, `class-variance-authority`): script à parte, depois do build passar.
-16. Tabelas sem uso: `quiz_attempts`, linhas antigas de `exam_modules`, `post_likes`. Decidir: ligar ou migração para remover.
+16. Tabelas sem uso: `study_progress`, `quiz_attempts`, linhas antigas de `exam_modules`, `post_likes`. Decidir: ligar ou migração para remover.
 
 Herdado do registo anterior (número do item antigo)
 - #7 dados reais das instituições (sigla, nome, descrição, logótipo).
@@ -92,9 +93,20 @@ Herdado do registo anterior (número do item antigo)
 - #146 as secções da Biblioteca dependem do `slug` das categorias (`MAIN_SECTIONS` em `lib/library-shared.ts`).
 - #147 instituição dos materiais é texto livre.
 
+## Identidade, onboarding e retenção (docs/IDENTIDADE-ONBOARDING-RETENCAO.md)
+Feito (fases A a D, ainda por testar com estudantes): guarda central, limite de pedidos em base de dados, chaves estrangeiras com CASCADE (`student_profiles`, `notifications`, `quiz_attempts`, `posts`), registo de 1 ecrã, onboarding de 3 ecrãs, regras de idade, `study_days`, saudação de aniversário. Migração `0024_identidade_onboarding.sql`: correr `npm run migrate` antes de publicar.
+Por fazer:
+- Fase C (resto): lista de dispositivos com sessão aberta e «terminar sessão» no perfil; mudar e-mail; apagar conta e exportar dados.
+- Fase E: marcos na plataforma, banner de anúncios do admin, barra de cookies com Aceitar e Recusar para o Google Analytics.
+- Fase F: e-mail de lembretes com orçamento diário, `notification_outbox`, cron, desligar com um clique, pré-visualização no admin, e-mail de aniversário. Hoje `notification_prefs` só guarda a escolha do ecrã 3: nada a lê.
+- Fase G: Web Push (o botão «No telemóvel» do onboarding está desactivado).
+- Fase H: datas de exame por instituição e contagem no painel.
+- Estudantes que já tinham conta passam pelo onboarding no próximo acesso (falta-lhes data de nascimento, meta e escolha de lembretes).
+- Quem entra por Google, com consentimento por registar, vê a caixa dos Termos no ecrã 1 do onboarding.
+
 ## Decisões por tomar
 - Pagamento: moeda, meio (cartão ou carteira móvel) e o que o plano pago desbloqueia. Sugestão: lançar gratuito e cobrar depois.
-- Menores de idade: consentimento, dados no ranking e na comunidade. Confirmar com quem conheça a lei local.
+- Menores de idade: decidido idade mínima de conta 13 (`MIN_AGE` em `lib/identity.ts`) e predefinições de privacidade abaixo de 18. Falta confirmar com quem conheça a lei local.
 - Comunidade e Desafios: terminar ou retirar até haver estudantes.
 - Conteúdo mínimo para lançar (percursos, disciplinas, número de questões).
 - Gestor de pacotes: npm ou pnpm.
@@ -102,4 +114,5 @@ Herdado do registo anterior (número do item antigo)
 - Decisões em aberto de `SIMULADOR.md` (secção 11) e `JONAS.md` (secção 7).
 
 ## Documentos
+- `docs/IDENTIDADE-ONBOARDING-RETENCAO.md`: desenho final de identidade, onboarding, actividade e retenção (fases A a H).
 - `SIMULADOR.md`, `JONAS.md`, `CONVITES.md`, `ADMIN-MATERIAIS.md`, `docs/EMAIL.md`, `docs/CURSOS-UEM-2026.md`, `docs/prompt-csv-questoes.md`: mantidos; ainda não foram revistos contra o código.

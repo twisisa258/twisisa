@@ -1,8 +1,9 @@
 import { and, count, eq, isNull } from 'drizzle-orm'
 import { db, pool } from '@/lib/db'
-import { notifications, studyProgress } from '@/lib/db/schema'
+import { notifications } from '@/lib/db/schema'
 import { getVisibleModules } from '@/lib/exam-modules'
 import type { Track } from '@/lib/percurso'
+import { getStudyStats } from '@/lib/study-days'
 
 /** Cada parte do painel é independente: se uma consulta falhar fica `ok: false` (indisponível), nunca um zero inventado. */
 export type Part<T> = { ok: true; value: T } | { ok: false }
@@ -27,14 +28,8 @@ export async function getAlunoOverview(input: { userId: string; track: Track | n
   const { userId, track, institutionId } = input
 
   const [progress, unread, downloads, saved, recent, savedItems, institution, simulador] = await Promise.all([
-    part('progresso', async () => {
-      const [row] = await db
-        .select({ weekly: studyProgress.weeklyProgress, streak: studyProgress.streakDays })
-        .from(studyProgress)
-        .where(eq(studyProgress.userId, userId))
-        .limit(1)
-      return row ?? null
-    }),
+    // Hoje, semana e sequência vêm de study_days (lib/study-days.ts): nada de número guardado que possa dessincronizar.
+    part('progresso', () => getStudyStats(userId)),
     part('notificações', async () => {
       const [row] = await db
         .select({ total: count() })
