@@ -42,6 +42,7 @@ export function profileSteps(input: {
   province: string | null
   school: string | null
   track: string | null
+  otherLevel?: string | null
   institutionId: string | null
   targetCourse: string | null
 }): ProfileStep[] {
@@ -49,7 +50,7 @@ export function profileSteps(input: {
     { key: 'foto', label: 'Foto', done: !!input.image },
     { key: 'nickname', label: '@nickname', done: !!input.nickname },
     { key: 'escola', label: 'Escola', done: !!input.province && !!input.school },
-    { key: 'percurso', label: 'Percurso', done: !!input.track },
+    { key: 'percurso', label: 'Percurso', done: !!input.track || !!input.otherLevel },
   ]
   if (input.track === 'admissao') {
     steps.push({ key: 'instituicao', label: 'Instituição', done: !!input.institutionId })

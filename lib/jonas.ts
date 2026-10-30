@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { pool } from '@/lib/db'
-import { trackLabel } from '@/lib/percurso'
+import { levelLabel, trackLabel } from '@/lib/percurso'
 import { titleFromMessage, type ExplainQuestion, type StoredMessage, type StudyContext } from '@/lib/jonas-prompts'
 
 // Dados do Jonas (só servidor). Tudo é sempre filtrado pelo aluno dono: um aluno nunca lê conversas de outro.
@@ -114,7 +114,7 @@ export async function checkAllowance(userId: string): Promise<{ ok: true } | { o
 /** Percurso, disciplina da conversa e assuntos recentes: o que torna o Jonas «de estudo» e não um chat genérico. */
 export async function getStudyContext(userId: string, conversationId: string | null, subjectId: string | null): Promise<StudyContext> {
   const [profile, subject, recent] = await Promise.all([
-    pool.query(`SELECT p.track, i.short_name FROM student_profiles p LEFT JOIN institutions i ON i.id = p.institution_id WHERE p.user_id = $1`, [userId]),
+    pool.query(`SELECT p.track, p.other_level, i.short_name FROM student_profiles p LEFT JOIN institutions i ON i.id = p.institution_id WHERE p.user_id = $1`, [userId]),
     subjectId ? pool.query(`SELECT name FROM library_subjects WHERE id = $1`, [subjectId]) : Promise.resolve(null),
     pool.query(
       `SELECT title FROM jonas_conversations WHERE user_id = $1 AND kind = 'chat' AND title <> $3 AND ($2::text IS NULL OR id <> $2) ORDER BY updated_at DESC LIMIT 6`,
@@ -123,7 +123,7 @@ export async function getStudyContext(userId: string, conversationId: string | n
   ])
   const track = profile.rows[0]?.track as string | undefined
   const institution = profile.rows[0]?.short_name as string | null | undefined
-  const base = trackLabel(track)
+  const base = levelLabel(track, profile.rows[0]?.other_level as string | null | undefined)
   return {
     trackLabel: base ? (track === 'admissao' && institution ? `${base} (${institution})` : base) : null,
     subject: (subject?.rows[0]?.name as string | undefined) ?? null,
