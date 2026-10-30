@@ -319,3 +319,22 @@ body {
   .tw-in-win{grid-template-columns:1fr 1fr}.tw-tx{padding:44px 40px}.tw-vis{padding:40px}
   .tw-ft{grid-template-columns:1.6fr 1fr 1fr 1fr}
 }
+
+/* Estado de processamento: botões de envio dentro de um formulário ocupado (aria-busy) */
+form[aria-busy="true"] button[type="submit"] { cursor: progress; }
+form[aria-busy="true"] button[type="submit"]::before {
+  content: "";
+  display: inline-block;
+  flex-shrink: 0;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.5em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 9999px;
+  vertical-align: -0.15em;
+  animation: estuda-spin 0.7s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  form[aria-busy="true"] button[type="submit"]::before { animation-duration: 2s; }
+}

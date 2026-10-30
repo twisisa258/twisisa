@@ -1,11 +1,11 @@
 'use server'
 
-import { and, desc, eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { follows, postLikes, posts } from '@/lib/db/schema'
+import { follows, posts } from '@/lib/db/schema'
 import { AppError, runAction, type ActionResult } from '@/lib/action-result'
 
 async function getUserId() {
@@ -34,17 +34,4 @@ export async function toggleFollow(targetUserId: string): Promise<ActionResult> 
     else await db.insert(follows).values({ followerId: userId, followingId: targetUserId })
     revalidatePath('/comunidade')
   }, 'Não foi possível actualizar. Tenta outra vez.')
-}
-
-export async function getCommunityPosts() {
-  await getUserId()
-  return db.select().from(posts).orderBy(desc(posts.createdAt)).limit(30)
-}
-
-export async function togglePostLike(postId: string) {
-  const userId = await getUserId()
-  const existing = await db.select().from(postLikes).where(and(eq(postLikes.postId, postId), eq(postLikes.userId, userId))).limit(1)
-  if (existing.length) await db.delete(postLikes).where(and(eq(postLikes.postId, postId), eq(postLikes.userId, userId)))
-  else await db.insert(postLikes).values({ postId, userId })
-  revalidatePath('/comunidade')
 }

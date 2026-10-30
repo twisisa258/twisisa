@@ -1,18 +1,16 @@
-# Ambiente
-.env.local
-.env.*
+# Ambiente (o .env.example fica no repositório)
 .env
+.env.*
 !.env.example
-.vercel/
-.backup-*
-.ux-backup-*
+
 # Dependências e build
 node_modules
 .next/
-.DS_Store
-.md
-.vercel
-.env*
+.vercel/
 *.tsbuildinfo
-#configs
-prompt-csv-questoes.md
+.DS_Store
+
+# Cópias locais
+.backup-*
+.ux-backup-*
+.sim-backup-*
