@@ -40,6 +40,21 @@ function FieldSkeleton({ labelWidth = 'w-24' }: { labelWidth?: string }) {
 }
 
 /** /admin/materiais: faixa com "Adicionar", pesquisa + contagem e painel de lista (título, metadados, abrir/eliminar) com paginação. */
+/** /admin/materiais/novo: cabeçalho e a zona de largar ficheiros. */
+export function AdminMateriaisNovoSkeleton() {
+  return (
+    <SkeletonRegion label="A preparar o carregamento" className={adminPageSkeletonClass}>
+      <AdminHeaderSkeleton />
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-[#d6e2d9] bg-white px-6 py-16">
+        <Skeleton className="size-14 rounded-2xl" />
+        <Skeleton className="h-5 w-64" />
+        <Skeleton className="h-4 w-80 max-w-full" />
+        <div className="flex gap-2"><Skeleton className="h-11 w-40 rounded-xl" /><Skeleton className="h-11 w-36 rounded-xl" /></div>
+      </div>
+    </SkeletonRegion>
+  )
+}
+
 export function AdminMateriaisSkeleton() {
   return (
     <SkeletonRegion label="A carregar os materiais" className={adminPageSkeletonClass}>
