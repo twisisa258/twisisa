@@ -1,4 +1,8 @@
 import { redirect } from 'next/navigation'
+import { eq } from 'drizzle-orm'
+import { db } from '@/lib/db'
+import { studentProfiles } from '@/lib/db/schema'
+import { ChooseCourseButton } from '@/components/orientacao/choose-course-button'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
 import { OrientacaoStartButton } from '@/components/orientacao/orientacao-buttons'
 import { getVisibleModules } from '@/lib/exam-modules'
@@ -22,6 +26,7 @@ export default async function ResultadoPage() {
   const latest = await getLatestResult(scope.userId)
   if (!latest) redirect(ORIENTACAO_HREF)
   const { courses, flat } = latest.result
+  const [profile] = await db.select({ targetCourseId: studentProfiles.targetCourseId }).from(studentProfiles).where(eq(studentProfiles.userId, scope.userId)).limit(1)
 
   return (
     <StudentFeatureShell firstName={firstName} eyebrow="Orientação" title="Os teus cursos" hideTitle>
@@ -34,6 +39,7 @@ export default async function ResultadoPage() {
           <>
             <p className="mt-3 text-[13px] leading-5 text-[#6b756e]">A afinidade mostra o quanto o curso combina com o que disseste que gostas. Não garante a entrada.</p>
             {flat && <p className="mt-2 text-[13px] leading-5 text-[#6b756e]">As tuas respostas foram muito parecidas, por isso as diferenças entre os cursos são pequenas.</p>}
+            <p className="mt-2 text-[13px] leading-5 text-[#6b756e]">Escolhe o curso a que queres candidatar-te: passas a treinar as provas dele nos Desafios.</p>
             <ol className="mt-5 space-y-3">
               {courses.map((course) => (
                 <li key={course.courseId} className={`${card} p-4`}>
@@ -48,6 +54,7 @@ export default async function ResultadoPage() {
                     </div>
                   </div>
                   {course.reasons.length > 0 && <p className="mt-3 text-[13px] text-[#39433e]">Porque gostas de {joinLabels(course.reasons.map((d) => DIMENSION_LABEL[d]))}.</p>}
+                  <div className="mt-3"><ChooseCourseButton courseId={course.courseId} chosen={profile?.targetCourseId === course.courseId} /></div>
                 </li>
               ))}
             </ol>

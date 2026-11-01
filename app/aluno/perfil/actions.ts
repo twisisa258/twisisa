@@ -4,7 +4,7 @@ import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { eq } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { db, pool } from '@/lib/db'
 import { studentProfiles, user } from '@/lib/db/schema'
 import { AppError, runAction, type ActionResult } from '@/lib/action-result'
 import { isUniqueViolation } from '@/lib/pg-errors'
@@ -80,14 +80,26 @@ export async function saveCandidate(formData: FormData): Promise<ActionResult> {
   return runAction(async () => {
     const current = await requireUser()
 
-    const targetCourse = String(formData.get('targetCourse') ?? '').trim().replace(/\s+/g, ' ').slice(0, 160) || null
+    // O curso tem de ser da instituição do aluno. O nome fica copiado em target_course.
+    const courseId = String(formData.get('targetCourseId') ?? '').trim()
+    let targetCourseId: string | null = null
+    let targetCourse: string | null = null
+    if (courseId) {
+      const found = await pool.query(
+        `SELECT c.name FROM courses c JOIN student_profiles sp ON sp.institution_id = c.institution_id WHERE c.id = $1 AND c.active AND sp.user_id = $2`,
+        [courseId, current.id],
+      )
+      if (!found.rows[0]) throw new AppError('Escolhe um curso da lista da tua instituição.')
+      targetCourseId = courseId
+      targetCourse = found.rows[0].name as string
+    }
     const parsedScore = Number(formData.get('targetScore'))
     const targetScore = Number.isInteger(parsedScore) && parsedScore >= 0 && parsedScore <= 20 ? parsedScore : 12
 
     await db
       .insert(studentProfiles)
-      .values({ userId: current.id, targetCourse, targetScore })
-      .onConflictDoUpdate({ target: studentProfiles.userId, set: { targetCourse, targetScore, updatedAt: new Date() } })
+      .values({ userId: current.id, targetCourseId, targetCourse, targetScore })
+      .onConflictDoUpdate({ target: studentProfiles.userId, set: { targetCourseId, targetCourse, targetScore, updatedAt: new Date() } })
 
     refresh()
     return 'Guardado.'

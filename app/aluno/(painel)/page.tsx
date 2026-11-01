@@ -7,7 +7,7 @@ import { getGreeting } from '@/lib/greeting'
 import { db } from '@/lib/db'
 import { studentProfiles } from '@/lib/db/schema'
 import { getAlunoOverview, type MaterialItem, type Part } from '@/lib/aluno-overview'
-import { isTrack, trackLabel, type Track } from '@/lib/percurso'
+import { isTrack, levelLabel, type Track } from '@/lib/percurso'
 import { relativeTime } from '@/lib/relative-time'
 import { cn } from '@/lib/utils'
 import { StudentSidebar } from '@/components/student-sidebar'
@@ -16,6 +16,9 @@ import { AlunoMenuButton } from '@/components/aluno/aluno-menu-button'
 import { Ic } from '@/components/aluno/icons'
 import { ContinuarCard, DescobreCursoCard, ErrosCard, ProgressoPorDisciplina } from '@/components/aluno/inicio-cards'
 import { getInicioAluno, type ResumeItem } from '@/lib/aluno-inicio'
+import { getDesafios } from '@/lib/desafios'
+import { buildAvisos } from '@/lib/avisos'
+import { Avisos } from '@/components/aluno/avisos'
 import { requireStudent } from '@/lib/require-student'
 
 export const dynamic = 'force-dynamic'
@@ -72,7 +75,7 @@ export default async function StudentPage() {
   const session = await requireStudent('/aluno')
 
   const [profile] = await db
-    .select({ track: studentProfiles.track, institutionId: studentProfiles.institutionId, birthDate: studentProfiles.birthDate, dailyGoal: studentProfiles.dailyGoal })
+    .select({ track: studentProfiles.track, institutionId: studentProfiles.institutionId, targetCourseId: studentProfiles.targetCourseId, otherLevel: studentProfiles.otherLevel, birthDate: studentProfiles.birthDate, dailyGoal: studentProfiles.dailyGoal })
     .from(studentProfiles)
     .where(eq(studentProfiles.userId, session.user.id))
     .limit(1)
@@ -84,7 +87,7 @@ export default async function StudentPage() {
   const rawTrack = profile?.track
   const track: Track | null = isTrack(rawTrack) ? rawTrack : null
   // Primeiro acesso: o aluno escolhe o percurso. A administração fica de fora para poder criar as instituições antes de escolher.
-  if (!track && !isAdmin) redirect('/aluno/percurso')
+  if (!track && !profile?.otherLevel && !isAdmin) redirect('/aluno/percurso')
 
   // O Início do Simulador e a orientação de curso correm ao mesmo tempo que o resto; se falharem, essas secções não aparecem (nunca um zero inventado).
   const inicioPromise = track
@@ -95,6 +98,13 @@ export default async function StudentPage() {
           return { ok: false as const }
         },
       )
+    : Promise.resolve(null)
+  // Sequência e avisos vêm das respostas do Simulador (lib/desafios). Se falhar, a página segue sem eles.
+  const desafiosPromise = track
+    ? getDesafios({ scope: { userId: session.user.id, track, institutionId: profile?.institutionId ?? null }, targetCourseId: profile?.targetCourseId ?? null }).catch((error: unknown) => {
+        console.error('[ALUNO] desafios', error)
+        return null
+      })
     : Promise.resolve(null)
   const { progress, unread, downloads, saved, recent, savedItems, institution, simulador } = await getAlunoOverview({
     userId: session.user.id,
@@ -108,7 +118,7 @@ export default async function StudentPage() {
       ? institution.ok && institution.value
         ? `Admissão · ${institution.value}`
         : 'Admissão'
-      : (trackLabel(track) ?? 'Escolher percurso')
+      : (levelLabel(track, profile?.otherLevel) ?? 'Escolher percurso')
   const week = progress.ok ? progress.value : null
   // O cartão «Continuar» só existe quando há mesmo algo para continuar.
   const last = recent.ok ? recent.value[0] : undefined
@@ -116,7 +126,9 @@ export default async function StudentPage() {
   // Ordem: orientação a meio, sessão do Simulador a meio, último material aberto.
   const resume: ResumeItem | null =
     (inicio?.ok ? inicio.value.resume : null) ?? (last ? { kind: 'material', title: last.title, at: last.at, href: fileHref(last.id) } : null)
-  const greeting = getGreeting({ name: session.user.name, userId: session.user.id, createdAt: session.user.createdAt, birthDate: profile?.birthDate ?? null, streak: week?.streak ?? null })
+  const desafios = await desafiosPromise
+  const avisos = desafios ? buildAvisos(desafios).slice(0, 3) : []
+  const greeting = getGreeting({ name: session.user.name, userId: session.user.id, createdAt: session.user.createdAt, birthDate: profile?.birthDate ?? null, streak: desafios ? desafios.streak.current : (week?.streak ?? null) })
   // Linha discreta com dados reais de study_days (sem cartão): «Hoje 4/10 · 3 dias seguidos». Sem dados, não aparece.
   const goal = profile?.dailyGoal ?? null
   const activityParts: string[] = []
@@ -170,6 +182,8 @@ export default async function StudentPage() {
                   <Ic name="chev" size={14} />
                 </Link>
               </div>
+
+              <Avisos items={avisos} />
 
               {resume && <ContinuarCard resume={resume} />}
 

@@ -32,7 +32,7 @@ Estados: FEITO E TESTADO · FEITO, FALTA TESTE · FICTÍCIO (dados inventados) �
 | `/jonas` | FEITO, FALTA TESTE | Groq. Só travão de 25 mensagens por minuto; sem limites por plano. |
 | `/aluno/notificacoes` | FICTÍCIO | Lê e marca como lida, mas nada cria notificações. |
 | `/aluno/favoritos` | FICTÍCIO | Página estática; a Biblioteca já guarda em `library_favorites`. |
-| `/aluno/desafios` | FICTÍCIO | Números fixos no código; missões só no browser. |
+| `/aluno/desafios` | FEITO, FALTA TESTE | Sequência, missões do dia e da semana, prontidão por curso e avisos, tudo calculado a partir das respostas do Simulador (`lib/desafios.ts`). Curso alvo escolhido no perfil ou no resultado do teste vocacional (`student_profiles.target_course_id`, migração 0026). |
 | `/comunidade` | FICTÍCIO | Pessoas fixas; "seguir" grava ids que não são utilizadores (`follows` sem chave estrangeira); a lista não vem da base. |
 | `/aluno/convites` | NÃO VERIFICADO | Tratar como fictícia até prova em contrário. |
 | `/aluno/descobrir-curso` | NÃO VERIFICADO | |

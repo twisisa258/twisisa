@@ -1,12 +1,17 @@
 import Link from 'next/link'
+import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
 import { BookOpen, GraduationCap, Lock, School, Sparkles, UserRound, Check } from 'lucide-react'
 import { eq } from 'drizzle-orm'
+import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { institutions, studentProfiles } from '@/lib/db/schema'
-import { trackLabel } from '@/lib/percurso'
+import { levelLabel } from '@/lib/percurso'
 import { PROVINCES, profileSteps } from '@/lib/perfil'
 import { getSubscription, isSubscriptionActive } from '@/lib/subscription'
 import { getRanking } from '@/lib/ranking'
+import { ORIENTACAO_HREF } from '@/lib/orientacao'
+import { getCourseSubjects, listInstitutionCourses } from '@/lib/target-course'
 import { formatPoints } from '@/lib/simulator-shared'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
 import { SelectField } from '@/components/ui/select-field'
@@ -15,15 +20,16 @@ import { Field, fieldClass } from '@/components/aluno/perfil/fields'
 import { PasswordForm } from '@/components/aluno/perfil/password-form'
 import { ProfileAccordion, type AccordionItem } from '@/components/aluno/perfil/profile-accordion'
 import { SectionForm } from '@/components/aluno/perfil/section-form'
+import { CoursePicker } from '@/components/aluno/perfil/course-picker'
 import { saveCandidate, savePersonal, saveSchool } from './actions'
-import { requireStudent } from '@/lib/require-student'
 
 export const metadata = { title: 'O meu perfil | Twisisa', description: 'Gere as tuas informações pessoais e preferências.' }
 
 const linkButton = 'inline-flex h-10 items-center rounded-xl border border-[#dfe3d9] bg-white px-4 text-sm font-semibold text-[#1d4d41] transition-colors hover:bg-[#f1f4ef]'
 
 export default async function PerfilPage() {
-  const session = await requireStudent('/aluno/perfil')
+  const session = await auth.api.getSession({ headers: await headers() })
+  if (!session?.user) redirect('/sign-in')
   const [[current], subscription] = await Promise.all([
     db.select().from(studentProfiles).where(eq(studentProfiles.userId, session.user.id)),
     getSubscription(session.user.id),
@@ -35,6 +41,11 @@ export default async function PerfilPage() {
   const institution = current?.institutionId
     ? (await db.select({ shortName: institutions.shortName, name: institutions.name }).from(institutions).where(eq(institutions.id, current.institutionId)))[0]
     : undefined
+
+  // Admissão: cursos da instituição e disciplinas das provas do curso escolhido (se falhar, o resto da página segue).
+  const isAdmissionTrack = current?.track === 'admissao' && !!current.institutionId
+  const institutionCourses = isAdmissionTrack ? await listInstitutionCourses(current.institutionId!).catch(() => []) : []
+  const courseSubjects = current?.targetCourseId ? await getCourseSubjects(current.targetCourseId).catch(() => []) : []
 
   const name = session.user.name
   const firstName = name.split(' ')[0]
@@ -48,8 +59,9 @@ export default async function PerfilPage() {
     province: current?.province ?? null,
     school: current?.school ?? null,
     track,
+    otherLevel: current?.otherLevel ?? null,
     institutionId: current?.institutionId ?? null,
-    targetCourse: current?.targetCourse ?? null,
+    targetCourse: current?.targetCourseId ?? null,
   })
   const doneCount = steps.filter((step) => step.done).length
   const percent = Math.round((doneCount / steps.length) * 100)
@@ -58,8 +70,9 @@ export default async function PerfilPage() {
 
   const has = (key: string) => steps.find((step) => step.key === key)?.done ?? false
   const schoolSummary = current?.school && current?.province ? `${current.school} · ${current.province}` : current?.school || current?.province || 'Onde estudas'
-  const trackSummary = track
-    ? [trackLabel(track), isAdmission ? (institution?.shortName ?? 'sem instituição') : null, isAdmission ? current?.targetCourse : null].filter(Boolean).join(' · ')
+  const levelName = levelLabel(track, current?.otherLevel)
+  const trackSummary = levelName
+    ? [levelName, isAdmission ? (institution?.shortName ?? 'sem instituição') : null, isAdmission ? current?.targetCourse : null].filter(Boolean).join(' · ')
     : 'O que estás a preparar'
 
   const items: AccordionItem[] = [
@@ -116,21 +129,27 @@ export default async function PerfilPage() {
       content: (
         <div className="grid gap-4">
           <p className="text-sm text-[#68716a]">
-            {track ? `${trackLabel(track)}${isAdmission ? (institution ? ` · ${institution.name}` : ' · sem instituição escolhida') : ''}` : 'Ainda não escolheste o que estás a preparar.'}
+            {levelName ? `${levelName}${isAdmission ? (institution ? ` · ${institution.name}` : ' · sem instituição escolhida') : ''}` : 'Ainda não escolheste o que estás a preparar.'}
           </p>
           <div>
-            <Link href="/aluno/percurso" className={linkButton}>{track ? 'Alterar percurso' : 'Escolher percurso'}</Link>
+            <Link href="/aluno/percurso" className={linkButton}>{levelName ? 'Alterar percurso' : 'Escolher percurso'}</Link>
           </div>
           {isAdmission && (
-            <div className="border-t border-[#eceee7] pt-4">
-              <SectionForm sectionId="percurso" action={saveCandidate}>
-                <Field label="Curso alvo">
-                  <input name="targetCourse" maxLength={160} defaultValue={current?.targetCourse ?? ''} placeholder="Ex.: Engenharia de Telecomunicações" className={fieldClass} />
-                </Field>
-                <Field label="Meta de nota" hint="Escala de 0 a 20." custom>
-                  <SelectField name="targetScore" label="Meta de nota" defaultValue={String(current?.targetScore ?? 12)} triggerClassName={fieldClass} options={[10, 12, 14, 16, 18, 20].map((score) => ({ value: String(score), label: String(score) }))} />
-                </Field>
-              </SectionForm>
+            <div className="grid gap-4 border-t border-[#eceee7] pt-4">
+              {institutionCourses.length === 0 ? (
+                <p className="text-sm text-[#68716a]">Ainda não há cursos desta instituição na plataforma.</p>
+              ) : (
+                <SectionForm sectionId="percurso" action={saveCandidate}>
+                  <Field label="Curso alvo" custom>
+                    <CoursePicker name="targetCourseId" courses={institutionCourses} defaultValue={current?.targetCourseId ?? null} />
+                  </Field>
+                  <Field label="Meta de nota" hint="Escala de 0 a 20." custom>
+                    <SelectField name="targetScore" label="Meta de nota" defaultValue={String(current?.targetScore ?? 12)} triggerClassName={fieldClass} options={[10, 12, 14, 16, 18, 20].map((score) => ({ value: String(score), label: String(score) }))} />
+                  </Field>
+                </SectionForm>
+              )}
+              {courseSubjects.length > 0 && <p className="text-xs text-[#68716a]">Provas do curso: {courseSubjects.map((subject) => subject.name).join(', ')}.</p>}
+              <p className="text-sm text-[#68716a]">Não sabes o curso? <Link href={ORIENTACAO_HREF} className="font-semibold text-[#1d4d41] hover:underline">Faz o teste vocacional</Link> e escolhe entre 5 sugestões.</p>
             </div>
           )}
         </div>

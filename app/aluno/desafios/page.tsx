@@ -1,31 +1,48 @@
-import { Flame, Trophy, Users } from 'lucide-react'
+import { eq } from 'drizzle-orm'
+import { db } from '@/lib/db'
+import { studentProfiles } from '@/lib/db/schema'
+import { buildAvisos } from '@/lib/avisos'
+import { getDesafios, type DesafiosSnapshot } from '@/lib/desafios'
+import { requireSimulatorScope } from '@/lib/simulator-scope'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
-import { ChallengeBoard } from '@/components/challenge-board'
-import { requireStudent } from '@/lib/require-student'
+import { Avisos } from '@/components/aluno/avisos'
+import { MissionList, ReadinessCard, Regras, StreakCard } from '@/components/aluno/desafios/parts'
+import { ErrorState } from '@/components/states/error-state'
+
+export const metadata = { title: 'Desafios | Twisisa', description: 'Sequência, missões do dia e da semana e prontidão para o teu curso.' }
+export const dynamic = 'force-dynamic'
 
 export default async function DesafiosPage() {
-  const session = await requireStudent('/aluno/desafios')
+  const { scope, firstName } = await requireSimulatorScope()
+  const [profile] = await db.select({ targetCourseId: studentProfiles.targetCourseId }).from(studentProfiles).where(eq(studentProfiles.userId, scope.userId)).limit(1)
 
-  const stats = [
-    { icon: Flame, value: '4', label: 'dias seguidos' },
-    { icon: Trophy, value: '2', label: 'concluídos' },
-    { icon: Users, value: '12', label: 'na turma' },
-  ]
+  let data: DesafiosSnapshot | null = null
+  try {
+    data = await getDesafios({ scope, targetCourseId: profile?.targetCourseId ?? null })
+  } catch (error) {
+    console.error('[DESAFIOS]', error)
+  }
+
+  // A meta de hoje e a sequência já estão no cartão de cima: não se repetem nos avisos.
+  const avisos = data ? buildAvisos(data).filter((aviso) => aviso.id !== 'done' && aviso.id !== 'daily') : []
+  const daysToSunday = data ? 6 - data.weekday : 0
 
   return (
-    <StudentFeatureShell firstName={session.user.name.split(' ')[0]} eyebrow="Desafios" title="Desafios da semana.">
-      <div className="mb-6 grid grid-cols-3 gap-3 sm:mb-8 sm:gap-6" aria-label="Resumo dos desafios">
-        {stats.map(({ icon: Icon, value, label }) => (
-          <div key={label} className="flex min-w-0 items-center gap-2 sm:gap-3">
-            <Icon className="size-[18px] shrink-0 text-[#1d4d41] sm:size-5" aria-hidden="true" />
-            <div className="min-w-0">
-              <p className="text-lg font-semibold leading-tight text-[#202321] sm:text-xl">{value}</p>
-              <p className="mt-1 text-[10px] leading-tight text-[#7d857e] sm:text-xs">{label}</p>
-            </div>
-          </div>
-        ))}
+    <StudentFeatureShell firstName={firstName} eyebrow="Desafios" title="Desafios" hideBackLink>
+      <div className="mx-auto flex max-w-2xl flex-col gap-5">
+        {!data ? (
+          <ErrorState title="Não foi possível carregar os desafios" description="Tenta outra vez daqui a pouco." />
+        ) : (
+          <>
+            <StreakCard s={data} />
+            <Avisos items={avisos} />
+            <MissionList title="Hoje" hint={`acaba às 24:00`} missions={data.daily} />
+            <MissionList title="Esta semana" hint={daysToSunday === 0 ? 'acaba hoje' : `acaba em ${daysToSunday} ${daysToSunday === 1 ? 'dia' : 'dias'}`} missions={data.weekly} />
+            <ReadinessCard s={data} />
+            <Regras admission={data.admission} />
+          </>
+        )}
       </div>
-      <ChallengeBoard />
     </StudentFeatureShell>
   )
 }

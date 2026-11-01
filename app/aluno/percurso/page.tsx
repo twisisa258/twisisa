@@ -14,7 +14,7 @@ export default async function PercursoPage() {
   const session = await requireStudent('/aluno/percurso')
 
   const [[profile], institutions] = await Promise.all([
-    db.select({ track: studentProfiles.track, institutionId: studentProfiles.institutionId }).from(studentProfiles).where(eq(studentProfiles.userId, session.user.id)).limit(1),
+    db.select({ track: studentProfiles.track, otherLevel: studentProfiles.otherLevel, institutionId: studentProfiles.institutionId }).from(studentProfiles).where(eq(studentProfiles.userId, session.user.id)).limit(1),
     listStudentInstitutions(),
   ])
   const firstName = session.user.name.split(' ')[0]
@@ -24,6 +24,7 @@ export default async function PercursoPage() {
     <StudentFeatureShell firstName={firstName} eyebrow="Percurso" title="O teu percurso" hideBackLink>
       <PercursoPicker
         initialTrack={isTrack(savedTrack) ? savedTrack : null}
+        initialOtherLevel={profile?.otherLevel ?? null}
         initialInstitutionId={profile?.institutionId ?? null}
         institutions={institutions.map((item) => ({ id: item.id, shortName: item.shortName, name: item.name, description: item.description, logoUrl: item.logoUrl, soon: item.contentCount === 0 }))}
       />

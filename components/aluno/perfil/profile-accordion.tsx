@@ -31,6 +31,16 @@ export function ProfileAccordion({ items }: { items: AccordionItem[] }) {
 
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current) }, [])
 
+  // /aluno/perfil#percurso abre essa secção.
+  useEffect(() => {
+    const id = window.location.hash.slice(1)
+    if (id && items.some((item) => item.id === id)) {
+      setOpenId(id)
+      document.getElementById(`perfil-${id}-botao`)?.scrollIntoView({ block: 'center' })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const saved = useCallback((id: string) => {
     setOpenId((current) => (current === id ? null : current))
     setSavedId(id)
