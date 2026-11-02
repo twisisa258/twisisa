@@ -23,7 +23,7 @@ export async function queueReminders(limit = 200): Promise<{ checked: number; qu
        JOIN "user" u ON u.id = p.user_id
        JOIN student_profiles sp ON sp.user_id = p.user_id AND sp.onboarded_at IS NOT NULL
        WHERE p.email_enabled AND coalesce((p.categories->>'study')::boolean, false)
-         AND coalesce(p.study_hour, $1) = extract(hour FROM (now() AT TIME ZONE 'Africa/Maputo'))::int
+         AND coalesce(p.study_hour, $1) <= extract(hour FROM (now() AT TIME ZONE 'Africa/Maputo'))::int
          AND p.last_sent_on IS DISTINCT FROM (now() AT TIME ZONE 'Africa/Maputo')::date
        ORDER BY p.user_id LIMIT $2`,
       [DEFAULT_STUDY_HOUR, limit],
