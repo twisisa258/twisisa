@@ -77,15 +77,13 @@ export function Toolbox({ attemptId, mode, item, wasWrong, onHints, onMarked, on
       const target = event.target as HTMLElement | null
       if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return
       if (event.key === 'Escape' && open) close()
-      else if ((event.key === 't' || event.key === 'T') && !event.ctrlKey && !event.metaKey && !event.altKey && !(timed && !answered)) setOpen((value) => !value)
+      else if ((event.key === 't' || event.key === 'T') && !event.ctrlKey && !event.metaKey && !event.altKey) setOpen((value) => !value)
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [open, close, timed, answered])
 
   // No Modo rápido o tempo corre: antes de responder não há ferramentas, para ninguém perder segundos a escolher.
-  if (timed && !answered) return null
-
   const hintsLeft = item.options.length >= 3 ? 3 - item.hints.length : 2 - item.hints.length
   const titles: Record<View, string> = { menu: 'Ferramentas', dica: 'Dica', materia: 'Matéria relacionada', depois: 'Estudar depois', parecida: 'Questão parecida', reportar: 'Reportar questão' }
 
@@ -122,8 +120,8 @@ export function Toolbox({ attemptId, mode, item, wasWrong, onHints, onMarked, on
                 <div className="grid gap-2 sm:grid-cols-2">
                   {wasWrong && <Tile icon={Lightbulb} tone="aviso" label="Porque errei" note="O Jonas encontra o engano" onClick={() => { close(); onOpenJonas('porque') }} />}
                   {answered && <Tile icon={Sparkles} tone="assistente" label="Pergunta ao Jonas" note="Explicação e dúvidas" onClick={() => { close(); onOpenJonas(null) }} />}
-                  {!answered && <Tile icon={Lightbulb} tone="ajuda" label="Dica" note={item.hints.length ? `${item.hints.length} de ${item.options.length >= 3 ? 3 : 2} usadas` : 'Custa 25 % dos pontos'} onClick={() => setView('dica')} />}
-                  <Tile icon={BookOpen} tone="ajuda" label="Matéria relacionada" note="Da Biblioteca" onClick={() => setView('materia')} />
+                  {!answered && !timed && <Tile icon={Lightbulb} tone="ajuda" label="Dica" note={item.hints.length ? `${item.hints.length} de ${item.options.length >= 3 ? 3 : 2} usadas` : 'Custa 25 % dos pontos'} onClick={() => setView('dica')} />}
+                  {(answered || !timed) && <Tile icon={BookOpen} tone="ajuda" label="Matéria relacionada" note="Da Biblioteca" onClick={() => setView('materia')} />}
                   {answered && <Tile icon={Repeat} tone="sucesso" label="Questão parecida" note="Treina mais, criada por IA" onClick={() => setView('parecida')} />}
                   <Tile icon={item.marked ? BookmarkCheck : Bookmark} tone="assistente" label="Estudar depois" note={item.marked ? 'Guardada' : 'Escolhe quando'} onClick={() => setView('depois')} />
                   <Tile icon={Flag} tone="neutro" label="Reportar questão" note="Erro no enunciado" onClick={() => setView('reportar')} />

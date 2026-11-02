@@ -14,3 +14,4 @@ node_modules
 .backup-*
 .ux-backup-*
 .sim-backup-*
+.vercel
