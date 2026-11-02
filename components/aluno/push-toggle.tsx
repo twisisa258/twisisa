@@ -13,12 +13,22 @@ function chaveParaBytes(base64: string) {
   return bytes
 }
 
+// Um registo antigo, criado com outra chave VAPID, é recusado pelo serviço de push (403) sem avisar o aluno.
+function mesmaChave(sub: PushSubscription, chave: string) {
+  const atual = sub.options?.applicationServerKey
+  if (!atual) return true
+  const a = new Uint8Array(atual)
+  const b = chaveParaBytes(chave)
+  return a.length === b.length && a.every((valor, i) => valor === b[i])
+}
+
 async function registo() {
   return (await navigator.serviceWorker.getRegistration('/sw.js')) ?? (await navigator.serviceWorker.register('/sw.js', { scope: '/' }))
 }
 
 // Notificações no telemóvel. Cada estado diz ao aluno o que fazer; nada falha em silêncio.
 export function PushToggle({ publicKey }: { publicKey: string }) {
+  const chave = publicKey.trim()
   const [estado, setEstado] = useState<Estado>('a-ver')
   const [ocupado, setOcupado] = useState(false)
   const [aviso, setAviso] = useState<string | null>(null)
@@ -28,12 +38,19 @@ export function PushToggle({ publicKey }: { publicKey: string }) {
     const ios = /iPad|iPhone|iPod/.test(navigator.userAgent)
     const instalada = window.matchMedia('(display-mode: standalone)').matches || (navigator as Navigator & { standalone?: boolean }).standalone === true
     if (!suporta) return setEstado(ios && !instalada ? 'instalar' : 'sem-suporte')
-    if (!publicKey) return setEstado('sem-chave')
+    if (!chave) return setEstado('sem-chave')
     if (Notification.permission === 'denied') return setEstado('bloqueado')
     const reg = await navigator.serviceWorker.getRegistration('/sw.js')
     const sub = await reg?.pushManager.getSubscription()
+    if (sub && !mesmaChave(sub, chave)) {
+      // Registo feito com outra chave: apaga-o para o aluno poder ligar de novo com a chave actual.
+      await fetch('/api/push', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ endpoint: sub.endpoint }) }).catch(() => undefined)
+      await sub.unsubscribe().catch(() => undefined)
+      setAviso('As notificações deste aparelho tinham de ser renovadas. Toca em «Ligar».')
+      return setEstado('desligado')
+    }
     setEstado(sub && Notification.permission === 'granted' ? 'ligado' : 'desligado')
-  }, [publicKey])
+  }, [chave])
 
   useEffect(() => { void ver().catch(() => setEstado('sem-suporte')) }, [ver])
 
@@ -48,7 +65,12 @@ export function PushToggle({ publicKey }: { publicKey: string }) {
       }
       const reg = await registo()
       await navigator.serviceWorker.ready
-      const sub = (await reg.pushManager.getSubscription()) ?? (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: chaveParaBytes(publicKey) }))
+      let sub = await reg.pushManager.getSubscription()
+      if (sub && !mesmaChave(sub, chave)) {
+        await sub.unsubscribe().catch(() => undefined)
+        sub = null
+      }
+      sub = sub ?? (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: chaveParaBytes(chave) }))
       const resposta = await fetch('/api/push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(sub.toJSON()) })
       if (!resposta.ok) {
         await sub.unsubscribe().catch(() => undefined)
