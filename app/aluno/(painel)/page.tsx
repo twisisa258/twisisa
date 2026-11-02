@@ -14,12 +14,15 @@ import { StudentSidebar } from '@/components/student-sidebar'
 import { UrlFeedback } from '@/components/url-feedback'
 import { AlunoMenuButton } from '@/components/aluno/aluno-menu-button'
 import { Ic } from '@/components/aluno/icons'
-import { ContinuarCard, DescobreCursoCard, ErrosCard, ProgressoPorDisciplina } from '@/components/aluno/inicio-cards'
+import { DescobreCursoCard, ProgressoPorDisciplina } from '@/components/aluno/inicio-cards'
 import { getInicioAluno, type ResumeItem } from '@/lib/aluno-inicio'
 import { getDesafios } from '@/lib/desafios'
 import { buildAvisos } from '@/lib/avisos'
-import { Avisos } from '@/components/aluno/avisos'
-import { PlanoHoje, buildPlan } from '@/components/aluno/plano-hoje'
+import { AvisoFaixa } from '@/components/aluno/aviso-faixa'
+import { HojeHero } from '@/components/aluno/hoje-hero'
+import { Fechavel } from '@/components/aluno/fechavel'
+import { NovidadeModal } from '@/components/aluno/novidade-modal'
+import { ParaHoje, buildPlan } from '@/components/aluno/plano-hoje'
 import { markCounts } from '@/lib/kit'
 import { requireStudent } from '@/lib/require-student'
 
@@ -69,8 +72,7 @@ function MaterialCard({ tone, items, emptyTitle, emptyText }: { tone: 'white' | 
   )
 }
 
-const rowBase = 'flex h-[64px] items-center gap-[12px] rounded-[16px] px-[16px] text-[16px] font-semibold no-underline'
-const iconBox = 'flex size-[40px] flex-none items-center justify-center rounded-[12px]'
+const tile = 'flex min-h-[92px] flex-col items-start justify-between rounded-2xl p-3 text-[14px] font-semibold no-underline'
 const sectionLabel = 'text-[11px] uppercase tracking-[0.12em] text-texto [font-family:inherit]'
 
 export default async function StudentPage() {
@@ -146,6 +148,7 @@ export default async function StudentPage() {
   return (
     <main className="min-h-screen max-w-full overflow-x-hidden bg-fundo text-texto" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
       <UrlFeedback />
+      {track && <NovidadeModal />}
       <div className="flex min-h-screen">
         <StudentSidebar firstName={firstName} image={session.user.image ?? null} />
         <div className="w-0 min-w-0 flex-1 overflow-x-clip leading-[normal]">
@@ -190,47 +193,35 @@ export default async function StudentPage() {
                 </Link>
               </div>
 
-              <Avisos items={avisos} />
+              <AvisoFaixa items={avisos} />
 
-              {plan.length > 0 && <PlanoHoje items={plan} />}
+              <HojeHero goal={desafios ? desafios.goal : null} answered={desafios ? desafios.todayAnswered : 0} resume={resume} />
 
-              {resume && <ContinuarCard resume={resume} />}
+              <ParaHoje items={plan} />
 
-              <section aria-label="O que queres fazer?" className={cn('rounded-[20px] bg-white p-[14px]', soft)}>
-                <div className="flex flex-col gap-[10px]">
-                  <Link href="/biblioteca" className={cn(rowBase, 'bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] text-marca')}>
-                    <span className={cn(iconBox, 'bg-white/[0.7]')}>
-                      <Ic name="book" />
-                    </span>
-                    Biblioteca
-                    <Ic name="up" className="ml-auto opacity-[.55]" />
-                  </Link>
-                  <Link href="/aluno/simulador" className={cn(rowBase, 'bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] text-marca')}>
-                    <span className={cn(iconBox, 'bg-white/[0.7]')}>
-                      <Ic name="test" />
-                    </span>
-                    Simulador
-                    <Ic name="up" className={'ml-auto opacity-[.55]'} />
-                  </Link>
-                  <Link href="/jonas" className={cn(rowBase, 'bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] text-marca')}>
-                    <span className={cn(iconBox, 'bg-white/[0.7]')}>
-                      <Ic name="spark" />
-                    </span>
-                    Jonas
-                    <Ic name="up" className="ml-auto opacity-[.55]" />
-                  </Link>
-                </div>
-              </section>
+              <nav aria-label="Atalhos" className="grid grid-cols-3 gap-2.5">
+                <Link href="/biblioteca" className={cn(tile, 'border border-linha bg-white text-texto')}>
+                  <span className="flex size-9 items-center justify-center rounded-xl bg-marca-suave text-marca"><Ic name="book" /></span>
+                  Biblioteca
+                </Link>
+                <Link href="/aluno/simulador" className={cn(tile, 'bg-marca-suave text-marca')}>
+                  <span className="flex size-9 items-center justify-center rounded-xl bg-white/70"><Ic name="test" /></span>
+                  Simulador
+                </Link>
+                <Link href="/jonas" className={cn(tile, 'bg-assistente-suave text-assistente')}>
+                  <span className="flex size-9 items-center justify-center rounded-xl bg-white/70"><Ic name="spark" /></span>
+                  Jonas
+                </Link>
+              </nav>
             </div>
 
             <div className="flex min-w-0 flex-col gap-[16px]">
               {inicio?.ok && inicio.value.practice && (
                 <>
                   <ProgressoPorDisciplina subjects={inicio.value.practice.subjects.slice(0, 5)} />
-                  {inicio.value.practice.showErrors && <ErrosCard count={inicio.value.practice.errorCount} href={inicio.value.practice.errorsHref} />}
                 </>
               )}
-              {inicio?.ok && inicio.value.orientacao && <DescobreCursoCard data={inicio.value.orientacao} />}
+              {inicio?.ok && inicio.value.orientacao && <Fechavel id="cartao:orientacao" days={14} label="Fechar sugestão"><DescobreCursoCard data={inicio.value.orientacao} /></Fechavel>}
               {(!savedItems.ok || savedItems.value.length > 0) && (
               <section aria-label="Guardados">
                 <h2 className={cn(sectionLabel, 'mb-[8px] ml-[4px] flex items-center gap-[6px] font-bold')}>

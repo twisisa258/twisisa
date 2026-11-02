@@ -26,3 +26,9 @@ Comunidade, Convites de estudante, `/biblioteca/partilhar`, ficheiros soltos (`*
 
 ## Fica por fazer (dito com franqueza)
 Web Push; datas de exame (fase H); repetição espaçada automática; «dia livre» da sequência; rascunho/calculadora no Kit; ligação explícita tema-material no admin; modo escuro; resto das pílulas (193) fora do Simulador; decidir preço/plano pago; testes de componentes. Os textos de Termos e Privacidade foram ajustados (sem comunidade): pedir revisão a quem conheça a lei local.
+
+## Ajustes pós-teste
+- Kit visível desde o início no Modo rápido (só Estudar depois e Reportar antes de responder).
+- Enunciado com hierarquia (cartão, dados, fórmulas em destaque, pergunta separada); regra documentada em State.md e no admin.
+- Resultado da questão passou para depois das opções.
+- Painel /aluno com blocos de formas diferentes, avisos e sugestões que se fecham e janela de novidade.

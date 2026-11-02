@@ -1,7 +1,6 @@
 'use client'
 
 import { QuestionStatement } from '@/components/simulador/question-statement'
-
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, Plus, Trash2 } from 'lucide-react'
 import { FeedbackForm } from '@/components/feedback-form'
@@ -296,10 +295,24 @@ export function QuestionForm({
           <textarea name="statement" rows={7} maxLength={12000} value={statement} onChange={(event) => setStatement(event.target.value)} className={field} placeholder="Escreve a pergunta. Fórmulas entre cifrões: $x^2 + 1$" />
         </label>
         <p className="-mt-2 text-xs text-texto-2">Fórmulas: <code>$x^2$</code> na linha, <code>$$\frac{'{a}'}{'{b}'}$$</code> em bloco. Para um cifrão normal escreve <code>\$</code>.</p>
+        <details className="-mt-2 rounded-xl border border-linha bg-white px-3 py-2 text-xs text-texto-2">
+          <summary className="cursor-pointer font-semibold text-texto">Como o enunciado aparece ao aluno</summary>
+          <ol className="mt-2 list-decimal space-y-1 pl-4">
+            <li><strong>Uma ideia por linha.</strong> O sistema separa o enunciado pelas linhas.</li>
+            <li><strong>Contexto:</strong> as primeiras linhas, em texto normal. Se a seguir vêm dados, termina a linha com dois pontos (<code>:</code>).</li>
+            <li><strong>Dados:</strong> uma linha por dado, logo a seguir aos dois pontos. Ficam num cartão com marcador; as linhas só com fórmula aparecem maiores e em destaque.</li>
+            <li><strong>Pergunta:</strong> a última linha. Termina em <code>?</code> ou começa por Qual, Calcule, Determine, Indique, Assinale… É a única em negrito.</li>
+          </ol>
+          <pre className="mt-2 overflow-x-auto rounded-lg bg-[#fafbf8] p-2 text-[11px] leading-4 text-texto">{String.raw`Seja f definida em R. Sabe-se que:
+$x_0 \in \mathbb{R}$;
+$f''(x_0) = -2$.
+Qual das alternativas é verdadeira?`}</pre>
+          <p className="mt-2">Um enunciado de uma só linha é tratado como a pergunta. Conferes tudo em «Como o aluno vê».</p>
+        </details>
         {statement.trim() && (
           <div className="rounded-2xl border border-linha bg-[#fafbf8] p-4">
-            <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#9aa39c]">Pré-visualização</p>
-            <MathText text={statement} className="text-[15px] leading-7" />
+            <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#9aa39c]">Como o aluno vê o enunciado</p>
+            <QuestionStatement text={statement} compact />
           </div>
         )}
       </div>

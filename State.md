@@ -75,6 +75,17 @@ Botão flutuante no quiz (`components/simulador/toolbox.tsx`, atalho `T`). No Mo
 ## Cores (`app/globals.css`)
 Marca (ação principal), sucesso, erro (só erros), aviso (atenção e tempo a acabar), ajuda (azul), assistente e revisão (índigo), conquista (dourado). Classes `.btn-primario/-secundario/-terciario/-perigo/-icone` e `.chip`. Pílula só para etiquetas.
 
+## Enunciado das questões (regra de apresentação)
+`lib/statement-parse.ts` separa o enunciado por linhas e `components/simulador/question-statement.tsx` desenha-o. A regra, que também aparece no formulário de questões do admin («Como o enunciado aparece ao aluno»):
+1. **Uma ideia por linha.**
+2. **Contexto**: as primeiras linhas, em texto normal. Se vêm dados a seguir, a linha termina em `:`.
+3. **Dados**: uma linha por dado, logo a seguir aos dois pontos, num cartão com marcador. Linhas só com fórmula (`$...$`) aparecem maiores, em bloco; o `;` ou `.` final é retirado.
+4. **Pergunta**: a última linha, se terminar em `?` ou começar por Qual, Calcule, Determine, Indique, Assinale, etc. É a única em negrito. Enunciado de uma só linha = pergunta.
+Pontuação solta numa linha (ex.: um `.` sozinho) junta-se à linha anterior, também nas opções. No simulador o enunciado fica num cartão com borda e fundo branco; o resultado (certo/errado) aparece depois das opções, para a questão não encolher.
+
+## Painel do aluno (/aluno)
+Cada bloco tem forma própria: destaque escuro «Hoje» (`hoje-hero.tsx`: anel da meta + continuar), faixa fina de aviso que se fecha (`aviso-faixa.tsx`, um por vez, «+N» abre janela pequena, volta no dia seguinte), fichas «Para hoje» (`plano-hoje.tsx`), três atalhos em grelha, cartão de orientação que se fecha (`fechavel.tsx`, volta ao fim de 14 dias) e uma janela de novidade única (`novidade-modal.tsx`, muda o ID em `ID` para anunciar outra). O «fechado» fica só no aparelho (`lib/dispensar.ts`, localStorage).
+
 ## Pendentes, por prioridade
 P0 (antes de receber estudantes)
 1. Ensaio completo com 3 a 5 estudantes reais num telemóvel (conta, e-mail, percurso, simulado, ranking, Jonas, Biblioteca).

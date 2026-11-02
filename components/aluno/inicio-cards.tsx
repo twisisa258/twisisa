@@ -1,8 +1,6 @@
 import Link from 'next/link'
-import { ArrowRight, ClipboardCheck, Compass } from 'lucide-react'
-import { Ic } from '@/components/aluno/icons'
-import type { OrientacaoCardData, ResumeItem, SubjectProgress } from '@/lib/aluno-inicio'
-import { relativeTime } from '@/lib/relative-time'
+import { Compass } from 'lucide-react'
+import type { OrientacaoCardData, SubjectProgress } from '@/lib/aluno-inicio'
 import { percent } from '@/lib/simulator-shared'
 import { cn } from '@/lib/utils'
 
@@ -20,46 +18,6 @@ function Empty({ title, text }: { title: string; text: string }) {
       <p className="text-[14px] font-medium text-texto">{title}</p>
       <p className="mt-[2px] text-[12px] text-texto-2">{text}</p>
     </div>
-  )
-}
-
-/** Um só «Continuar»: orientação a meio, sessão do Simulador a meio ou o último material. */
-export function ContinuarCard({ resume }: { resume: ResumeItem }) {
-  const material = resume.kind === 'material'
-  const Icon = resume.kind === 'orientacao' ? Compass : ClipboardCheck
-  const pct = resume.kind === 'material' ? 0 : percent(resume.answered, resume.total)
-  const unit = resume.kind === 'orientacao' ? 'perguntas' : 'questões'
-  const buttonClass = 'mt-[14px] flex h-[48px] items-center justify-center gap-[8px] rounded-[24px] bg-white text-[15px] font-semibold text-marca no-underline'
-
-  return (
-    <section aria-label="Continuar" className={cn('rounded-[20px] bg-gradient-to-br from-[#2f7260] via-marca to-[#12362d] p-[16px] text-white', soft)}>
-      <div className="flex items-center gap-[12px]">
-        <span className="flex size-[44px] flex-none items-center justify-center rounded-[14px] bg-white/[0.16] text-white">
-          {material ? <Ic name="file" /> : <Icon size={20} aria-hidden />}
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-white/70">CONTINUAR</p>
-          <p className="mt-[2px] truncate text-[16px] font-semibold">{resume.title}</p>
-          <p className="mt-[2px] text-[12px] text-white/70">
-            {resume.kind === 'material' ? relativeTime(resume.at) : `${resume.answered} de ${resume.total} ${unit}`}
-          </p>
-        </div>
-      </div>
-      {resume.kind !== 'material' && (
-        <div role="progressbar" aria-label="Progresso" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} className="mt-[12px] h-[6px] overflow-hidden rounded-[3px] bg-white/[0.2]">
-          <div className="h-full rounded-[3px] bg-white" style={{ width: `${pct}%` }} />
-        </div>
-      )}
-      {resume.kind === 'material' ? (
-        <a href={resume.href} target="_blank" rel="noopener" className={buttonClass}>
-          Abrir <Ic name="up" size={16} />
-        </a>
-      ) : (
-        <Link href={resume.href} className={buttonClass}>
-          Continuar <ArrowRight size={16} aria-hidden />
-        </Link>
-      )}
-    </section>
   )
 }
 
@@ -91,30 +49,6 @@ export function ProgressoPorDisciplina({ subjects }: { subjects: SubjectProgress
               )
             })}
           </ul>
-        )}
-      </div>
-    </section>
-  )
-}
-
-/** Questões erradas por rever (o mesmo número do Início do Simulador). */
-export function ErrosCard({ count, href }: { count: number; href: string }) {
-  return (
-    <section aria-label="Erros">
-      <h2 className={sectionLabel}>Erros</h2>
-      <div className={card}>
-        {count === 0 ? (
-          <Empty title="Ainda não tens erros para rever" text="As questões que errares aparecem aqui para refazeres." />
-        ) : (
-          <div className="flex items-center gap-[12px] px-[16px] py-[14px]">
-            <div className="min-w-0 flex-1">
-              <p className="text-[18px] font-semibold text-texto">{count}</p>
-              <p className="text-[12px] text-texto-2">{count === 1 ? 'questão para rever' : 'questões para rever'}</p>
-            </div>
-            <Link href={href} className={secondaryButton}>
-              Rever erros
-            </Link>
-          </div>
         )}
       </div>
     </section>

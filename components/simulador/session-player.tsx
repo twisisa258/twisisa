@@ -45,6 +45,8 @@ export function SessionPlayer({ data, cues }: { data: PlayData; cues: { sound: b
   const item = items[index]
   const isLast = index === items.length - 1
   const fb = item.feedback
+  const feedbackRef = useRef<HTMLDivElement>(null)
+  useEffect(() => { if (fb) feedbackRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }) }, [fb])
   const chosen = item.selectedOptionId ?? picked
 
   let streak = 0
@@ -188,9 +190,11 @@ export function SessionPlayer({ data, cues }: { data: PlayData; cues: { sound: b
       {/* Pergunta + opções: ocupam o espaço que sobra. */}
       <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         <div className="mx-auto flex min-h-full w-full max-w-[640px] flex-col justify-center px-4 pb-20 pt-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-marca">{item.subject}</p>
+          <section aria-label="Questão" className="rounded-2xl border border-linha bg-white px-4 pb-4 pt-3.5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-marca">{item.subject}</p>
           {item.images.length > 0 && <div className="mt-2 space-y-2">{item.images.map((image, i) => <QuestionImage key={image.url + i} image={image} priority={i === 0} />)}</div>}
-          <div className="mt-2"><QuestionStatement text={item.statement} /></div>
+          <div className="mt-2.5"><QuestionStatement text={item.statement} /></div>
+          </section>
 
           <div
             className={`mt-4 grid gap-2 ${imageOptions ? 'grid-cols-2' : ''}`}
@@ -225,10 +229,23 @@ export function SessionPlayer({ data, cues }: { data: PlayData; cues: { sound: b
               )
             })}
           </div>
+
+            {fb && (
+              <div ref={feedbackRef} role="status" className={`mt-3 scroll-mb-24 flex items-center gap-3 rounded-xl px-3 py-2.5 ${fb.isCorrect ? 'bg-sucesso-suave' : 'bg-erro-suave'}`}>
+                <span className={`flex size-8 shrink-0 items-center justify-center rounded-full text-white ${fb.isCorrect ? 'bg-sucesso' : 'bg-erro'}`}>{fb.isCorrect ? <Check size={16} aria-hidden /> : <X size={16} aria-hidden />}</span>
+                <span className="min-w-0 flex-1">
+                  <span className={`block text-[14px] font-semibold leading-5 ${fb.isCorrect ? 'text-sucesso-texto' : 'text-erro-texto'}`}>
+                    {fb.isCorrect ? (streak >= 3 ? `Acertaste! ${streak} seguidas` : 'Acertaste!') : 'Errado'}{fb.points > 0 && <span className="ml-1.5 text-[12px] font-bold">+{formatPoints(fb.points)} pts</span>}
+                  </span>
+                  <span className="block truncate text-[12px] leading-4 text-[#5d675f]">{fb.isCorrect ? 'Continua assim.' : `A certa é a ${correctLetter}. Vê «Porque errei» nas ferramentas.`}</span>
+                </span>
+                <button type="button" onClick={() => openJonas(null)} className="btn btn-secundario shrink-0"><Sparkles size={14} aria-hidden />Ver explicação</button>
+              </div>
+            )}
         </div>
       </div>
 
-      {/* Zona de ação: no fluxo (nunca tapa as opções). Antes de verificar, o botão; depois, o resultado + «Seguinte». */}
+      {/* Zona de ação: no fluxo (nunca tapa as opções). Só o botão (Verificar / Seguinte); o resultado aparece a seguir às opções, para não roubar espaço à questão. */}
       <footer className="relative flex-none bg-fundo pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         {/* Kit de ferramentas: flutua à direita, logo acima da zona de ação (nunca sobre as opções). */}
         <div className="pointer-events-none absolute inset-x-0 -top-[64px] z-10">
@@ -241,18 +258,6 @@ export function SessionPlayer({ data, cues }: { data: PlayData; cues: { sound: b
         <div className="mx-auto w-full max-w-[640px] space-y-2 px-4 pt-2">
           {error && <p role="alert" className="rounded-xl bg-erro-suave px-3 py-2 text-[13px] text-erro-texto">{error}</p>}
           {timeout && <p className="text-center text-[13px] text-texto-2">Sem tempo! A passar à seguinte…</p>}
-          {fb && (
-            <div role="status" className={`flex items-center gap-3 rounded-xl px-3 py-2.5 ${fb.isCorrect ? 'bg-sucesso-suave' : 'bg-erro-suave'}`}>
-              <span className={`flex size-8 shrink-0 items-center justify-center rounded-full text-white ${fb.isCorrect ? 'bg-sucesso' : 'bg-erro'}`}>{fb.isCorrect ? <Check size={16} aria-hidden /> : <X size={16} aria-hidden />}</span>
-              <span className="min-w-0 flex-1">
-                <span className={`block text-[14px] font-semibold leading-5 ${fb.isCorrect ? 'text-sucesso-texto' : 'text-erro-texto'}`}>
-                  {fb.isCorrect ? (streak >= 3 ? `Acertaste! ${streak} seguidas` : 'Acertaste!') : 'Errado'}{fb.points > 0 && <span className="ml-1.5 text-[12px] font-bold">+{formatPoints(fb.points)} pts</span>}
-                </span>
-                <span className="block truncate text-[12px] leading-4 text-[#5d675f]">{fb.isCorrect ? 'Continua assim.' : `A certa é a ${correctLetter}. Vê «Porque errei» nas ferramentas.`}</span>
-              </span>
-              <button type="button" onClick={() => openJonas(null)} className="btn btn-secundario shrink-0"><Sparkles size={14} aria-hidden />Ver explicação</button>
-            </div>
-          )}
           {fb ? (
             <button type="button" disabled={finishing} onClick={() => advance(index)} className="btn btn-primario btn-grande w-full">
               {isLast ? (finishing ? 'A calcular…' : 'Ver resultado') : <>Seguinte<ArrowRight size={18} aria-hidden /></>}

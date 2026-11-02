@@ -2,9 +2,9 @@ import Link from 'next/link'
 import { AlertTriangle, ArrowRight, BookOpen, CalendarDays, Check, Clock, Flame, Target, type LucideIcon } from 'lucide-react'
 import type { Aviso, AvisoIcon, AvisoTone } from '@/lib/avisos'
 
-const ICONS: Record<AvisoIcon, LucideIcon> = { flame: Flame, clock: Clock, target: Target, book: BookOpen, alert: AlertTriangle, check: Check, calendar: CalendarDays }
+export const ICONS: Record<AvisoIcon, LucideIcon> = { flame: Flame, clock: Clock, target: Target, book: BookOpen, alert: AlertTriangle, check: Check, calendar: CalendarDays }
 
-const TONES: Record<AvisoTone, { card: string; icon: string; cta: string }> = {
+export const TONES: Record<AvisoTone, { card: string; icon: string; cta: string }> = {
   urgent: { card: 'bg-gradient-to-br from-[#fff4ee] to-[#fde5da]', icon: 'bg-aviso text-white', cta: 'text-[#9a3412]' },
   warning: { card: 'bg-gradient-to-br from-[#fffaec] to-[#f8edca]', icon: 'bg-aviso text-white', cta: 'text-[#8a5a12]' },
   info: { card: 'bg-gradient-to-br from-white to-[#f4f6f1]', icon: 'bg-[#eaf1ec] text-marca', cta: 'text-marca' },

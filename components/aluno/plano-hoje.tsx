@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Check, Circle } from 'lucide-react'
+import { Bookmark, RotateCcw } from 'lucide-react'
 import { plural } from '@/lib/desafios-regras'
 
 export type PlanItem = { id: string; label: string; detail: string | null; done: boolean; href: string }
@@ -21,28 +21,26 @@ export function buildPlan(input: { goal: number; answered: number; marksDue: num
   return items
 }
 
-// O cartão mostra o que falta hoje, com um toque até à ação. Todos feitos: uma linha de confirmação, sem confete.
-export function PlanoHoje({ items }: { items: PlanItem[] }) {
-  const open = items.filter((i) => !i.done)
+// As tarefas extra do dia (a meta fica no destaque «Hoje»): fichas que se deslizam, uma forma diferente dos cartões.
+export function ParaHoje({ items }: { items: PlanItem[] }) {
+  const extra = items.filter((item) => item.id !== 'meta' && !item.done)
+  if (extra.length === 0) return null
   return (
-    <section aria-label="Plano de hoje" className="rounded-[20px] bg-white p-4 shadow-[0_1px_2px_rgba(20,50,40,0.04),0_10px_26px_-14px_rgba(20,50,40,0.18)]">
-      <div className="flex items-baseline justify-between">
-        <h2 className="text-[15px] font-semibold">Plano de hoje</h2>
-        <span className="text-[12px] text-texto-2">{open.length === 0 ? 'Tudo feito' : `${items.length - open.length} de ${items.length}`}</span>
-      </div>
-      <ul className="mt-3 space-y-2">
-        {items.map((item) => (
-          <li key={item.id}>
-            <Link href={item.href} className={`flex min-h-[56px] items-center gap-3 rounded-2xl px-3 no-underline ${item.done ? 'bg-sucesso-suave' : 'bg-fundo hover:bg-[#f0f2ea]'}`}>
-              <span className={`flex size-6 shrink-0 items-center justify-center rounded-full ${item.done ? 'bg-sucesso text-white' : 'text-texto-2'}`}>{item.done ? <Check size={14} aria-hidden /> : <Circle size={20} aria-hidden />}</span>
-              <span className="min-w-0 flex-1">
-                <span className={`block text-[14px] font-semibold ${item.done ? 'text-sucesso-texto' : 'text-texto'}`}>{item.label}</span>
-                {item.detail && <span className="block text-[12px] text-texto-2">{item.detail}</span>}
-              </span>
-              {!item.done && <ArrowRight size={16} className="shrink-0 text-marca" aria-hidden />}
-            </Link>
-          </li>
-        ))}
+    <section aria-label="Para hoje">
+      <h2 className="mb-2 ml-1 text-[11px] font-bold uppercase tracking-[0.12em] text-texto">Para hoje</h2>
+      <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+        {extra.map((item) => {
+          const Icon = item.id === 'erros' ? RotateCcw : Bookmark
+          return (
+            <li key={item.id} className="shrink-0">
+              <Link href={item.href} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-linha bg-white px-4 text-[13px] font-semibold text-texto no-underline hover:bg-[#f4f7f2]">
+                <Icon size={15} className={item.id === 'erros' ? 'text-erro' : 'text-aviso'} aria-hidden />
+                {item.label}
+                {item.id === 'erros' && item.detail && <span className="font-normal text-texto-2">· {item.detail}</span>}
+              </Link>
+            </li>
+          )
+        })}
       </ul>
     </section>
   )
