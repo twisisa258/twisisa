@@ -51,7 +51,7 @@ export default async function PerfilPage() {
   const firstName = name.split(' ')[0]
   const track = current?.track ?? null
   const isAdmission = track === 'admissao'
-  const plus = isSubscriptionActive(subscription?.status)
+  const plus = isSubscriptionActive(subscription?.status, subscription?.currentPeriodEnd)
 
   const steps = profileSteps({
     image: session.user.image ?? null,

@@ -6,7 +6,7 @@ const sections = [
   ['2. Conta e utilização', 'Deves fornecer informação verdadeira ao criar uma conta e manter as tuas credenciais seguras. A tua conta é pessoal e não deve ser partilhada. Usa a plataforma apenas para fins legais e académicos.'],
   ['3. Conteúdo que envias', 'Quando envias materiais para a Biblioteca, não envies conteúdo ilegal, ofensivo, enganador, discriminatório ou que viole direitos de terceiros. Podemos remover conteúdo que viole estas regras.'],
   ['4. Materiais de estudo', 'Os materiais são disponibilizados para apoio educativo. Embora procuremos manter a informação correta e atualizada, o conteúdo não substitui orientação de professores, instituições ou fontes oficiais.'],
-  ['5. Planos e pagamentos', 'As funcionalidades pagas, quando disponíveis, são apresentadas antes da subscrição. Os pagamentos são processados por parceiros especializados. A gestão da subscrição e eventuais reembolsos seguem as condições apresentadas no checkout.'],
+  ['5. Planos e pagamentos', 'As funcionalidades pagas, quando disponíveis, são apresentadas antes da subscrição. Os pagamentos são feitos por meios de pagamento locais. As condições de cada pagamento, incluindo eventuais reembolsos, são indicadas antes de pagares.'],
   ['6. Disponibilidade', 'Trabalhamos para manter o serviço disponível, mas podem ocorrer interrupções para manutenção, segurança ou motivos fora do nosso controlo.'],
   ['7. Alterações', 'Podemos atualizar estes termos para refletir melhorias no serviço ou alterações legais. Quando a alteração for relevante, comunicaremos através da plataforma.'],
 ]

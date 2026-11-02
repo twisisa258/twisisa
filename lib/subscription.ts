@@ -9,6 +9,8 @@ export async function getSubscription(userId: string) {
   return row
 }
 
-export function isSubscriptionActive(status: string | undefined) {
-  return !!status && ACTIVE_STATUSES.includes(status)
+/** Ativa se o estado for ativo e o período pago ainda não acabou (sem data de fim, vale o estado). */
+export function isSubscriptionActive(status: string | undefined, periodEnd?: Date | null) {
+  if (!status || !ACTIVE_STATUSES.includes(status)) return false
+  return !periodEnd || periodEnd.getTime() > Date.now()
 }

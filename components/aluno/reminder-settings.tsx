@@ -31,9 +31,9 @@ export function ReminderSettings({ email, initialEnabled, initialHour }: { email
         <input type="checkbox" role="switch" checked={enabled} onChange={(event) => setEnabled(event.target.checked)} className="size-6 shrink-0 accent-marca" />
       </label>
 
-      <fieldset disabled={!enabled} className="disabled:opacity-50">
+      <fieldset>
         <legend className="text-[15px] font-semibold">A que horas costumas estudar?</legend>
-        <p className="mt-0.5 text-[13px] text-texto-2">Hora de Maputo. O lembrete chega por volta desta hora.</p>
+        <p className="mt-0.5 text-[13px] text-texto-2">Hora de Maputo. O lembrete (e-mail ou notificação) chega por volta desta hora.</p>
         <div className="mt-3 grid grid-cols-2 gap-2" role="radiogroup" aria-label="Hora do lembrete">
           {STUDY_HOURS.map((h) => (
             <button key={h.value} type="button" role="radio" aria-checked={hour === h.value} onClick={() => setHour(h.value)} className={`min-h-[52px] rounded-xl border-2 px-3 text-left ${hour === h.value ? 'border-marca bg-marca-suave' : 'border-linha bg-white'}`}>

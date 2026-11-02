@@ -36,7 +36,7 @@ Estados: FEITO E TESTADO · FEITO, FALTA TESTE · FICTÍCIO (dados inventados) �
 | `/aluno/favoritos` | FEITO, FALTA TESTE | Lista real de `library_favorites` (só materiais aprovados). |
 | `/aluno/desafios` | FEITO, FALTA TESTE | Sequência, missões do dia e da semana, prontidão por curso e avisos, tudo calculado a partir das respostas do Simulador (`lib/desafios.ts`). Curso alvo escolhido no perfil ou no resultado do teste vocacional (`student_profiles.target_course_id`, migração 0026). |
 | `/aluno/descobrir-curso` | NÃO VERIFICADO | |
-| `/planos`, `/pagamentos/sucesso` | FEITO, FALTA TESTE | Stripe em USD 9,99; a landing diz 197 MT; nada na plataforma é reservado a quem paga. |
+| `/planos` | FEITO | Mostra 197 MT/mês (`lib/plano.ts`). Sem Stripe. O pagamento por meios locais ainda não existe; nada na plataforma é reservado a quem paga. |
 | `/blog` | FEITO | 5 artigos em `lib/blog.ts`. |
 
 ## Administração (`/admin`)
@@ -86,6 +86,9 @@ Pontuação solta numa linha (ex.: um `.` sozinho) junta-se à linha anterior, t
 ## Painel do aluno (/aluno)
 Cada bloco tem forma própria: destaque escuro «Hoje» (`hoje-hero.tsx`: anel da meta + continuar), faixa fina de aviso que se fecha (`aviso-faixa.tsx`, um por vez, «+N» abre janela pequena, volta no dia seguinte), fichas «Para hoje» (`plano-hoje.tsx`), três atalhos em grelha, cartão de orientação que se fecha (`fechavel.tsx`, volta ao fim de 14 dias) e uma janela de novidade única (`novidade-modal.tsx`, muda o ID em `ID` para anunciar outra). O «fechado» fica só no aparelho (`lib/dispensar.ts`, localStorage).
 
+## Web push
+Ficheiros: `public/sw.js` (service worker), `lib/push.ts` (envio), `app/api/push` (registar/apagar aparelho) e `app/api/push/teste`, `components/aluno/push-toggle.tsx` (botão em `/aluno/lembretes`). O cron dos lembretes (`lib/lembretes.ts`) envia também por push a quem ligou. Variáveis: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` (opcional). Chaves: `npx web-push generate-vapid-keys`. No iPhone só funciona com a app instalada no ecrã principal. Com o plano Hobby da Vercel o cron corre uma vez por dia.
+
 ## Pendentes, por prioridade
 P0 (antes de receber estudantes)
 1. Ensaio completo com 3 a 5 estudantes reais num telemóvel (conta, e-mail, percurso, simulado, ranking, Jonas, Biblioteca).
@@ -100,13 +103,13 @@ P1
 8. FEITO: ranking oculto por omissão para menores de 18 (decisão: idade mínima 13).
 9. Ligação à base com pooler; monitorização de erros; eventos de utilização (primeiro simulado, primeira mensagem ao Jonas).
 10. Jonas: limites por plano, tecto diário, estado quando a Groq recusa por quota, política de dados da Groq nos Termos.
-11. Testar fluxo Stripe de ponta a ponta, ou trocar o meio de pagamento.
+11. Pagamento local (M-Pesa, e-Mola…): decidir os meios e o fluxo (confirmação manual no admin ou API); a tabela `subscriptions` já tem `provider`, `reference` e `current_period_end`.
 
 P2
 12. FEITO por outra via: `study_days` (`lib/study-days.ts`). A tabela `study_progress` ficou sem leitura nem escrita: remover (ver 16).
 13. FEITO: notificações e e-mail de lembretes (`lib/lembretes.ts`, cron `/api/cron/lembretes`, fila `notification_outbox`). Falta testar com e-mail real.
 14. FEITO: `/aluno/favoritos` lê `library_favorites`.
-15. Remover as dependências sem uso (`ai`, `@ai-sdk/react`, `@stripe/stripe-js`, `@base-ui/react`, `class-variance-authority`): script à parte, depois do build passar.
+15. Remover as dependências sem uso (`ai`, `@ai-sdk/react`, `@base-ui/react`, `class-variance-authority`): script à parte, depois do build passar.
 16. FEITO: a migração 0028 remove `study_progress`, `quiz_attempts`, `posts`, `follows` e `post_likes` (apaga dados). Ficam as linhas antigas de `exam_modules`.
 
 Herdado do registo anterior (número do item antigo)

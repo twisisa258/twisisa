@@ -1,5 +1,6 @@
 'use client'
 
+import { PLANO } from '@/lib/plano'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -130,10 +131,9 @@ export default function Page({ signedIn = false }: { signedIn?: boolean }) {
         <p className="tw-sub tw-rv">Desbloqueia ferramentas para praticar melhor e acompanha a tua evolução.</p>
         <div className="tw-plan tw-rv">
           <strong>Plano mensal</strong>
-          <div className="pr">$9.99 <small>/ mês</small></div>
-          <ul><li>Simulados premium</li><li>Desafios</li><li>Materiais avançados</li><li>Cancela quando quiseres</li></ul>
+          <div className="pr">{PLANO.precoMt} MT <small>/ mês</small></div>
+          <ul><li>Simulados premium</li><li>Desafios</li><li>Materiais avançados</li></ul>
           <Link href="/planos" className="tw-btn">Ver o plano</Link>
-          <p className="fn">Pagamento processado com segurança pela Stripe.</p>
         </div>
       </div></section>
 

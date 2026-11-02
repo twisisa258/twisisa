@@ -32,3 +32,7 @@ Web Push; datas de exame (fase H); repetição espaçada automática; «dia livr
 - Enunciado com hierarquia (cartão, dados, fórmulas em destaque, pergunta separada); regra documentada em State.md e no admin.
 - Resultado da questão passou para depois das opções.
 - Painel /aluno com blocos de formas diferentes, avisos e sugestões que se fecham e janela de novidade.
+- Stripe removido (código, rotas, página de sucesso, colunas); preço em `lib/plano.ts` (197 MT/mês). Migração 0029 (acrescenta colunas; as do Stripe saem depois, em `database/opcional/0030_remover_colunas_stripe.sql`).
+- Web push construído de raiz (antes só estava planeado). Migração 0029 cria `push_subscriptions`.
+- A migração 0028 (apaga tabelas) saiu de `database/migrations` para `database/opcional`, para não correr sem querer.
+
