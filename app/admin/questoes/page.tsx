@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { QuestionStatement } from '@/components/simulador/question-statement'
 import { redirect } from 'next/navigation'
 import { Archive, ArchiveRestore, Check, CheckCircle2, CircleHelp, Copy, Download, Eye, Pencil, Trash2 } from 'lucide-react'
 import { getStaffAccess } from '@/lib/staff'
@@ -175,7 +176,7 @@ export default async function AdminQuestoesPage({ searchParams }: { searchParams
       {preview && (
         <RouteModal title="Como o aluno vê" description="A resposta certa e a explicação só aparecem ao aluno depois de responder." closeHref={closeHref}>
           <div className="grid gap-4">
-            <p className="text-[15px] leading-7"><MathText text={preview.statement} /></p>
+            <QuestionStatement text={preview.statement} compact />
             <ul className="grid gap-2">
               {preview.options.map((option, index) => (
                 <li key={index} className={`flex items-start gap-3 rounded-2xl border px-4 py-3 text-sm ${option.isCorrect ? 'border-marca bg-[#edf3ee]' : 'border-linha'}`}>

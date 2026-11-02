@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowRight, Check, Clock, Flame, Sparkles, X } from 'lucide-react'
+import { QuestionStatement } from '@/components/simulador/question-statement'
 import { Toolbox } from '@/components/simulador/toolbox'
 import { MathText } from '@/lib/math-text'
 import { finishSession, saveAnswer } from '@/app/aluno/simulador/actions'
@@ -189,7 +190,7 @@ export function SessionPlayer({ data, cues }: { data: PlayData; cues: { sound: b
         <div className="mx-auto flex min-h-full w-full max-w-[640px] flex-col justify-center px-4 pb-20 pt-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-marca">{item.subject}</p>
           {item.images.length > 0 && <div className="mt-2 space-y-2">{item.images.map((image, i) => <QuestionImage key={image.url + i} image={image} priority={i === 0} />)}</div>}
-          <h1 className="mt-1.5 text-[19px] font-semibold leading-[1.4] tracking-[-0.01em] sm:text-[21px]"><MathText text={item.statement} /></h1>
+          <div className="mt-2"><QuestionStatement text={item.statement} /></div>
 
           <div
             className={`mt-4 grid gap-2 ${imageOptions ? 'grid-cols-2' : ''}`}

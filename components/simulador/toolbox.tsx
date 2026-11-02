@@ -1,5 +1,7 @@
 'use client'
 
+import { QuestionStatement } from '@/components/simulador/question-statement'
+
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, BookOpen, Bookmark, BookmarkCheck, Check, ExternalLink, Flag, Lightbulb, Repeat, Sparkles, Wrench, X } from 'lucide-react'
 import { MathText } from '@/lib/math-text'
@@ -339,7 +341,7 @@ function SimilarView({ attemptId, position }: { attemptId: string; position: num
   return (
     <div>
       <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-assistente">Criada por IA</p>
-      <h3 className="mt-1 text-[17px] font-semibold leading-[1.45]"><MathText text={question.statement} /></h3>
+      <div className="mt-1"><QuestionStatement text={question.statement} compact /></div>
       <div className="mt-3 grid gap-2" role="radiogroup" aria-label="Respostas">
         {question.options.map((text, i) => {
           const right = result && result.correctIndex === i

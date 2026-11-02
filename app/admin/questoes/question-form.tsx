@@ -1,5 +1,7 @@
 'use client'
 
+import { QuestionStatement } from '@/components/simulador/question-statement'
+
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, Plus, Trash2 } from 'lucide-react'
 import { FeedbackForm } from '@/components/feedback-form'
@@ -276,7 +278,7 @@ export function QuestionForm({
       {preview && (
         <div className="grid gap-3 rounded-2xl border border-linha bg-[#fafbf8] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-[#9aa39c]">Como o aluno vê</p>
-          {statement.trim() ? <MathText text={statement} className="text-[15px] leading-7" /> : <p className="text-sm text-[#9aa39c]">Ainda sem enunciado.</p>}
+          {statement.trim() ? <QuestionStatement text={statement} compact /> : <p className="text-sm text-[#9aa39c]">Ainda sem enunciado.</p>}
           <ul className="grid gap-2">
             {filled.map((option, index) => (
               <li key={option.key} className="flex items-start gap-3 rounded-xl border border-linha bg-white px-3 py-2.5 text-sm">

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { QuestionStatement } from '@/components/simulador/question-statement'
 import { Check, ChevronDown, Clock, X } from 'lucide-react'
 import { MathText, plainExcerpt } from '@/lib/math-text'
 import { ExplainButton } from '@/components/simulador/jonas-explain'
@@ -27,7 +28,7 @@ function Review({ item, attemptId }: { item: PlayItem; attemptId: string }) {
   return (
     <div className="space-y-3 border-t border-black/[0.05] px-4 py-4">
       {item.images.map((image, i) => <QuestionImage key={image.url + i} image={image} />)}
-      <p className="text-[15px] font-medium leading-6"><MathText text={item.statement} /></p>
+      <QuestionStatement text={item.statement} compact />
       <ul className="space-y-2">
         {item.options.map((option, i) => {
           const right = fb?.correctOptionId === option.id
