@@ -41,7 +41,7 @@ export function AdminTabsSkeleton({ count = 2 }: { count?: number }) {
 
 export function AdminPanelSkeleton({ children, pager = true }: { children: React.ReactNode; pager?: boolean }) {
   return (
-    <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#e3e5dc] bg-white">
+    <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-linha bg-white">
       <div className="min-h-0 flex-1 divide-y divide-[#edf0e9] overflow-hidden px-4 sm:px-5">{children}</div>
       {pager && (
         <div className="flex shrink-0 items-center justify-between gap-3 border-t border-[#edf0e9] px-4 py-3 sm:px-5">

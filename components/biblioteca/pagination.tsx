@@ -19,7 +19,7 @@ export function Pagination({ page, pages, hrefFor }: { page: number; pages: numb
   return (
     <nav aria-label="Páginas" className="flex items-center justify-center gap-1.5">
       {page > 1 ? (
-        <Link href={hrefFor(page - 1)} aria-label="Página anterior" className={`${base} bg-white text-[#1d4d41] shadow-[0_1px_2px_rgba(20,50,40,0.05)]`}><ChevronLeft size={18} /></Link>
+        <Link href={hrefFor(page - 1)} aria-label="Página anterior" className={`${base} bg-white text-marca shadow-[0_1px_2px_rgba(20,50,40,0.05)]`}><ChevronLeft size={18} /></Link>
       ) : (
         <span aria-hidden="true" className={`${base} text-[#c3c9c1]`}><ChevronLeft size={18} /></span>
       )}
@@ -32,14 +32,14 @@ export function Pagination({ page, pages, hrefFor }: { page: number; pages: numb
             href={hrefFor(item)}
             aria-current={item === page ? 'page' : undefined}
             aria-label={`Página ${item}`}
-            className={`${base} ${item === page ? 'bg-gradient-to-br from-[#2a6a57] to-[#1d4d41] text-white' : 'text-[#465249] hover:bg-white'}`}
+            className={`${base} ${item === page ? 'bg-gradient-to-br from-[#2a6a57] to-marca text-white' : 'text-[#465249] hover:bg-white'}`}
           >
             {item}
           </Link>
         ),
       )}
       {page < pages ? (
-        <Link href={hrefFor(page + 1)} aria-label="Página seguinte" className={`${base} bg-white text-[#1d4d41] shadow-[0_1px_2px_rgba(20,50,40,0.05)]`}><ChevronRight size={18} /></Link>
+        <Link href={hrefFor(page + 1)} aria-label="Página seguinte" className={`${base} bg-white text-marca shadow-[0_1px_2px_rgba(20,50,40,0.05)]`}><ChevronRight size={18} /></Link>
       ) : (
         <span aria-hidden="true" className={`${base} text-[#c3c9c1]`}><ChevronRight size={18} /></span>
       )}

@@ -15,7 +15,7 @@ export const metadata: Metadata = pageMetadata({
   index: false,
 })
 
-const badge = 'rounded-full bg-[#e6f0e9] px-2.5 py-1 text-[11px] font-semibold text-[#1d4d41]'
+const badge = 'rounded-full bg-[#e6f0e9] px-2.5 py-1 text-[11px] font-semibold text-marca'
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const access = await getStaffAccess()
@@ -27,18 +27,18 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const firstName = admin.name.split(' ')[0]
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-[#f8f8f5] text-[#202321] lg:flex-row">
-      <aside className="hidden w-[252px] shrink-0 flex-col border-r border-[#e3e5dc] bg-[#f3f4ef] px-4 py-5 lg:flex lg:h-full">
+    <div className="flex h-dvh flex-col overflow-hidden bg-fundo text-texto lg:flex-row">
+      <aside className="hidden w-[252px] shrink-0 flex-col border-r border-linha bg-[#f3f4ef] px-4 py-5 lg:flex lg:h-full">
         <div className="flex items-center justify-between gap-2 px-3">
           <Brand href={home} />
         </div>
         <span className={`${badge} mx-3 mt-4 w-fit`}>{roleLabel}</span>
         <AdminNav variant="sidebar" role={access.role} />
         <div className="mt-auto border-t border-[#dfe2d9] pt-4">
-          <Link href="/aluno" className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-[#68716a] hover:bg-white hover:text-[#1d4d41]"><ArrowLeft size={16} /> Área do estudante</Link>
+          <Link href="/aluno" className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-texto-2 hover:bg-white hover:text-marca"><ArrowLeft size={16} /> Área do estudante</Link>
           <div className="mt-3 flex items-center justify-between gap-2 px-3">
             <span className="flex min-w-0 items-center gap-2 text-xs font-medium">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#d8e4dc] text-[#1d4d41]">{firstName.slice(0, 1)}</span>
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#d8e4dc] text-marca">{firstName.slice(0, 1)}</span>
               <span className="truncate">{firstName}</span>
             </span>
             <SignOutButton />
@@ -47,7 +47,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
       </aside>
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <header className="z-30 shrink-0 border-b border-[#e3e5dc] bg-[#f8f8f5]/95 px-5 pt-3 backdrop-blur lg:hidden">
+        <header className="z-30 shrink-0 border-b border-linha bg-fundo/95 px-5 pt-3 backdrop-blur lg:hidden">
           <div className="flex items-center justify-between gap-3 pb-3">
             <Brand href={home} />
             <div className="flex items-center gap-2">

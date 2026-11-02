@@ -13,20 +13,20 @@ export function QuestionImage({ image, priority = false, zoomable = true }: { im
 
   if (failed) {
     return (
-      <div className="rounded-2xl border border-dashed border-[#d5dacd] bg-[#f8f8f5] p-4 text-center text-sm text-[#68736a]">
+      <div className="rounded-2xl border border-dashed border-[#d5dacd] bg-fundo p-4 text-center text-sm text-texto-2">
         <p>{image.alt}</p>
-        <button type="button" onClick={() => { setFailed(false); setAttempt((n) => n + 1) }} className="mt-2 font-semibold text-[#1d4d41] hover:underline">Tentar de novo</button>
+        <button type="button" onClick={() => { setFailed(false); setAttempt((n) => n + 1) }} className="mt-2 font-semibold text-marca hover:underline">Tentar de novo</button>
       </div>
     )
   }
   const src = slimImage(image.url)
   return (
     <figure>
-      <button type="button" disabled={!zoomable} onClick={() => setZoom(true)} className="block w-full overflow-hidden rounded-2xl border border-[#e3e5dc] bg-white" style={{ aspectRatio: ratio }} aria-label={zoomable ? `Ampliar: ${image.alt}` : image.alt}>
+      <button type="button" disabled={!zoomable} onClick={() => setZoom(true)} className="block w-full overflow-hidden rounded-2xl border border-linha bg-white" style={{ aspectRatio: ratio }} aria-label={zoomable ? `Ampliar: ${image.alt}` : image.alt}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img key={attempt} src={src} alt={image.alt} width={image.width ?? undefined} height={image.height ?? undefined} loading={priority ? 'eager' : 'lazy'} decoding="async" onError={() => setFailed(true)} className="h-full w-full object-contain" />
       </button>
-      {image.caption && <figcaption className="mt-1.5 text-center text-xs text-[#7d857e]">{image.caption}</figcaption>}
+      {image.caption && <figcaption className="mt-1.5 text-center text-xs text-texto-2">{image.caption}</figcaption>}
       {zoom && (
         <div role="dialog" aria-modal="true" aria-label="Imagem ampliada" className="fixed inset-0 z-[70] flex flex-col bg-black/90" onClick={() => setZoom(false)}>
           <button type="button" aria-label="Fechar" className="m-3 ml-auto flex size-11 items-center justify-center rounded-full bg-white/15 text-white"><X size={22} aria-hidden /></button>

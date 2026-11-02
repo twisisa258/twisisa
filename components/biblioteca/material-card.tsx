@@ -28,7 +28,7 @@ export function MaterialCard({ item }: { item: LibraryItem }) {
   return (
     <article className="relative flex aspect-[3/4] min-w-0 flex-col overflow-hidden rounded-2xl bg-gradient-to-br from-white to-[#eef3ec] shadow-[0_1px_2px_rgba(20,50,40,0.05),0_10px_24px_-14px_rgba(20,50,40,0.3)]">
       <div className="relative h-1/2 shrink-0 overflow-hidden bg-gradient-to-br from-[#e4eee8] to-[#cbddd2]">
-        <span className="absolute inset-0 flex items-center justify-center text-[#1d4d41]/45" aria-hidden="true">
+        <span className="absolute inset-0 flex items-center justify-center text-marca/45" aria-hidden="true">
           <Icon size={30} />
         </span>
         {item.coverUrl && !coverFailed && (
@@ -38,16 +38,16 @@ export function MaterialCard({ item }: { item: LibraryItem }) {
       </div>
       <div className="flex min-h-0 flex-1 flex-col justify-center px-2.5 py-2">
         <h3 className="line-clamp-2 text-[13px] font-semibold leading-[17px] text-[#202923]">{item.title}</h3>
-        {meta && <p className="mt-0.5 truncate text-[11px] text-[#788178]">{meta}</p>}
+        {meta && <p className="mt-0.5 truncate text-[11px] text-texto-2">{meta}</p>}
       </div>
-      <button type="button" onClick={() => library.open(item)} aria-label={`Abrir ${item.title}`} className="absolute inset-0 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#1d4d41]" />
+      <button type="button" onClick={() => library.open(item)} aria-label={`Abrir ${item.title}`} className="absolute inset-0 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-marca" />
       <button
         type="button"
         onClick={() => library.toggleSaved(item)}
         disabled={library.savingId === item.id}
         aria-pressed={saved}
         aria-label={saved ? 'Remover dos guardados' : 'Guardar'}
-        className={`absolute right-1.5 top-1.5 z-10 flex size-8 items-center justify-center rounded-full bg-white/90 backdrop-blur transition-colors disabled:opacity-60 ${saved ? 'text-[#1d4d41]' : 'text-[#68716a]'}`}
+        className={`absolute right-1.5 top-1.5 z-10 flex size-8 items-center justify-center rounded-full bg-white/90 backdrop-blur transition-colors disabled:opacity-60 ${saved ? 'text-marca' : 'text-texto-2'}`}
       >
         <Bookmark size={16} fill={saved ? 'currentColor' : 'none'} />
       </button>

@@ -39,7 +39,7 @@ export function StartCard({ mode, subjectId, variant = null, title, caption, sec
       disabled={busy || disabled}
       className={cn(
         'group flex h-[60px] w-full items-center gap-3 rounded-2xl px-5 text-left transition duration-200 active:scale-[0.985] disabled:cursor-not-allowed',
-        disabled ? 'bg-[#eceee7] text-[#9aa29b]' : secondary ? 'bg-white text-[#1d4d41] shadow-[0_1px_3px_rgba(20,50,40,0.10)] hover:bg-[#f4f6f1]' : 'bg-[#1d4d41] text-white shadow-[0_8px_18px_-10px_rgba(29,77,65,0.65)] hover:bg-[#18413a]',
+        disabled ? 'bg-[#eceee7] text-texto-2' : secondary ? 'bg-white text-marca shadow-[0_1px_3px_rgba(20,50,40,0.10)] hover:bg-[#f4f6f1]' : 'bg-marca text-white shadow-[0_8px_18px_-10px_rgba(29,77,65,0.65)] hover:bg-[#18413a]',
       )}
     >
       <span className="min-w-0 flex-1 truncate text-[16px] font-semibold">{title}</span>

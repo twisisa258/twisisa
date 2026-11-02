@@ -9,7 +9,7 @@ export function AdminJonasSkeleton() {
       <AdminTabsSkeleton count={2} />
       <div className="grid gap-3 sm:grid-cols-2">
         {[0, 1].map((i) => (
-          <div key={i} className="rounded-2xl border border-[#e3e5dc] bg-white p-4 sm:p-5">
+          <div key={i} className="rounded-2xl border border-linha bg-white p-4 sm:p-5">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
                 <Skeleton className="size-9 rounded-xl" />
@@ -22,7 +22,7 @@ export function AdminJonasSkeleton() {
           </div>
         ))}
       </div>
-      <div className="rounded-2xl border border-[#e3e5dc] bg-white p-4 sm:p-5">
+      <div className="rounded-2xl border border-linha bg-white p-4 sm:p-5">
         <div className="flex items-center gap-2.5">
           <Skeleton className="size-9 rounded-xl" />
           <Skeleton className="h-4 w-32" />
@@ -32,7 +32,7 @@ export function AdminJonasSkeleton() {
       </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="rounded-2xl border border-[#e3e5dc] bg-white p-4">
+          <div key={i} className="rounded-2xl border border-linha bg-white p-4">
             <Skeleton className="size-5 rounded-full" />
             <Skeleton className="mt-3 h-6 w-12" />
             <Skeleton className="mt-2 h-3 w-24" />

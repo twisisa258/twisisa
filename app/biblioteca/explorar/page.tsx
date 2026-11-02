@@ -46,7 +46,7 @@ export default async function ExplorarPage() {
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <li>
-            <Link href="/biblioteca/pesquisa" className={`${tile} bg-gradient-to-br from-[#2f7260] to-[#1d4d41] text-white`}>
+            <Link href="/biblioteca/pesquisa" className={`${tile} bg-gradient-to-br from-[#2f7260] to-marca text-white`}>
               <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white/[0.16]"><Layers size={20} /></span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-[15px] font-semibold">Todos os materiais</span>
@@ -60,11 +60,11 @@ export default async function ExplorarPage() {
             const label = MAIN_SECTIONS.find((section) => section.slug === item.slug)?.title ?? item.name
             return (
               <li key={item.slug}>
-                <Link href={`/biblioteca/${item.slug}`} className={`${tile} bg-gradient-to-br from-white to-[#f1f5ef] text-[#202321]`}>
-                  <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#e4eee8] to-[#cbddd2] text-[#1d4d41]"><Icon size={20} /></span>
+                <Link href={`/biblioteca/${item.slug}`} className={`${tile} bg-gradient-to-br from-white to-[#f1f5ef] text-texto`}>
+                  <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#e4eee8] to-[#cbddd2] text-marca"><Icon size={20} /></span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[15px] font-semibold">{label}</span>
-                    <span className="block text-xs text-[#788178]">{item.count === 1 ? '1 material' : `${item.count} materiais`}</span>
+                    <span className="block text-xs text-texto-2">{item.count === 1 ? '1 material' : `${item.count} materiais`}</span>
                   </span>
                   <ChevronRight size={18} className="shrink-0 text-[#929b94]" />
                 </Link>

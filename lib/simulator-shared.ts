@@ -24,8 +24,16 @@ export const MODE_META: Record<AttemptMode, { label: string; tagline: string; me
 export type PlayImage = { url: string; alt: string; width: number | null; height: number | null; caption: string | null }
 export type PlayOption = { id: string; body: string | null; image: PlayImage | null }
 export type PlayFeedback = { isCorrect: boolean; correctOptionId: string; explanation: string | null; images: PlayImage[]; points: number }
+export type PlayHint = { level: 1 | 2 | 3; content: string }
 export type PlayItem = {
   position: number
+  /** Id da questão: as ferramentas do Kit (marcar, reportar, matéria relacionada) usam-no. */
+  questionId: string
+  topic: string | null
+  /** Dicas já pedidas nesta sessão (nível 3: id da opção eliminada). */
+  hints: PlayHint[]
+  /** O aluno já marcou esta questão para estudar depois. */
+  marked: boolean
   subject: string
   statement: string
   images: PlayImage[]

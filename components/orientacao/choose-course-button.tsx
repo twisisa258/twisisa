@@ -14,7 +14,7 @@ export function ChooseCourseButton({ courseId, chosen }: { courseId: string; cho
   const [pending, setPending] = useState(false)
 
   if (chosen) {
-    return <p className="inline-flex h-10 items-center gap-1.5 text-sm font-semibold text-[#1d4d41]"><Check size={16} aria-hidden="true" />O teu curso</p>
+    return <p className="inline-flex h-10 items-center gap-1.5 text-sm font-semibold text-marca"><Check size={16} aria-hidden="true" />O teu curso</p>
   }
 
   async function choose() {
@@ -34,7 +34,7 @@ export function ChooseCourseButton({ courseId, chosen }: { courseId: string; cho
   }
 
   return (
-    <button type="button" onClick={choose} disabled={pending} aria-busy={pending} className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[#1d4d41] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#173f35] disabled:opacity-80">
+    <button type="button" onClick={choose} disabled={pending} aria-busy={pending} className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-marca px-4 text-sm font-semibold text-white transition-colors hover:bg-[#173f35] disabled:opacity-80">
       {pending ? <><Spinner />A guardar…</> : 'Escolher este curso'}
     </button>
   )

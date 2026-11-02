@@ -21,7 +21,7 @@ Estados: FEITO E TESTADO · FEITO, FALTA TESTE · FICTÍCIO (dados inventados) �
 | Página | Estado | Nota |
 |---|---|---|
 | `/sign-up`, `/sign-in` | FEITO, FALTA TESTE | Registo de 1 ecrã: e-mail, palavra-passe, caixa dos Termos (versão e data em `account_consents`). Validação em tempo real e repetida no servidor (`hooks.before` em `lib/auth.ts`). Botão Google desactivado até existirem `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`. Sessão de 30 dias; «Computador partilhado» na entrada (`rememberMe: false`, a confirmar em ensaio); depois de entrar volta ao sítio de origem (`?next=`). Limite de pedidos na base de dados (tabela `rateLimit`). |
-| `/aluno/bem-vindo` (onboarding) | FEITO, FALTA TESTE | 3 ecrãs: Sobre ti (nome, data de nascimento, Termos se faltarem), O que preparas (percurso, instituição, meta diária), Lembretes (e-mail ou nada; telemóvel «Em breve»). Cada passo guarda-se ao avançar. Menor de 13 anos: conta apagada e ecrã de recusa. Menores de 18: ranking oculto por omissão. No fim abre uma Prática com o tamanho da meta diária (se houver questões). Critério nº 1: o ecrã 2 caber em 360x640 sem scroll (não testado em aparelho). |
+| `/aluno/bem-vindo` (onboarding) | FEITO, FALTA TESTE | 3 ecrãs: Sobre ti (nome, data de nascimento, Termos se faltarem), O que preparas (percurso, instituição, meta diária), Lembretes (e-mail com hora preferida, ou nada; telemóvel «Em breve»). Cada passo guarda-se ao avançar. Menor de 13 anos: conta apagada e ecrã de recusa. Menores de 18: ranking oculto por omissão. No fim abre uma Prática com o tamanho da meta diária (se houver questões). Critério nº 1: o ecrã 2 caber em 360x640 sem scroll (não testado em aparelho). |
 | `/esqueci-a-senha`, `/redefinir-senha` | FEITO, FALTA TESTE | Depende do domínio no Resend (`docs/EMAIL.md`). |
 | `/aluno/percurso` | FEITO, FALTA TESTE | 10ª, 12ª ou admissão (com instituição). |
 | `/aluno` (painel) | FEITO, FALTA TESTE | Linha discreta «Hoje 4/10 · 3 dias seguidos» com dados reais de `study_days` (escritos pelo simulador, pela Biblioteca e pelo Jonas). Parabéns no aniversário (dia e mês, fuso de Maputo; 29/02 celebra a 28/02 nos anos não bissextos). |
@@ -30,11 +30,11 @@ Estados: FEITO E TESTADO · FEITO, FALTA TESTE · FICTÍCIO (dados inventados) �
 | `/aluno/perfil` | FEITO, FALTA TESTE | Foto no Cloudinary com upload assinado. |
 | `/aluno/ranking` | FEITO, FALTA TESTE | Real (pontos de `attempt_items`). `show_in_ranking` é verdadeiro por omissão. |
 | `/jonas` | FEITO, FALTA TESTE | Groq. Só travão de 25 mensagens por minuto; sem limites por plano. |
-| `/aluno/notificacoes` | FICTÍCIO | Lê e marca como lida, mas nada cria notificações. |
-| `/aluno/favoritos` | FICTÍCIO | Página estática; a Biblioteca já guarda em `library_favorites`. |
+| `/aluno/notificacoes` | FEITO, FALTA TESTE | Lembretes criados pelo cron (`lib/lembretes.ts`) e a mensagem de boas-vindas; mais recentes primeiro, com ação e «marcar tudo como lido». |
+| `/aluno/lembretes` | FEITO, FALTA TESTE | Ligar ou desligar o e-mail e escolher a hora (de Maputo). `/lembretes/cancelar?token=` desliga com um botão de confirmação (não ao abrir a ligação). |
+| `/aluno/estudar-depois` | FEITO, FALTA TESTE | Questões guardadas no Kit ou no resultado, por data; «Praticar este tema» inicia uma Prática. |
+| `/aluno/favoritos` | FEITO, FALTA TESTE | Lista real de `library_favorites` (só materiais aprovados). |
 | `/aluno/desafios` | FEITO, FALTA TESTE | Sequência, missões do dia e da semana, prontidão por curso e avisos, tudo calculado a partir das respostas do Simulador (`lib/desafios.ts`). Curso alvo escolhido no perfil ou no resultado do teste vocacional (`student_profiles.target_course_id`, migração 0026). |
-| `/comunidade` | FICTÍCIO | Pessoas fixas; "seguir" grava ids que não são utilizadores (`follows` sem chave estrangeira); a lista não vem da base. |
-| `/aluno/convites` | NÃO VERIFICADO | Tratar como fictícia até prova em contrário. |
 | `/aluno/descobrir-curso` | NÃO VERIFICADO | |
 | `/planos`, `/pagamentos/sucesso` | FEITO, FALTA TESTE | Stripe em USD 9,99; a landing diz 197 MT; nada na plataforma é reservado a quem paga. |
 | `/blog` | FEITO | 5 artigos em `lib/blog.ts`. |
@@ -55,13 +55,33 @@ Instituições, Disciplinas, Temas, Classificação (categorias e níveis), Mód
 - As pastas do Cloudinary `estuda-mz/materiais` e `estuda-mz/logotipos` mantêm-se (já há ficheiros nelas).
 - Sem emojis na interface nova.
 
+## Kit de ferramentas do Simulador (novo)
+Botão flutuante no quiz (`components/simulador/toolbox.tsx`, atalho `T`). No Modo rápido só aparece depois de responder.
+| Ferramenta | Quando | Como funciona |
+|---|---|---|
+| Dica (3 níveis) | antes de responder | Níveis 1 e 2 pela IA (Groq, mesmas definições do Jonas, sem revelar a resposta); nível 3 elimina uma opção errada (servidor). Cada dica custa 25 % dos pontos (`hint_events`, mínimo 25 %). Sem dicas no Modo rápido. |
+| Porque errei | depois de errar | Ação `porque` do Jonas (`/api/jonas/explicar`), guardada na conversa da questão. |
+| Questão parecida | depois de responder | A IA cria uma questão nova (JSON validado em `lib/kit-pure.ts`); o servidor guarda a certa em `ai_practice` e só a revela após a resposta. Não conta para pontos nem ranking; marcada «Criada por IA». |
+| Matéria relacionada | sempre | Materiais aprovados da mesma disciplina; os que falam do tema (título ou descrição) vêm primeiro. Sem ligação tema-material explícita. |
+| Estudar depois | sempre | `study_marks` (hoje, amanhã, fim de semana, sem data). Alimenta `/aluno/estudar-depois`, o Plano de hoje e os lembretes. |
+| Reportar questão | sempre | `question_reports`; lido em `/admin/reportes`. |
+
+## Lembretes
+- Hora escolhida no onboarding ou em `/aluno/lembretes` (`notification_prefs.study_hour`, padrão 18h de Maputo).
+- Cron de hora a hora (`vercel.json`; exige plano da Vercel com crons horários). Protegido por `CRON_SECRET`.
+- No máximo um lembrete por aluno e dia (`last_sent_on`, chave `lembrete:<dia>`). Meta cumprida e nada para rever: não envia nada (`chooseReminder`, testado).
+- Meta diária do aluno (`student_profiles.daily_goal`) já manda na sequência, nas missões e nos avisos.
+
+## Cores (`app/globals.css`)
+Marca (ação principal), sucesso, erro (só erros), aviso (atenção e tempo a acabar), ajuda (azul), assistente e revisão (índigo), conquista (dourado). Classes `.btn-primario/-secundario/-terciario/-perigo/-icone` e `.chip`. Pílula só para etiquetas.
+
 ## Pendentes, por prioridade
 P0 (antes de receber estudantes)
 1. Ensaio completo com 3 a 5 estudantes reais num telemóvel (conta, e-mail, percurso, simulado, ranking, Jonas, Biblioteca).
 2. Conteúdo mínimo carregado: instituições, disciplinas, temas, questões publicadas, materiais.
 3. Confirmar a entrega de PDF no Cloudinary.
 4. Verificar o domínio no Resend e testar a recuperação de conta com e-mail real.
-5. Retirar do menu o que é FICTÍCIO, ou terminá-lo.
+5. FEITO: Comunidade e Convites retirados; Notificações e Favoritos ligados a dados reais. Falta correr `npm run migrate` (0027 e 0028) e definir `CRON_SECRET`.
 
 P1
 6. Registo: FEITO (idade, Termos, validação). Falta ligar o Google: criar as credenciais, registar `<BETTER_AUTH_URL>/api/auth/callback/google`, preencher as duas variáveis e passar a aplicação a «In production» na Google.
@@ -73,17 +93,16 @@ P1
 
 P2
 12. FEITO por outra via: `study_days` (`lib/study-days.ts`). A tabela `study_progress` ficou sem leitura nem escrita: remover (ver 16).
-13. Criar notificações reais (e ligá-las ao e-mail).
-14. Ligar `/aluno/favoritos` a `library_favorites`.
+13. FEITO: notificações e e-mail de lembretes (`lib/lembretes.ts`, cron `/api/cron/lembretes`, fila `notification_outbox`). Falta testar com e-mail real.
+14. FEITO: `/aluno/favoritos` lê `library_favorites`.
 15. Remover as dependências sem uso (`ai`, `@ai-sdk/react`, `@stripe/stripe-js`, `@base-ui/react`, `class-variance-authority`): script à parte, depois do build passar.
-16. Tabelas sem uso: `study_progress`, `quiz_attempts`, linhas antigas de `exam_modules`, `post_likes`. Decidir: ligar ou migração para remover.
+16. FEITO: a migração 0028 remove `study_progress`, `quiz_attempts`, `posts`, `follows` e `post_likes` (apaga dados). Ficam as linhas antigas de `exam_modules`.
 
 Herdado do registo anterior (número do item antigo)
 - #7 dados reais das instituições (sigla, nome, descrição, logótipo).
 - #10 `/planos` sem ligação em nenhuma página.
 - #11 depois de entrar, vai sempre para `/aluno` (perde o contexto de onde veio).
-- #13 PNGs de 1,6 MB e 1,8 MB com `images.unoptimized: true`.
-- #22 `/biblioteca/partilhar` continua acessível por URL e não envia nada.
+- #13 PNGs comprimidos (OG de 1,6 MB para 0,7 MB); `images.unoptimized: true` mantém-se.
 - #50 eliminar tema não verifica uso.
 - #61 o envio de material cria a disciplina por texto livre.
 - #127 CSV gravado pelo Excel com `;` falha; só aceita vírgulas.
@@ -98,7 +117,7 @@ Feito (fases A a D, ainda por testar com estudantes): guarda central, limite de 
 Por fazer:
 - Fase C (resto): lista de dispositivos com sessão aberta e «terminar sessão» no perfil; mudar e-mail; apagar conta e exportar dados.
 - Fase E: marcos na plataforma, banner de anúncios do admin, barra de cookies com Aceitar e Recusar para o Google Analytics.
-- Fase F: e-mail de lembretes com orçamento diário, `notification_outbox`, cron, desligar com um clique, pré-visualização no admin, e-mail de aniversário. Hoje `notification_prefs` só guarda a escolha do ecrã 3: nada a lê.
+- Fase F (feito): lembrete diário por e-mail na hora escolhida, `notification_outbox`, cron, desligar com confirmação. Por fazer: pré-visualização no admin, e-mail de aniversário. Hoje `notification_prefs` só guarda a escolha do ecrã 3: nada a lê.
 - Fase G: Web Push (o botão «No telemóvel» do onboarding está desactivado).
 - Fase H: datas de exame por instituição e contagem no painel.
 - Estudantes que já tinham conta passam pelo onboarding no próximo acesso (falta-lhes data de nascimento, meta e escolha de lembretes).
@@ -107,7 +126,7 @@ Por fazer:
 ## Decisões por tomar
 - Pagamento: moeda, meio (cartão ou carteira móvel) e o que o plano pago desbloqueia. Sugestão: lançar gratuito e cobrar depois.
 - Menores de idade: decidido idade mínima de conta 13 (`MIN_AGE` em `lib/identity.ts`) e predefinições de privacidade abaixo de 18. Falta confirmar com quem conheça a lei local.
-- Comunidade e Desafios: terminar ou retirar até haver estudantes.
+- Desafios: manter ou simplificar até haver estudantes (a Comunidade foi retirada).
 - Conteúdo mínimo para lançar (percursos, disciplinas, número de questões).
 - Gestor de pacotes: npm ou pnpm.
 - Origens de questão jogáveis (`PLAYABLE_ORIGINS` em `lib/simulator.ts`).

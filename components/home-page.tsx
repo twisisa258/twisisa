@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { articles } from '@/lib/blog'
 
-// Separadores "Por dentro": conteúdo real da plataforma (Biblioteca, Simulador, Jonas, Comunidade, Blog).
+// Separadores "Por dentro": conteúdo real da plataforma (Biblioteca, Simulador, Jonas, Blog).
 const tabs = [
   {
     key: 'Biblioteca', href: '/biblioteca', title: 'Biblioteca',
@@ -21,11 +21,6 @@ const tabs = [
     key: 'Jonas', href: '/jonas', title: 'Jonas, o explicador (IA)',
     text: 'Um explicador académico que responde em português claro, passo a passo, e explica o porquê de cada passo.',
     items: ['Pede uma explicação, um exemplo ou ajuda a organizar o estudo', 'Reconhece quando não tem certeza', 'Não inventa fontes', 'Não substitui professores nem fontes oficiais'],
-  },
-  {
-    key: 'Comunidade', href: '/comunidade', title: 'Comunidade',
-    text: 'Aprender em conjunto: partilha o que aprendeste e acompanha outros estudantes.',
-    items: ['Publica o que queres partilhar', 'Segue outros estudantes', 'Tira dúvidas e troca ideias'],
   },
   {
     key: 'Blog', href: '/blog', title: 'Blog',
@@ -46,10 +41,6 @@ function Visual({ k }: { k: string }) {
     <div className="tw-bub tw-me">Porque dividimos os dois lados?</div>
     <div className="tw-bub tw-jo">Para manter a balança equilibrada: o que fazes de um lado, fazes do outro.</div>
     <div className="tw-bub tw-me">Agora percebi!</div></>
-  if (k === 'Comunidade') return <>
-    <div className="tw-row" style={{ color: '#5d6b64', fontWeight: 500 }}>O que queres partilhar?</div>
-    <div className="tw-row"><b />Estudante<small style={{ color: '#14704a', fontWeight: 700 }}>Seguir</small></div>
-    <div className="tw-row"><b />Estudante<small style={{ color: '#14704a', fontWeight: 700 }}>Seguir</small></div></>
   return <>{articles.slice(0, 3).map((a) => <div className="tw-row" key={a.slug}><b />{a.title}</div>)}</>
 }
 
@@ -78,7 +69,7 @@ export default function Page({ signedIn = false }: { signedIn?: boolean }) {
           </Link>
           <nav className="tw-nav" aria-label="Navegação principal">
             <Link href="/biblioteca">Biblioteca</Link><Link href="/aluno/simulador">Simulador</Link>
-            <Link href="/comunidade">Comunidade</Link><Link href="/jonas">Jonas</Link><Link href="/blog">Blog</Link>
+            <Link href="/jonas">Jonas</Link><Link href="/blog">Blog</Link>
           </nav>
           <div className="flex items-center gap-2">
             {!signedIn && <Link href="/sign-in" className="hidden px-3 text-sm font-semibold text-[#5d6b64] md:block">Entrar</Link>}
@@ -87,7 +78,7 @@ export default function Page({ signedIn = false }: { signedIn?: boolean }) {
           </div>
         </div>
         {menu && <nav className="tw-mob tw-menu" aria-label="Menu móvel" onClick={() => setMenu(false)}>
-          <Link href="/biblioteca">Biblioteca</Link><Link href="/aluno/simulador">Simulador</Link><Link href="/comunidade">Comunidade</Link>
+          <Link href="/biblioteca">Biblioteca</Link><Link href="/aluno/simulador">Simulador</Link>
           <Link href="/jonas">Jonas</Link><Link href="/blog">Blog</Link><Link href="/planos">Planos</Link>{!signedIn && <Link href="/sign-in">Entrar</Link>}
         </nav>}
       </header>
@@ -120,8 +111,8 @@ export default function Page({ signedIn = false }: { signedIn?: boolean }) {
             <div className="tw-chips"><span>10ª classe</span><span>12ª classe</span><span>Admissão</span></div></div>
           <div className="tw-card tw-step tw-rv" style={{ ['--d' as string]: '.1s' }}><b>02</b><h3 style={{ marginTop: 8 }}>Estuda e pratica</h3><p>Lê na Biblioteca, tira dúvidas com o Jonas e testa o que sabes no Simulador.</p>
             <div className="tw-chips"><span>Biblioteca</span><span>Jonas</span><span>Simulador</span></div></div>
-          <div className="tw-card tw-step tw-rv" style={{ ['--d' as string]: '.2s' }}><b>03</b><h3 style={{ marginTop: 8 }}>Revê e evolui</h3><p>Refaz os erros, acompanha o histórico e estuda em conjunto com a comunidade.</p>
-            <div className="tw-chips"><span>Revisar erros</span><span>Histórico</span><span>Comunidade</span></div></div>
+          <div className="tw-card tw-step tw-rv" style={{ ['--d' as string]: '.2s' }}><b>03</b><h3 style={{ marginTop: 8 }}>Revê e evolui</h3><p>Refaz os erros, acompanha o histórico e estuda no teu ritmo, com lembretes na hora que escolheres.</p>
+            <div className="tw-chips"><span>Revisar erros</span><span>Histórico</span></div></div>
         </div>
       </div></section>
 
@@ -158,7 +149,7 @@ export default function Page({ signedIn = false }: { signedIn?: boolean }) {
           <div><Link href="/" className="tw-brand"><Image src="/images/twisisa-mark.png" alt="" width={44} height={24} className="h-6 w-auto" />Twisisa</Link>
             <p style={{ marginTop: 12, maxWidth: 260, lineHeight: 1.6 }}>Percebe a matéria. Não decores. Feita em Moçambique.</p></div>
           <div><h4>Explorar</h4><Link href="/biblioteca">Biblioteca</Link><Link href="/aluno/simulador">Simulador</Link><Link href="/blog">Blog</Link></div>
-          <div><h4>Plataforma</h4><Link href="/jonas">Jonas</Link><Link href="/comunidade">Comunidade</Link><Link href="/planos">Planos</Link><Link href={cta}>{signedIn ? 'Painel' : 'Criar conta'}</Link></div>
+          <div><h4>Plataforma</h4><Link href="/jonas">Jonas</Link><Link href="/planos">Planos</Link><Link href={cta}>{signedIn ? 'Painel' : 'Criar conta'}</Link></div>
           <div><h4>Legal</h4><Link href="/privacidade">Privacidade</Link><Link href="/termos">Termos</Link></div>
         </div>
         <div className="tw-bot"><span>© {new Date().getFullYear()} Twisisa</span><span>Feito em Moçambique</span></div>

@@ -84,17 +84,17 @@ export function PercursoPicker({ initialTrack, initialOtherLevel, initialInstitu
                     role="radio"
                     aria-checked={selected}
                     onClick={() => setInstitutionId(item.id)}
-                    className={`flex items-center gap-3 rounded-3xl border bg-white p-4 text-left transition ${selected ? 'border-2 border-[#1d4d41] bg-[#f3f7f4]' : 'border-[#e3e5dc] hover:border-[#c4d3c8]'}`}
+                    className={`flex items-center gap-3 rounded-3xl border bg-white p-4 text-left transition ${selected ? 'border-2 border-marca bg-[#f3f7f4]' : 'border-linha hover:border-[#c4d3c8]'}`}
                   >
-                    <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[#e3e5dc] bg-[#f3f4ef] text-xs font-bold text-[#1d4d41]">
+                    <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-linha bg-[#f3f4ef] text-xs font-bold text-marca">
                       {item.logoUrl ? <img src={item.logoUrl} alt="" className="size-full object-contain" /> : item.shortName}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="flex items-center gap-2 text-sm font-semibold">{item.shortName}{item.soon && <span className="rounded-full bg-[#f4eddb] px-2 py-0.5 text-[10px] font-semibold text-[#805f19]">Em breve</span>}</span>
+                      <span className="flex items-center gap-2 text-sm font-semibold">{item.shortName}{item.soon && <span className="rounded-full bg-[#f4eddb] px-2 py-0.5 text-[10px] font-semibold text-aviso-texto">Em breve</span>}</span>
                       <span className="mt-0.5 block truncate text-xs text-[#3f6357]">{item.name}</span>
                       {item.description && <span className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-[#3f6357]">{bold(item.description)}</span>}
                     </span>
-                    {selected ? <Check size={18} aria-hidden="true" className="shrink-0 text-[#1d4d41]" /> : <ChevronRight size={18} aria-hidden="true" className="shrink-0 text-[#3f6357]" />}
+                    {selected ? <Check size={18} aria-hidden="true" className="shrink-0 text-marca" /> : <ChevronRight size={18} aria-hidden="true" className="shrink-0 text-[#3f6357]" />}
                   </button>
                 )
               })}
@@ -107,7 +107,7 @@ export function PercursoPicker({ initialTrack, initialOtherLevel, initialInstitu
         type="button"
         onClick={save}
         disabled={!canSave}
-        className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#1d4d41] text-sm font-semibold text-white shadow-sm hover:bg-[#163e34] disabled:cursor-not-allowed disabled:opacity-50 sm:w-fit sm:px-10"
+        className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-marca text-sm font-semibold text-white shadow-sm hover:bg-marca-escura disabled:cursor-not-allowed disabled:opacity-50 sm:w-fit sm:px-10"
       >
         {pending ? <><Spinner />A guardar…</> : 'Guardar percurso'}
       </button>

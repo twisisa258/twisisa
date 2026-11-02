@@ -31,26 +31,26 @@ export default async function ResultadoPage() {
   return (
     <StudentFeatureShell firstName={firstName} eyebrow="Orientação" title="Os teus cursos" hideTitle>
       <div className="max-w-[560px]">
-        <h1 className="text-[26px] font-semibold tracking-[-0.03em] text-[#202321]">Os teus cursos</h1>
+        <h1 className="text-[26px] font-semibold tracking-[-0.03em] text-texto">Os teus cursos</h1>
 
         {courses.length === 0 ? (
           <p className="mt-3 text-[15px] leading-6 text-[#5f6962]">As tuas respostas não apontam para nenhum curso com clareza. Tenta de novo quando quiseres.</p>
         ) : (
           <>
-            <p className="mt-3 text-[13px] leading-5 text-[#6b756e]">A afinidade mostra o quanto o curso combina com o que disseste que gostas. Não garante a entrada.</p>
-            {flat && <p className="mt-2 text-[13px] leading-5 text-[#6b756e]">As tuas respostas foram muito parecidas, por isso as diferenças entre os cursos são pequenas.</p>}
-            <p className="mt-2 text-[13px] leading-5 text-[#6b756e]">Escolhe o curso a que queres candidatar-te: passas a treinar as provas dele nos Desafios.</p>
+            <p className="mt-3 text-[13px] leading-5 text-texto-2">A afinidade mostra o quanto o curso combina com o que disseste que gostas. Não garante a entrada.</p>
+            {flat && <p className="mt-2 text-[13px] leading-5 text-texto-2">As tuas respostas foram muito parecidas, por isso as diferenças entre os cursos são pequenas.</p>}
+            <p className="mt-2 text-[13px] leading-5 text-texto-2">Escolhe o curso a que queres candidatar-te: passas a treinar as provas dele nos Desafios.</p>
             <ol className="mt-5 space-y-3">
               {courses.map((course) => (
                 <li key={course.courseId} className={`${card} p-4`}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-[16px] font-semibold leading-5 text-[#202321]">{course.name}</p>
-                      <p className="mt-1 text-[12.5px] leading-4 text-[#6b756e]">{[course.unit, course.institution].filter(Boolean).join(' · ')}</p>
+                      <p className="text-[16px] font-semibold leading-5 text-texto">{course.name}</p>
+                      <p className="mt-1 text-[12.5px] leading-4 text-texto-2">{[course.unit, course.institution].filter(Boolean).join(' · ')}</p>
                     </div>
                     <div className="flex-none text-right">
-                      <p className="text-[20px] font-semibold leading-6 text-[#1d4d41]">{course.percent}%</p>
-                      <p className="text-[11px] text-[#6b756e]">afinidade</p>
+                      <p className="text-[20px] font-semibold leading-6 text-marca">{course.percent}%</p>
+                      <p className="text-[11px] text-texto-2">afinidade</p>
                     </div>
                   </div>
                   {course.reasons.length > 0 && <p className="mt-3 text-[13px] text-[#39433e]">Porque gostas de {joinLabels(course.reasons.map((d) => DIMENSION_LABEL[d]))}.</p>}

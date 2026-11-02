@@ -11,7 +11,7 @@ export function PercursoSkeleton() {
           <Skeleton className="mt-2 h-4 w-80 max-w-full" />
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="flex items-start gap-3 rounded-3xl border border-[#e3e5dc] bg-white p-4">
+              <div key={i} className="flex items-start gap-3 rounded-3xl border border-linha bg-white p-4">
                 <Skeleton className="size-11 shrink-0 rounded-2xl" />
                 <div className="flex-1">
                   <Skeleton className="h-4 w-3/4" />

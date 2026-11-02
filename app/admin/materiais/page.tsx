@@ -63,7 +63,7 @@ export default async function AdminMateriaisPage({ searchParams }: { searchParam
         title="Materiais académicos"
         description="Consulta, abre e elimina os recursos da Biblioteca. Podes carregar vários de uma vez."
         action={
-          <Link href="/admin/materiais/novo" className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#1d4d41] px-4 text-sm font-semibold text-white shadow-sm hover:bg-[#163e34] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d4d41]">
+          <Link href="/admin/materiais/novo" className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-marca px-4 text-sm font-semibold text-white shadow-sm hover:bg-marca-escura focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca">
             <Plus size={18} aria-hidden="true" />Adicionar
           </Link>
         }
@@ -87,13 +87,13 @@ export default async function AdminMateriaisPage({ searchParams }: { searchParam
               <li key={m.id} className="flex items-center justify-between gap-3 py-3">
                 <div className="min-w-0">
                   <p className="truncate font-medium leading-5">{m.title}</p>
-                  <p className="mt-0.5 truncate text-xs text-[#737c75]">
+                  <p className="mt-0.5 truncate text-xs text-texto-2">
                     {m.category}{m.subject ? ` · ${m.subject}` : ''}
-                    <span className={`ml-2 inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold ${m.status === 'approved' ? 'bg-[#e6f0e9] text-[#1d4d41]' : 'bg-[#f4eddb] text-[#805f19]'}`}>{m.status === 'approved' ? 'Publicado' : m.status}</span>
+                    <span className={`ml-2 inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold ${m.status === 'approved' ? 'bg-[#e6f0e9] text-marca' : 'bg-[#f4eddb] text-aviso-texto'}`}>{m.status === 'approved' ? 'Publicado' : m.status}</span>
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
-                  <a href={`/api/biblioteca/${m.id}/ficheiro`} target="_blank" rel="noreferrer" aria-label={`Abrir ${m.title}`} className="rounded-lg p-2 text-[#1d4d41] hover:bg-[#f1f4ef]"><ExternalLink size={17} /></a>
+                  <a href={`/api/biblioteca/${m.id}/ficheiro`} target="_blank" rel="noreferrer" aria-label={`Abrir ${m.title}`} className="rounded-lg p-2 text-marca hover:bg-[#f1f4ef]"><ExternalLink size={17} /></a>
                   <DeleteMaterialButton id={m.id} title={m.title} action={deleteAcademicMaterial} />
                 </div>
               </li>

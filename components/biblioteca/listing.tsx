@@ -80,9 +80,9 @@ export async function Listing({ userId, basePath, category, params }: { userId: 
       ) : data.total === 0 ? (
         anyFilter ? (
           <div className="rounded-3xl bg-white px-5 py-10 text-center shadow-[0_1px_2px_rgba(20,50,40,0.04),0_10px_26px_-14px_rgba(20,50,40,0.18)]">
-            <SearchX size={26} className="mx-auto text-[#788178]" />
+            <SearchX size={26} className="mx-auto text-texto-2" />
             <p className="mt-3 text-sm font-semibold text-[#202923]">Nenhum resultado</p>
-            <Link href={basePath} className="mt-4 inline-flex h-10 items-center rounded-full bg-gradient-to-br from-[#2a6a57] to-[#1d4d41] px-5 text-sm font-semibold text-white">
+            <Link href={basePath} className="mt-4 inline-flex h-10 items-center rounded-full bg-gradient-to-br from-[#2a6a57] to-marca px-5 text-sm font-semibold text-white">
               Limpar pesquisa
             </Link>
           </div>
@@ -91,7 +91,7 @@ export async function Listing({ userId, basePath, category, params }: { userId: 
         )
       ) : (
         <LibraryProvider savedIds={savedIds}>
-          <p className="text-xs text-[#788178]">{data.total === 1 ? '1 material' : `${data.total} materiais`}</p>
+          <p className="text-xs text-texto-2">{data.total === 1 ? '1 material' : `${data.total} materiais`}</p>
           <ul className="grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
             {data.items.map((item) => (
               <li key={item.id} className="min-w-0">

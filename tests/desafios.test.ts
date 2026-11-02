@@ -84,7 +84,7 @@ function snapshot(over: Partial<DesafiosSnapshot> = {}): DesafiosSnapshot {
     streak: { current: 0, best: 0, todayMet: false, lost: null, lastActiveDay: '2026-10-30' },
     daysSinceActive: 0, todayAnswered: 0, todayCorrect: 0, weekPoints: 0, weekGoalDays: 0, weekDaysLeft: 3,
     daily: [], weekly: [{ id: 'w-dias', title: '', detail: null, current: 0, target: 5, unit: 'dias', status: 'em_curso', href: null }],
-    admission: false, course: null, subjects: [], readiness: null, weak: null, errorCount: 0, ...over,
+    admission: false, course: null, subjects: [], readiness: null, weak: null, errorCount: 0, goal: 10, ...over,
   }
 }
 

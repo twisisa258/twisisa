@@ -166,3 +166,17 @@ export async function sendInviteEmail(input: { to: string; name: string; link: s
     text: `${input.name.trim()}, foste convidado para a equipa do Twisisa (${input.roleLabel}).\n\nAbre a carta: ${input.link}\n${input.code ? `Código: ${input.code}\n` : 'O código será entregue à parte.\n'}\nA carta só pode ser aberta uma vez. Não encaminhes este e-mail.\n\n— Twisisa`,
   })
 }
+
+/** Lembrete de estudo (cron). `href` é um caminho interno; o botão leva o aluno direto à ação. */
+export function reminderEmail(input: { name: string; title: string; text: string; cta: string; href: string; unsubscribeUrl: string }) {
+  const url = `${siteBaseUrl()}${input.href.startsWith('/') ? input.href : '/aluno'}`
+  const html = layout({
+    title: escapeHtml(input.title),
+    preheader: escapeHtml(input.text),
+    body: p(`Olá, ${firstName(input.name)}.`) + p(escapeHtml(input.text)) + note(`Para deixares de receber estes lembretes, <a href="${input.unsubscribeUrl}" style="color:${GREEN}">desliga aqui</a>. Também podes mudar a hora na tua conta.`),
+    button: { label: input.cta, href: url },
+    reason: 'Recebes este lembrete porque o ativaste no Twisisa.',
+  })
+  const text = `Olá, ${input.name.trim().split(/\s+/)[0] || 'estudante'}.\n\n${input.text}\n\n${input.cta}: ${url}\n\nPara deixares de receber estes lembretes: ${input.unsubscribeUrl}`
+  return { subject: input.title, html, text }
+}

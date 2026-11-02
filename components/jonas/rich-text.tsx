@@ -56,7 +56,7 @@ function Items({ items }: { items: ListItem[] }) {
   return (
     <>
       {items.map((item, index) => (
-        <li key={index} className="pl-1 marker:font-semibold marker:text-[#1d4d41]">
+        <li key={index} className="pl-1 marker:font-semibold marker:text-marca">
           <Inlines nodes={item.c} />
           {item.children.length > 0 && <Blocks blocks={item.children} nested />}
         </li>
@@ -90,10 +90,10 @@ function Blocks({ blocks, nested = false }: { blocks: Block[]; nested?: boolean 
           case 'math':
             return <div key={index} className={`${space} max-w-full overflow-x-auto overflow-y-hidden py-1`} dangerouslySetInnerHTML={{ __html: renderMath(block.v, true) }} />
           case 'hr':
-            return <hr key={index} className="my-4 border-[#e3e5dc]" />
+            return <hr key={index} className="my-4 border-linha" />
           case 'table':
             return (
-              <div key={index} className={`${space} max-w-full overflow-x-auto rounded-xl border border-[#e3e5dc]`}>
+              <div key={index} className={`${space} max-w-full overflow-x-auto rounded-xl border border-linha`}>
                 <table className="w-full border-collapse text-left text-[14px]">
                   <thead className="bg-[#f4f6f1]">
                     <tr>{block.head.map((cell, i) => <th key={i} className="px-3 py-2 font-semibold"><Inlines nodes={cell} /></th>)}</tr>

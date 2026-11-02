@@ -48,7 +48,7 @@ export default async function BibliotecaPage({ searchParams }: { searchParams: P
             ))}
             <Link
               href="/biblioteca/explorar"
-              className="flex h-12 items-center justify-center gap-1 rounded-2xl bg-gradient-to-br from-[#eaf1ec] to-[#d6e6dc] text-sm font-semibold text-[#1d4d41]"
+              className="flex h-12 items-center justify-center gap-1 rounded-2xl bg-gradient-to-br from-[#eaf1ec] to-[#d6e6dc] text-sm font-semibold text-marca"
             >
               Explorar mais
               <ChevronRight size={16} />

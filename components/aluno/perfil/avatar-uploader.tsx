@@ -92,25 +92,25 @@ export function AvatarUploader({ name, image }: { name: string; image: string | 
   return (
     <div className="flex shrink-0 flex-col items-center gap-1.5">
       <label className="relative block size-20 cursor-pointer rounded-full sm:size-24" aria-label="Alterar foto de perfil">
-        <span className={`relative flex size-full items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[#e1ece5] to-[#cfe0d5] text-2xl font-semibold text-[#1d4d41] ${src && !loaded && !preview ? 'animate-pulse motion-reduce:animate-none' : ''}`}>
+        <span className={`relative flex size-full items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[#e1ece5] to-[#cfe0d5] text-2xl font-semibold text-marca ${src && !loaded && !preview ? 'animate-pulse motion-reduce:animate-none' : ''}`}>
           {src ? (
             <img src={src} alt="" onLoad={() => setLoaded(true)} className={`size-full object-cover transition-opacity duration-300 ${loaded || preview ? 'opacity-100' : 'opacity-0'}`} />
           ) : (
             name.trim().slice(0, 1).toUpperCase()
           )}
           {busy && (
-            <span className="absolute inset-0 flex items-center justify-center bg-white/70 text-[#1d4d41]" role="status" aria-label="A enviar a foto">
+            <span className="absolute inset-0 flex items-center justify-center bg-white/70 text-marca" role="status" aria-label="A enviar a foto">
               <Spinner className="size-6" />
             </span>
           )}
         </span>
-        <span className="absolute -bottom-0.5 -right-0.5 flex size-8 items-center justify-center rounded-full border-2 border-[#f8f8f5] bg-[#1d4d41] text-white" aria-hidden="true">
+        <span className="absolute -bottom-0.5 -right-0.5 flex size-8 items-center justify-center rounded-full border-2 border-fundo bg-marca text-white" aria-hidden="true">
           <Camera size={14} />
         </span>
         <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={onChange} disabled={busy} className="sr-only" />
       </label>
       {url && !busy && (
-        <button type="button" onClick={remove} className="text-[11px] font-semibold text-[#737c75] hover:text-[#1d4d41]">
+        <button type="button" onClick={remove} className="text-[11px] font-semibold text-texto-2 hover:text-marca">
           Remover
         </button>
       )}

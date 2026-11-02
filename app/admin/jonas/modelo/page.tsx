@@ -12,7 +12,7 @@ import { saveJonas } from '../actions'
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Modelo do Jonas | Administração | Twisisa' }
 
-const field = 'mt-1 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 py-2.5 text-sm outline-none focus:border-[#1d4d41] focus:ring-2 focus:ring-[#1d4d41]/10'
+const field = 'mt-1 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 py-2.5 text-sm outline-none focus:border-marca focus:ring-2 focus:ring-marca/10'
 const LABELS = ['Modelo principal', 'Alternativo 1', 'Alternativo 2']
 
 export default async function AdminJonasModelPage() {
@@ -30,7 +30,7 @@ export default async function AdminJonasModelPage() {
   return (
     <JonasShell active="modelo">
       {settings === null ? (
-        <div className="rounded-2xl border border-[#e3e5dc] bg-white">
+        <div className="rounded-2xl border border-linha bg-white">
           <AdminLoadError href="/admin/jonas/modelo" />
         </div>
       ) : (
@@ -50,7 +50,7 @@ export default async function AdminJonasModelPage() {
                 ]}
               />
             </div>
-            <p className="mt-2 text-xs leading-5 text-[#737c75]">Em pausa, o chat e as explicações do Jonas deixam de responder e os alunos veem um aviso.</p>
+            <p className="mt-2 text-xs leading-5 text-texto-2">Em pausa, o chat e as explicações do Jonas deixam de responder e os alunos veem um aviso.</p>
           </section>
 
           <section className={jonasCard}>
@@ -83,12 +83,12 @@ export default async function AdminJonasModelPage() {
               })}
             </div>
             {!live.ok && (
-              <p className="mt-3 flex items-start gap-2 rounded-xl bg-[#f4eddb] px-3 py-2.5 text-xs leading-5 text-[#805f19]">
+              <p className="mt-3 flex items-start gap-2 rounded-xl bg-[#f4eddb] px-3 py-2.5 text-xs leading-5 text-aviso-texto">
                 <CircleAlert size={15} aria-hidden="true" className="mt-0.5 shrink-0" />
                 {live.reason === 'no-key' ? 'A chave da Groq ainda não está definida, por isso não há lista de modelos. Escreve o nome do modelo.' : 'Não foi possível obter a lista de modelos da Groq. Escreve o nome do modelo.'}
               </p>
             )}
-            <p className="mt-3 text-xs leading-5 text-[#737c75]">
+            <p className="mt-3 text-xs leading-5 text-texto-2">
               O Jonas tenta o principal; se não existir na conta ou estiver com o limite cheio, passa ao seguinte. Tudo vazio = automático: usa GROQ_MODEL (se existir no servidor) ou a lista predefinida ({DEFAULT_GROQ_MODELS.join(', ')}).
             </p>
           </section>
@@ -109,10 +109,10 @@ export default async function AdminJonasModelPage() {
                 ]}
               />
             </div>
-            <p className="mt-2 text-xs leading-5 text-[#737c75]">Mais esforço melhora as contas difíceis, mas demora mais e consome mais do limite da Groq, que é partilhado por todos os alunos.</p>
+            <p className="mt-2 text-xs leading-5 text-texto-2">Mais esforço melhora as contas difíceis, mas demora mais e consome mais do limite da Groq, que é partilhado por todos os alunos.</p>
           </section>
 
-          <button type="submit" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#1d4d41] px-5 py-3 text-sm font-semibold text-white hover:bg-[#163e34]">
+          <button type="submit" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-marca px-5 py-3 text-sm font-semibold text-white hover:bg-marca-escura">
             <Save size={16} aria-hidden="true" />
             Guardar
           </button>

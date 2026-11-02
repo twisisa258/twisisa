@@ -33,7 +33,7 @@ export function DeleteMaterialButton({ id, title, action }: { id: string; title:
 
   if (!confirming) {
     return (
-      <button type="button" onClick={() => setConfirming(true)} aria-label={`Eliminar ${title}`} className="rounded-lg p-2 text-[#9a3030] hover:bg-[#fbeeee]">
+      <button type="button" onClick={() => setConfirming(true)} aria-label={`Eliminar ${title}`} className="rounded-lg p-2 text-erro-texto hover:bg-[#fbeeee]">
         <Trash2 size={17} />
       </button>
     )
@@ -41,7 +41,7 @@ export function DeleteMaterialButton({ id, title, action }: { id: string; title:
 
   return (
     <div className="flex items-center gap-1.5">
-      <button type="button" onClick={remove} disabled={pending} className="rounded-lg bg-[#9a3030] px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-[#7f2626] disabled:opacity-60">{pending ? 'A eliminar…' : 'Eliminar'}</button>
+      <button type="button" onClick={remove} disabled={pending} className="rounded-lg bg-erro-texto px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-[#7f2626] disabled:opacity-60">{pending ? 'A eliminar…' : 'Eliminar'}</button>
       <button type="button" onClick={() => setConfirming(false)} disabled={pending} className="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-[#526057] hover:bg-[#f1f4ef] disabled:opacity-60">Cancelar</button>
     </div>
   )

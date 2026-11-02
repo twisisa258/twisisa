@@ -6,6 +6,10 @@ const nextConfig = {
       { source: '/exames', destination: '/biblioteca', permanent: true },
       // O Simulador substitui a página de simulados (que tinha um simulado de demonstração).
       { source: '/aluno/simulados', destination: '/aluno/simulador', permanent: true },
+      // A Comunidade e os Convites de estudante eram fictícios e foram retirados.
+      { source: '/comunidade', destination: '/aluno', permanent: true },
+      { source: '/aluno/convites', destination: '/aluno', permanent: true },
+      { source: '/biblioteca/partilhar', destination: '/biblioteca', permanent: true },
     ]
   },
   typescript: {

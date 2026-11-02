@@ -63,14 +63,14 @@ export function LogoUpload({ defaultUrl = '', fallbackText = '' }: { defaultUrl?
 
   return (
     <div className="text-sm font-medium">
-      <span>Logótipo <span className="font-normal text-[#737c75]">(PNG, JPG ou WebP, até 1 MB)</span></span>
+      <span>Logótipo <span className="font-normal text-texto-2">(PNG, JPG ou WebP, até 1 MB)</span></span>
       <input type="hidden" name="logoUrl" value={url} />
       <div className="mt-1 flex items-center gap-3">
-        <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[#dfe3d9] bg-[#f3f4ef] text-[10px] font-bold text-[#1d4d41]">
+        <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-[#dfe3d9] bg-[#f3f4ef] text-[10px] font-bold text-marca">
           {url ? <img src={url} alt="" className="size-full object-contain" /> : fallbackText || <ImagePlus size={18} aria-hidden="true" />}
         </span>
         <div className="flex flex-wrap items-center gap-2">
-          <label className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border border-[#dfe3d9] bg-white px-3.5 text-sm font-semibold text-[#1d4d41] hover:bg-[#f1f4ef]">
+          <label className="inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border border-[#dfe3d9] bg-white px-3.5 text-sm font-semibold text-marca hover:bg-[#f1f4ef]">
             {uploading ? 'A carregar…' : url ? 'Trocar' : 'Carregar'}
             <input ref={fileRef} type="file" accept={ACCEPT} onChange={onChange} disabled={uploading} className="sr-only" />
           </label>
@@ -81,7 +81,7 @@ export function LogoUpload({ defaultUrl = '', fallbackText = '' }: { defaultUrl?
           )}
         </div>
       </div>
-      {message && <p role="alert" className="mt-2 text-xs font-normal text-[#9a3030]">{message}</p>}
+      {message && <p role="alert" className="mt-2 text-xs font-normal text-erro-texto">{message}</p>}
     </div>
   )
 }

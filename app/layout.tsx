@@ -49,7 +49,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light dark',
+  colorScheme: 'light',
   themeColor: '#1d4d41',
 }
 
@@ -60,6 +60,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-MZ">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700&display=swap" />
+      </head>
       <body className="antialiased">
         <JsonLd data={siteJsonLd} />
         <FeedbackProvider>{children}</FeedbackProvider>

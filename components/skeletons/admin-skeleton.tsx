@@ -9,7 +9,7 @@ export function AdminHomeSkeleton() {
       <AdminTabsSkeleton count={2} />
       <div className="grid shrink-0 grid-cols-3 gap-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="rounded-2xl border border-[#e3e5dc] bg-white p-3.5 sm:p-5">
+          <div key={i} className="rounded-2xl border border-linha bg-white p-3.5 sm:p-5">
             <Skeleton className="h-6 w-12 sm:h-9 sm:w-16" />
             <Skeleton className="mt-2 h-3 w-full" />
           </div>

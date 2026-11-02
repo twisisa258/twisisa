@@ -5,10 +5,10 @@ import type { Aviso, AvisoIcon, AvisoTone } from '@/lib/avisos'
 const ICONS: Record<AvisoIcon, LucideIcon> = { flame: Flame, clock: Clock, target: Target, book: BookOpen, alert: AlertTriangle, check: Check, calendar: CalendarDays }
 
 const TONES: Record<AvisoTone, { card: string; icon: string; cta: string }> = {
-  urgent: { card: 'bg-gradient-to-br from-[#fff4ee] to-[#fde5da]', icon: 'bg-[#c2410c] text-white', cta: 'text-[#9a3412]' },
-  warning: { card: 'bg-gradient-to-br from-[#fffaec] to-[#f8edca]', icon: 'bg-[#b7791f] text-white', cta: 'text-[#8a5a12]' },
-  info: { card: 'bg-gradient-to-br from-white to-[#f4f6f1]', icon: 'bg-[#eaf1ec] text-[#1d4d41]', cta: 'text-[#1d4d41]' },
-  success: { card: 'bg-gradient-to-br from-[#eef6f0] to-[#dcebe0]', icon: 'bg-[#1d4d41] text-white', cta: 'text-[#1d4d41]' },
+  urgent: { card: 'bg-gradient-to-br from-[#fff4ee] to-[#fde5da]', icon: 'bg-aviso text-white', cta: 'text-[#9a3412]' },
+  warning: { card: 'bg-gradient-to-br from-[#fffaec] to-[#f8edca]', icon: 'bg-aviso text-white', cta: 'text-[#8a5a12]' },
+  info: { card: 'bg-gradient-to-br from-white to-[#f4f6f1]', icon: 'bg-[#eaf1ec] text-marca', cta: 'text-marca' },
+  success: { card: 'bg-gradient-to-br from-[#eef6f0] to-[#dcebe0]', icon: 'bg-marca text-white', cta: 'text-marca' },
 }
 
 // Avisos e lembretes do aluno (calculados em lib/avisos.ts). Cada cartão é uma ligação para a ação.
@@ -24,7 +24,7 @@ export function Avisos({ items }: { items: Aviso[] }) {
             key={aviso.id}
             href={aviso.href}
             role={aviso.tone === 'urgent' ? 'alert' : undefined}
-            className={`flex items-center gap-3 rounded-[18px] p-3.5 text-[#202321] no-underline shadow-[0_1px_2px_rgba(20,50,40,0.04),0_10px_26px_-14px_rgba(20,50,40,0.18)] ${tone.card}`}
+            className={`flex items-center gap-3 rounded-[18px] p-3.5 text-texto no-underline shadow-[0_1px_2px_rgba(20,50,40,0.04),0_10px_26px_-14px_rgba(20,50,40,0.18)] ${tone.card}`}
           >
             <span className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${tone.icon}`}><Icon size={18} aria-hidden="true" /></span>
             <span className="min-w-0 flex-1">

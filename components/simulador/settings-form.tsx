@@ -19,7 +19,7 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
 function Choice<T extends number>({ label, value, options, onChange, format = String }: { label: string; value: T; options: readonly T[]; onChange: (value: T) => void; format?: (value: T) => string }) {
   return (
     <div className="space-y-2">
-      <p className="text-[14px] text-[#68716a]">{label}</p>
+      <p className="text-[14px] text-texto-2">{label}</p>
       <div role="radiogroup" aria-label={label} className="grid gap-1 rounded-xl bg-[#eceee7] p-1" style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}>
         {options.map((option) => (
           <button
@@ -28,7 +28,7 @@ function Choice<T extends number>({ label, value, options, onChange, format = St
             role="radio"
             aria-checked={option === value}
             onClick={() => onChange(option)}
-            className={cn('h-10 rounded-lg text-[14px] font-medium tabular-nums transition-all duration-200', option === value ? 'bg-white text-[#1d4d41] shadow-[0_2px_6px_rgba(20,50,40,0.10)]' : 'text-[#68716a]')}
+            className={cn('h-10 rounded-lg text-[14px] font-medium tabular-nums transition-all duration-200', option === value ? 'bg-white text-marca shadow-[0_2px_6px_rgba(20,50,40,0.10)]' : 'text-texto-2')}
           >
             {format(option)}
           </button>
@@ -42,7 +42,7 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
   return (
     <button type="button" role="switch" aria-checked={checked} onClick={() => onChange(!checked)} className="flex w-full items-center justify-between gap-3 text-left">
       <span className="text-[15px]">{label}</span>
-      <span className={cn('relative h-7 w-12 shrink-0 rounded-full transition-colors duration-200', checked ? 'bg-[#1d4d41]' : 'bg-[#d5dad1]')}>
+      <span className={cn('relative h-7 w-12 shrink-0 rounded-full transition-colors duration-200', checked ? 'bg-marca' : 'bg-[#d5dad1]')}>
         <span className={cn('absolute top-1 size-5 rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.2)] transition-all duration-200', checked ? 'left-6' : 'left-1')} />
       </span>
     </button>
@@ -92,8 +92,8 @@ export function SettingsForm({ initial }: { initial: SimPrefs }) {
       </Group>
 
       <div className="flex h-6 items-center justify-between px-1 text-[13px]" role="status">
-        <span className={cn('text-[#7d857e] transition-opacity duration-200', saved ? 'opacity-100' : 'opacity-0')}>Guardado</span>
-        <button type="button" disabled={isDefault} onClick={() => update(DEFAULT_PREFS)} className="font-medium text-[#1d4d41] hover:underline disabled:opacity-0">Repor</button>
+        <span className={cn('text-texto-2 transition-opacity duration-200', saved ? 'opacity-100' : 'opacity-0')}>Guardado</span>
+        <button type="button" disabled={isDefault} onClick={() => update(DEFAULT_PREFS)} className="font-medium text-marca hover:underline disabled:opacity-0">Repor</button>
       </div>
     </div>
   )

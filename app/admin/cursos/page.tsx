@@ -15,7 +15,7 @@ import { EmptyState } from '@/components/states/empty-state'
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Cursos | Administração | Twisisa' }
 
-const input = 'mt-1 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 py-2.5 text-sm outline-none focus:border-[#1d4d41] focus:ring-2 focus:ring-[#1d4d41]/10'
+const input = 'mt-1 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 py-2.5 text-sm outline-none focus:border-marca focus:ring-2 focus:ring-marca/10'
 
 function CourseForm({ editing, institutions, subjects, courses }: { editing: CourseRow | null; institutions: InstitutionRow[]; subjects: SubjectRow[]; courses: CourseRow[] }) {
   const units = [...new Set(courses.map((c) => c.unit).filter((u): u is string => Boolean(u)))]
@@ -45,12 +45,12 @@ function CourseForm({ editing, institutions, subjects, courses }: { editing: Cou
 
       <div>
         <p className="text-sm font-medium">Provas de admissão *</p>
-        <p className="mt-0.5 text-xs text-[#737c75]">Cada opção é uma combinação de provas que dá acesso ao curso (o candidato escolhe uma). Os pesos de cada opção somam 100%.</p>
+        <p className="mt-0.5 text-xs text-texto-2">Cada opção é uma combinação de provas que dá acesso ao curso (o candidato escolhe uma). Os pesos de cada opção somam 100%.</p>
         <div className="mt-3 grid gap-3">
           {Array.from({ length: MAX_OPTIONS }).map((_, i) => {
             const option = editing?.options[i]
             return (
-              <details key={i} open={i === 0 || Boolean(option)} className="rounded-2xl border border-[#e3e5dc] bg-[#fbfbf9] p-3 open:bg-white">
+              <details key={i} open={i === 0 || Boolean(option)} className="rounded-2xl border border-linha bg-[#fbfbf9] p-3 open:bg-white">
                 <summary className="cursor-pointer text-sm font-semibold">Opção {i + 1}{option ? ` · ${periodLabel(option.period)}` : i === 0 ? '' : ' (opcional)'}</summary>
                 <div className="mt-3 grid gap-3">
                   <label className="text-xs font-medium text-[#526057]">Período
@@ -86,7 +86,7 @@ function CourseForm({ editing, institutions, subjects, courses }: { editing: Cou
           })}
         </div>
       </div>
-      <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#1d4d41] px-5 py-3 text-sm font-semibold text-white hover:bg-[#163e34]">{editing ? 'Guardar alterações' : 'Criar curso'}</button>
+      <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-marca px-5 py-3 text-sm font-semibold text-white hover:bg-marca-escura">{editing ? 'Guardar alterações' : 'Criar curso'}</button>
     </FeedbackForm>
   )
 }
@@ -94,7 +94,7 @@ function CourseForm({ editing, institutions, subjects, courses }: { editing: Cou
 function ViewSwitch({ view, q }: { view: 'cursos' | 'provas'; q: string }) {
   const href = (target: string) => `/admin/cursos${target === 'provas' ? '?vista=provas' : ''}${q ? `${target === 'provas' ? '&' : '?'}q=${encodeURIComponent(q)}` : ''}`
   const item = (target: 'cursos' | 'provas', label: string) => (
-    <Link href={href(target)} aria-current={view === target ? 'page' : undefined} className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${view === target ? 'bg-[#1d4d41] font-semibold text-white' : 'text-[#526057] hover:bg-white'}`}>{label}</Link>
+    <Link href={href(target)} aria-current={view === target ? 'page' : undefined} className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${view === target ? 'bg-marca font-semibold text-white' : 'text-[#526057] hover:bg-white'}`}>{label}</Link>
   )
   return <div className="flex shrink-0 gap-1 self-start rounded-full border border-[#dfe3d9] bg-[#f3f4ef] p-1">{item('cursos', 'Por curso')}{item('provas', 'Por provas')}</div>
 }
@@ -152,10 +152,10 @@ export default async function AdminCursosPage({ searchParams }: { searchParams: 
           <ul className="min-h-0 flex-1 divide-y divide-[#edf0e9] overflow-y-auto px-4 sm:px-5">
             {groups.map((group) => (
               <li key={group.key} className="py-3">
-                <p className="text-sm font-semibold leading-5">{group.key} <span className="font-normal text-[#737c75]">· {group.courses.length} {group.courses.length === 1 ? 'curso' : 'cursos'}</span></p>
+                <p className="text-sm font-semibold leading-5">{group.key} <span className="font-normal text-texto-2">· {group.courses.length} {group.courses.length === 1 ? 'curso' : 'cursos'}</span></p>
                 <p className="mt-1 text-xs leading-5 text-[#526057]">
                   {group.courses.map((c, index) => (
-                    <span key={c.id}>{index > 0 && ', '}<Link href={`/admin/cursos?editar=${c.id}`} className="hover:text-[#1d4d41] hover:underline">{c.name}</Link>{c.periods.length === 1 && c.periods[0] === 'pos_laboral' ? ' (pós-laboral)' : ''}</span>
+                    <span key={c.id}>{index > 0 && ', '}<Link href={`/admin/cursos?editar=${c.id}`} className="hover:text-marca hover:underline">{c.name}</Link>{c.periods.length === 1 && c.periods[0] === 'pos_laboral' ? ' (pós-laboral)' : ''}</span>
                   ))}
                 </p>
               </li>
@@ -167,9 +167,9 @@ export default async function AdminCursosPage({ searchParams }: { searchParams: 
               <li key={item.id} className={`flex items-start gap-3 py-3 ${item.active ? '' : 'opacity-70'}`}>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium leading-5">{item.name}</p>
-                  <p className="mt-0.5 text-xs text-[#737c75]">{[item.institutionShortName, item.unit, item.campus && item.campus !== 'Cidade de Maputo' ? item.campus : null].filter(Boolean).join(' · ')}</p>
+                  <p className="mt-0.5 text-xs text-texto-2">{[item.institutionShortName, item.unit, item.campus && item.campus !== 'Cidade de Maputo' ? item.campus : null].filter(Boolean).join(' · ')}</p>
                   {describeOptions(item.options).map((line) => (
-                    <p key={line.periods} className="mt-1 text-xs leading-5 text-[#526057]"><span className="font-semibold text-[#1d4d41]">{line.periods}:</span> {line.text}</p>
+                    <p key={line.periods} className="mt-1 text-xs leading-5 text-[#526057]"><span className="font-semibold text-marca">{line.periods}:</span> {line.text}</p>
                   ))}
                 </div>
                 {!item.active && <span className="shrink-0 rounded-full bg-[#f1f1ee] px-2.5 py-1 text-[11px] font-semibold text-[#6b716c]">Arquivado</span>}

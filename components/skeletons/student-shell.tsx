@@ -35,7 +35,7 @@ export function StudentSidebarSkeleton() {
  */
 export function StudentShellSkeleton({ children, hideBackLink = false, hideTitle = false }: { children: React.ReactNode; hideBackLink?: boolean; hideTitle?: boolean }) {
   return (
-    <main role="status" aria-live="polite" aria-busy="true" aria-label="A carregar" className="min-h-screen overflow-x-hidden bg-[#f8f8f5]">
+    <main role="status" aria-live="polite" aria-busy="true" aria-label="A carregar" className="min-h-screen overflow-x-hidden bg-fundo">
       <div className="flex min-h-screen">
         <StudentSidebarSkeleton />
         <div className="min-w-0 flex-1">

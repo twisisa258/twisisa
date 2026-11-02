@@ -1,5 +1,6 @@
 'use server'
 
+import { DEFAULT_STUDY_HOUR, isStudyHour } from '@/lib/lembretes-shared'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { randomBytes, randomUUID } from 'node:crypto'
@@ -92,19 +93,21 @@ export async function saveTrackAndGoal(input: { track: string; institutionId: st
   })
 }
 
-/** Ecrã 3: lembretes. Fecha o onboarding. «push» fica registado como indisponível até o Web Push existir (fase G). */
-export async function saveReminders(input: { choice: 'email' | 'none' }): Promise<StepResult> {
+/** Ecrã 3: lembretes e hora preferida. Fecha o onboarding. O Web Push ainda não existe: fica sempre desligado. */
+export async function saveReminders(input: { choice: 'email' | 'none'; hour?: number }): Promise<StepResult> {
   return step('Não foi possível guardar. Tenta outra vez.', async (user) => {
     if (input?.choice !== 'email' && input?.choice !== 'none') throw new AppError('Escolhe uma opção.')
+    const hour = input.hour ?? DEFAULT_STUDY_HOUR
+    if (!isStudyHour(hour)) throw new AppError('Escolhe uma hora válida.')
     const state = await getOnboardingState(user.id)
     if (!state.birthDate || !state.track || !state.dailyGoal) throw new AppError('Faltam passos anteriores. Volta atrás.')
 
     // Só lembretes de estudo e resumo: nunca promoção (menores de 18 não recebem promoção; hoje ninguém recebe).
     await pool.query(
-      `INSERT INTO notification_prefs (user_id, email_enabled, push_enabled, categories, unsubscribe_token)
-       VALUES ($1, $2, false, $3::jsonb, $4)
-       ON CONFLICT (user_id) DO UPDATE SET email_enabled = $2, categories = $3::jsonb, updated_at = now()`,
-      [user.id, input.choice === 'email', JSON.stringify({ study: true, summary: true, promo: false }), randomBytes(24).toString('hex')],
+      `INSERT INTO notification_prefs (user_id, email_enabled, push_enabled, categories, unsubscribe_token, study_hour)
+       VALUES ($1, $2, false, $3::jsonb, $4, $5)
+       ON CONFLICT (user_id) DO UPDATE SET email_enabled = $2, categories = $3::jsonb, study_hour = $5, updated_at = now()`,
+      [user.id, input.choice === 'email', JSON.stringify({ study: true, summary: true, promo: false }), randomBytes(24).toString('hex'), hour],
     )
     await pool.query(`UPDATE student_profiles SET onboarded_at = coalesce(onboarded_at, now()), updated_at = now() WHERE user_id = $1`, [user.id])
 

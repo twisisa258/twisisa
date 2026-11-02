@@ -15,13 +15,13 @@ const ROW = 56
 const TOTAL = 64
 const TARGET = TOTAL - 2
 
-const primary = 'inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1d4d41] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#163e34] disabled:opacity-60'
-const field = 'h-12 w-full rounded-xl border border-[#dfe3d9] bg-white px-4 text-[15px] outline-none transition-colors focus:border-[#1d4d41]'
+const primary = 'inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-marca px-6 text-sm font-semibold text-white transition-colors hover:bg-marca-escura disabled:opacity-60'
+const field = 'h-12 w-full rounded-xl border border-[#dfe3d9] bg-white px-4 text-[15px] outline-none transition-colors focus:border-marca'
 
 function Paper({ children, className = '', onAnimationEnd }: { children: React.ReactNode; className?: string; onAnimationEnd?: () => void }) {
   return (
-    <section onAnimationEnd={onAnimationEnd} className={`w-full max-w-[420px] rounded-[28px] border border-[#e3e5dc] bg-white p-6 shadow-[0_24px_60px_rgba(35,54,44,0.10)] sm:p-8 ${className}`}>
-      <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#1d4d41]"><Flame size={13} aria-hidden />Carta pessoal · abre-se uma só vez</p>
+    <section onAnimationEnd={onAnimationEnd} className={`w-full max-w-[420px] rounded-[28px] border border-linha bg-white p-6 shadow-[0_24px_60px_rgba(35,54,44,0.10)] sm:p-8 ${className}`}>
+      <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-marca"><Flame size={13} aria-hidden />Carta pessoal · abre-se uma só vez</p>
       {children}
     </section>
   )
@@ -63,15 +63,15 @@ function Roulette({ label, instant, onLanded }: { label: string; instant: boolea
   }, [])
 
   return (
-    <div className="relative mt-6 overflow-hidden rounded-2xl border border-[#e3e5dc] bg-[#f8f8f5]" style={{ height: ROW * 3 }} role="img" aria-label={`A tua tarefa: ${label}`}>
-      <div className="pointer-events-none absolute inset-x-0 z-10 rounded-xl border-y-2 border-[#1d4d41]/70 bg-[#1d4d41]/[0.06]" style={{ top: ROW, height: ROW }} />
-      <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-b from-[#f8f8f5] via-transparent to-[#f8f8f5]" />
+    <div className="relative mt-6 overflow-hidden rounded-2xl border border-linha bg-fundo" style={{ height: ROW * 3 }} role="img" aria-label={`A tua tarefa: ${label}`}>
+      <div className="pointer-events-none absolute inset-x-0 z-10 rounded-xl border-y-2 border-marca/70 bg-marca/[0.06]" style={{ top: ROW, height: ROW }} />
+      <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-b from-fundo via-transparent to-fundo" />
       <div
         onTransitionEnd={land}
         style={{ transform: `translateY(-${go ? (TARGET - 1) * ROW : 0}px)`, transition: go && !instant ? 'transform 4800ms cubic-bezier(0.12, 0.6, 0.08, 1)' : 'none', filter: blur ? 'blur(1.6px)' : 'none' }}
       >
         {strip.map((area, i) => (
-          <div key={i} className={`flex items-center justify-center px-4 text-center text-lg font-semibold ${i === TARGET ? 'text-[#1d4d41]' : 'text-[#48534b]'}`} style={{ height: ROW }}>{area}</div>
+          <div key={i} className={`flex items-center justify-center px-4 text-center text-lg font-semibold ${i === TARGET ? 'text-marca' : 'text-[#48534b]'}`} style={{ height: ROW }}>{area}</div>
         ))}
       </div>
     </div>
@@ -80,10 +80,10 @@ function Roulette({ label, instant, onLanded }: { label: string; instant: boolea
 
 function Ended({ message, hint }: { message: string; hint?: string }) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#f3f4ef] px-5 text-[#202321]">
+    <main className="flex min-h-screen items-center justify-center bg-[#f3f4ef] px-5 text-texto">
       <div className="max-w-xs text-center">
         <p className="text-lg font-semibold">{message}</p>
-        {hint && <p className="mt-2 text-sm leading-6 text-[#68736a]">{hint}</p>}
+        {hint && <p className="mt-2 text-sm leading-6 text-texto-2">{hint}</p>}
       </div>
     </main>
   )
@@ -160,21 +160,21 @@ export function InviteFlow({ token, view }: { token: string; view: InviteView })
   if (view.state === 'locked') return <Ended message="Esta carta está bloqueada." hint="Houve demasiadas tentativas com o código. Pede a quem te convidou que envie uma nova carta." />
   if (phase === 'gone') return <Ended message="Esta carta já não existe." hint="Foi aberta e destruída, ou foi retirada. Se achas que é engano, fala com quem te convidou." />
 
-  const stage = 'flex min-h-screen items-center justify-center bg-[#f3f4ef] px-5 py-10 text-[#202321]'
+  const stage = 'flex min-h-screen items-center justify-center bg-[#f3f4ef] px-5 py-10 text-texto'
 
   if (phase === 'sealed' || phase === 'opening') {
     return (
       <main className={stage}>
         <Envelope open={phase === 'opening'}>
           <form onSubmit={(e) => { e.preventDefault(); void unlock() }} className="flex w-full max-w-[300px] flex-col items-stretch gap-3" aria-busy={busy}>
-            <label htmlFor="code" className="text-center text-xs font-medium text-[#68736a]">Código de abertura (veio no e-mail)</label>
+            <label htmlFor="code" className="text-center text-xs font-medium text-texto-2">Código de abertura (veio no e-mail)</label>
             <input
               id="code" value={code} disabled={busy || phase === 'opening'} autoComplete="one-time-code" autoCapitalize="characters" spellCheck={false} maxLength={9} placeholder="XXXX-XXXX"
               onChange={(e) => { const raw = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8); setCode(raw.length > 4 ? `${raw.slice(0, 4)}-${raw.slice(4)}` : raw) }}
               className={`${field} text-center font-mono text-lg font-semibold tracking-[0.2em]`}
             />
             <button type="submit" disabled={busy || phase === 'opening' || code.replace('-', '').length < 8} className={primary}>{busy ? 'A verificar…' : 'Abrir'}</button>
-            <p role="alert" className="min-h-5 text-center text-sm text-[#9a3030]">{error}</p>
+            <p role="alert" className="min-h-5 text-center text-sm text-erro-texto">{error}</p>
           </form>
         </Envelope>
       </main>
@@ -186,7 +186,7 @@ export function InviteFlow({ token, view }: { token: string; view: InviteView })
       <main className={stage}>
         <Paper className="letter-burn" onAnimationEnd={() => setPhase('destroyed')}>
           <h1 className="mt-5 text-2xl font-semibold tracking-[-0.03em]">Dados verificados.</h1>
-          <p className="mt-3 text-sm leading-6 text-[#68736a]">A carta cumpriu o seu papel.</p>
+          <p className="mt-3 text-sm leading-6 text-texto-2">A carta cumpriu o seu papel.</p>
         </Paper>
       </main>
     )
@@ -197,8 +197,8 @@ export function InviteFlow({ token, view }: { token: string; view: InviteView })
       <main className={stage}>
         <div className="fade-up max-w-xs text-center">
           <p className="text-2xl font-semibold tracking-[-0.03em]">Carta destruída.</p>
-          <p className="mt-3 text-sm leading-6 text-[#68736a]">Está tudo verificado. Bem-vindo à equipa. Esta carta não pode ser aberta outra vez.</p>
-          <Link href="/admin/questoes" className="mt-6 inline-flex h-12 items-center justify-center rounded-full bg-[#1d4d41] px-7 text-sm font-semibold text-white hover:bg-[#163e34]">Entrar no painel</Link>
+          <p className="mt-3 text-sm leading-6 text-texto-2">Está tudo verificado. Bem-vindo à equipa. Esta carta não pode ser aberta outra vez.</p>
+          <Link href="/admin/questoes" className="mt-6 inline-flex h-12 items-center justify-center rounded-full bg-marca px-7 text-sm font-semibold text-white hover:bg-marca-escura">Entrar no painel</Link>
         </div>
       </main>
     )
@@ -212,11 +212,11 @@ export function InviteFlow({ token, view }: { token: string; view: InviteView })
           <>
             <h1 className="mt-5 text-3xl font-semibold tracking-[-0.04em]">Olá, {ctx.name}.</h1>
             <p className="mt-4 text-[17px] font-medium leading-7">Se estás a ver este convite, é porque aceitaste participar na administração do twisisa.</p>
-            <p className="mt-3 text-sm leading-6 text-[#68736a]">Lê com atenção e segue as instruções. Depois de finalizares, esta carta será destruída e não poderá ser aberta outra vez.</p>
+            <p className="mt-3 text-sm leading-6 text-texto-2">Lê com atenção e segue as instruções. Depois de finalizares, esta carta será destruída e não poderá ser aberta outra vez.</p>
             <div className="my-6 h-px bg-[#edf0e9]" />
             <p className="text-sm leading-6 text-[#48534b]">Clica no botão abaixo para saberes a tua tarefa.</p>
             <button type="button" onClick={() => void toTask()} disabled={busy} className={`${primary} mt-4`}>{busy ? 'A abrir…' : <>Descobrir a minha tarefa<ArrowRight size={18} aria-hidden /></>}</button>
-            <p role="alert" className="mt-3 min-h-5 text-center text-sm text-[#9a3030]">{error}</p>
+            <p role="alert" className="mt-3 min-h-5 text-center text-sm text-erro-texto">{error}</p>
           </>
         )}
 
@@ -228,8 +228,8 @@ export function InviteFlow({ token, view }: { token: string; view: InviteView })
               <div className="fade-up">
                 <p className="mt-5 text-sm leading-6 text-[#48534b]">Vais rever exercícios: confirmar enunciados, opções e explicações antes de chegarem aos alunos. Só terás acesso a essa área.</p>
                 <button type="button" onClick={() => void toAccount()} disabled={busy} className={`${primary} mt-5`}>{busy ? 'A continuar…' : <>Continuar<ArrowRight size={18} aria-hidden /></>}</button>
-                <p className="mt-2 text-center text-xs text-[#9aa29b]">Daqui não se volta atrás.</p>
-                <p role="alert" className="mt-2 min-h-5 text-center text-sm text-[#9a3030]">{error}</p>
+                <p className="mt-2 text-center text-xs text-texto-2">Daqui não se volta atrás.</p>
+                <p role="alert" className="mt-2 min-h-5 text-center text-sm text-erro-texto">{error}</p>
               </div>
             )}
           </>
@@ -238,24 +238,24 @@ export function InviteFlow({ token, view }: { token: string; view: InviteView })
         {phase === 'conta' && (
           <form onSubmit={(e) => { e.preventDefault(); void createAccount() }} aria-busy={busy}>
             <h1 className="mt-5 text-2xl font-semibold tracking-[-0.03em]">Cria a tua conta</h1>
-            <p className="mt-2 text-sm leading-6 text-[#68736a]">O teu nome e o resto defines depois, no painel.</p>
-            <label className="mt-5 block text-xs font-medium text-[#68736a]" htmlFor="email">E-mail do convite</label>
+            <p className="mt-2 text-sm leading-6 text-texto-2">O teu nome e o resto defines depois, no painel.</p>
+            <label className="mt-5 block text-xs font-medium text-texto-2" htmlFor="email">E-mail do convite</label>
             <div className="relative mt-1.5">
-              <input id="email" value={ctx.email} readOnly className={`${field} bg-[#f3f4ef] pr-10 text-[#68736a]`} />
-              <Lock size={15} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#9aa29b]" aria-hidden />
+              <input id="email" value={ctx.email} readOnly className={`${field} bg-[#f3f4ef] pr-10 text-texto-2`} />
+              <Lock size={15} className="absolute right-4 top-1/2 -translate-y-1/2 text-texto-2" aria-hidden />
             </div>
-            <label className="mt-4 block text-xs font-medium text-[#68736a]" htmlFor="password">Palavra-passe</label>
+            <label className="mt-4 block text-xs font-medium text-texto-2" htmlFor="password">Palavra-passe</label>
             <div className="relative mt-1.5">
               <input id="password" type={show ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" minLength={8} maxLength={128} required placeholder="Mínimo 8 caracteres" className={`${field} pr-12`} />
-              <button type="button" onClick={() => setShow((v) => !v)} aria-label={show ? 'Esconder palavra-passe' : 'Mostrar palavra-passe'} className="absolute right-1 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center text-[#68736a]">{show ? <EyeOff size={18} aria-hidden /> : <Eye size={18} aria-hidden />}</button>
+              <button type="button" onClick={() => setShow((v) => !v)} aria-label={show ? 'Esconder palavra-passe' : 'Mostrar palavra-passe'} className="absolute right-1 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center text-texto-2">{show ? <EyeOff size={18} aria-hidden /> : <Eye size={18} aria-hidden />}</button>
             </div>
-            <label className="mt-4 block text-xs font-medium text-[#68736a]" htmlFor="confirm">Repete a palavra-passe</label>
+            <label className="mt-4 block text-xs font-medium text-texto-2" htmlFor="confirm">Repete a palavra-passe</label>
             <input id="confirm" type={show ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} autoComplete="new-password" minLength={8} maxLength={128} required className={`${field} mt-1.5`} />
             {needSignIn && (
-              <p role="status" className="mt-4 rounded-xl bg-[#f4eddb] p-3 text-sm leading-6 text-[#805f19]">Já existe uma conta com este e-mail. <Link href="/sign-in" className="font-semibold underline">Entra com ela</Link> e volta a abrir esta carta (link e código): conclui-se sozinha.</p>
+              <p role="status" className="mt-4 rounded-xl bg-[#f4eddb] p-3 text-sm leading-6 text-aviso-texto">Já existe uma conta com este e-mail. <Link href="/sign-in" className="font-semibold underline">Entra com ela</Link> e volta a abrir esta carta (link e código): conclui-se sozinha.</p>
             )}
             <button type="submit" disabled={busy || needSignIn} className={`${primary} mt-5`}>{busy ? 'A criar…' : 'Criar conta'}</button>
-            <p role="alert" className="mt-3 min-h-5 text-center text-sm text-[#9a3030]">{error}</p>
+            <p role="alert" className="mt-3 min-h-5 text-center text-sm text-erro-texto">{error}</p>
           </form>
         )}
 
@@ -263,12 +263,12 @@ export function InviteFlow({ token, view }: { token: string; view: InviteView })
           <div className="text-center">
             <div className="mx-auto mt-8 size-14 animate-spin rounded-full border-[3px] border-[#dfe8e1] border-t-[#1d4d41]" role="status" aria-label="A aguardar verificação" />
             <h1 className="mt-6 text-2xl font-semibold tracking-[-0.03em]">A aguardar a verificação dos dados</h1>
-            <p className="mt-3 text-sm leading-6 text-[#68736a]">Enviámos uma mensagem para <span className="font-semibold text-[#202321]">{maskEmail(ctx.email)}</span>. Abre-a e confirma o e-mail. Esta página atualiza sozinha.</p>
-            <button type="button" onClick={() => void resend()} disabled={busy || cooldown > 0} className="mt-6 text-sm font-semibold text-[#1d4d41] hover:underline disabled:text-[#9aa29b] disabled:no-underline">
+            <p className="mt-3 text-sm leading-6 text-texto-2">Enviámos uma mensagem para <span className="font-semibold text-texto">{maskEmail(ctx.email)}</span>. Abre-a e confirma o e-mail. Esta página atualiza sozinha.</p>
+            <button type="button" onClick={() => void resend()} disabled={busy || cooldown > 0} className="mt-6 text-sm font-semibold text-marca hover:underline disabled:text-texto-2 disabled:no-underline">
               {cooldown > 0 ? `Reenviar e-mail (${cooldown} s)` : 'Reenviar e-mail'}
             </button>
-            {resent && !error && <p className="mt-2 text-xs text-[#1f6b45]">Mensagem reenviada.</p>}
-            <p role="alert" className="mt-2 min-h-5 text-sm text-[#9a3030]">{error}</p>
+            {resent && !error && <p className="mt-2 text-xs text-sucesso-texto">Mensagem reenviada.</p>}
+            <p role="alert" className="mt-2 min-h-5 text-sm text-erro-texto">{error}</p>
           </div>
         )}
       </Paper>

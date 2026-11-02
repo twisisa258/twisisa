@@ -8,7 +8,7 @@ import { withParams } from '@/lib/library-shared'
 type Facet = { value: string; label: string; count: number }
 
 const trigger =
-  'h-11 rounded-xl bg-white px-3 text-sm text-[#202321] shadow-[0_1px_2px_rgba(20,50,40,0.05),0_8px_20px_-14px_rgba(20,50,40,0.25)] outline-none focus-visible:ring-2 focus-visible:ring-[#1d4d41]/25'
+  'h-11 rounded-xl bg-white px-3 text-sm text-texto shadow-[0_1px_2px_rgba(20,50,40,0.05),0_8px_20px_-14px_rgba(20,50,40,0.25)] outline-none focus-visible:ring-2 focus-visible:ring-marca/25'
 
 // Disciplina e Ano, em funil: mudar a disciplina limpa o ano. A instituição são botões (ver `ChipRow`).
 // A página recarrega com o novo endereço, por isso só vem da base de dados o que é preciso.
@@ -72,7 +72,7 @@ export function ListingFilters({
         <button
           type="button"
           onClick={() => router.push(withParams(basePath, { q, categoria }))}
-          className="inline-flex h-11 items-center gap-1.5 rounded-xl px-3 text-xs font-semibold text-[#1d4d41] hover:bg-[#eaf1ec]"
+          className="inline-flex h-11 items-center gap-1.5 rounded-xl px-3 text-xs font-semibold text-marca hover:bg-[#eaf1ec]"
         >
           <X size={14} /> Limpar
         </button>

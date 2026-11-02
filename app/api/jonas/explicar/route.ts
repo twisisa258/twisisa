@@ -1,7 +1,7 @@
 import { headers } from 'next/headers'
 import { auth } from '@/lib/auth'
 import { addMessage, checkAllowance, deleteTrailing, getExplainMessages, getExplainTarget, getOrCreateExplainConversation, lastMessageRole, lastMessages } from '@/lib/jonas'
-import { MAX_HISTORY_MESSAGES, buildExplainSystem, explainConversation, explainUserText, isExplainAction } from '@/lib/jonas-prompts'
+import { EXPLAIN_LABELS, MAX_HISTORY_MESSAGES, buildExplainSystem, explainConversation, explainUserText, isExplainAction } from '@/lib/jonas-prompts'
 import { jsonResponse, streamReply } from '@/lib/jonas-stream'
 
 export const runtime = 'nodejs'
@@ -58,7 +58,9 @@ export async function POST(request: Request) {
     // A explicação passo a passo já feita para esta questão volta tal como estava: não se gasta IA outra vez.
     if (action === 'passo') {
       const stored = await getExplainMessages(userId, attemptId, position)
-      const first = stored.find((message) => message.role === 'assistant')
+      // A resposta do «passo a passo» é a que vem logo a seguir ao pedido com esse texto (ou a primeira, nas conversas antigas).
+      const askedAt = stored.findIndex((message) => message.role === 'user' && message.content === EXPLAIN_LABELS.passo)
+      const first = askedAt >= 0 ? stored.slice(askedAt + 1).find((message) => message.role === 'assistant') : stored.find((message) => message.role === 'assistant')
       if (first) return new Response(first.content, { headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' } })
     }
 

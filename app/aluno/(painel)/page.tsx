@@ -19,6 +19,8 @@ import { getInicioAluno, type ResumeItem } from '@/lib/aluno-inicio'
 import { getDesafios } from '@/lib/desafios'
 import { buildAvisos } from '@/lib/avisos'
 import { Avisos } from '@/components/aluno/avisos'
+import { PlanoHoje, buildPlan } from '@/components/aluno/plano-hoje'
+import { markCounts } from '@/lib/kit'
 import { requireStudent } from '@/lib/require-student'
 
 export const dynamic = 'force-dynamic'
@@ -31,8 +33,8 @@ const soft = 'shadow-[0_1px_2px_rgba(20,50,40,0.04),0_10px_26px_-14px_rgba(20,50
 function ListEmpty({ title, text }: { title: string; text: string }) {
   return (
     <div className="px-[16px] py-[14px]">
-      <p className="text-[14px] font-medium text-[#202321]">{title}</p>
-      <p className="mt-[2px] text-[12px] text-[#6b756e]">{text}</p>
+      <p className="text-[14px] font-medium text-texto">{title}</p>
+      <p className="mt-[2px] text-[12px] text-texto-2">{text}</p>
     </div>
   )
 }
@@ -53,13 +55,13 @@ function MaterialCard({ tone, items, emptyTitle, emptyText }: { tone: 'white' | 
             target="_blank"
             rel="noopener"
             className={cn(
-              'flex h-[48px] items-center gap-[12px] px-[16px] text-[14px] font-medium text-inherit no-underline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#1d4d41]',
+              'flex h-[48px] items-center gap-[12px] px-[16px] text-[14px] font-medium text-inherit no-underline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-marca',
               index > 0 && 'border-t border-black/[0.05]',
             )}
           >
-            <Ic name="file" size={16} className="text-[#6b756e]" />
+            <Ic name="file" size={16} className="text-texto-2" />
             <p className="min-w-0 truncate">{item.title}</p>
-            <small className="ml-auto flex-none whitespace-nowrap text-[12px] font-normal text-[#6b756e]">{relativeTime(item.at)}</small>
+            <small className="ml-auto flex-none whitespace-nowrap text-[12px] font-normal text-texto-2">{relativeTime(item.at)}</small>
           </a>
         ))
       )}
@@ -69,7 +71,7 @@ function MaterialCard({ tone, items, emptyTitle, emptyText }: { tone: 'white' | 
 
 const rowBase = 'flex h-[64px] items-center gap-[12px] rounded-[16px] px-[16px] text-[16px] font-semibold no-underline'
 const iconBox = 'flex size-[40px] flex-none items-center justify-center rounded-[12px]'
-const sectionLabel = 'text-[11px] uppercase tracking-[0.12em] text-[#202321] [font-family:inherit]'
+const sectionLabel = 'text-[11px] uppercase tracking-[0.12em] text-texto [font-family:inherit]'
 
 export default async function StudentPage() {
   const session = await requireStudent('/aluno')
@@ -101,7 +103,7 @@ export default async function StudentPage() {
     : Promise.resolve(null)
   // Sequência e avisos vêm das respostas do Simulador (lib/desafios). Se falhar, a página segue sem eles.
   const desafiosPromise = track
-    ? getDesafios({ scope: { userId: session.user.id, track, institutionId: profile?.institutionId ?? null }, targetCourseId: profile?.targetCourseId ?? null }).catch((error: unknown) => {
+    ? getDesafios({ scope: { userId: session.user.id, track, institutionId: profile?.institutionId ?? null }, targetCourseId: profile?.targetCourseId ?? null, dailyGoal: profile?.dailyGoal ?? null }).catch((error: unknown) => {
         console.error('[ALUNO] desafios', error)
         return null
       })
@@ -127,6 +129,11 @@ export default async function StudentPage() {
   const resume: ResumeItem | null =
     (inicio?.ok ? inicio.value.resume : null) ?? (last ? { kind: 'material', title: last.title, at: last.at, href: fileHref(last.id) } : null)
   const desafios = await desafiosPromise
+  const marks = await markCounts(session.user.id).catch(() => null)
+  // Plano de hoje: só com dados reais. Sem os desafios (falha ou sem percurso) o cartão não aparece.
+  const plan = desafios
+    ? buildPlan({ goal: desafios.goal, answered: desafios.todayAnswered, marksDue: marks?.due ?? 0, errorCount: inicio?.ok && inicio.value.practice?.showErrors ? inicio.value.practice.errorCount : 0, errorsHref: inicio?.ok && inicio.value.practice ? inicio.value.practice.errorsHref : null })
+    : []
   const avisos = desafios ? buildAvisos(desafios).slice(0, 3) : []
   const greeting = getGreeting({ name: session.user.name, userId: session.user.id, createdAt: session.user.createdAt, birthDate: profile?.birthDate ?? null, streak: desafios ? desafios.streak.current : (week?.streak ?? null) })
   // Linha discreta com dados reais de study_days (sem cartão): «Hoje 4/10 · 3 dias seguidos». Sem dados, não aparece.
@@ -137,7 +144,7 @@ export default async function StudentPage() {
   const activity = activityParts.join(' · ')
 
   return (
-    <main className="min-h-screen max-w-full overflow-x-hidden bg-[#f8f8f5] text-[#202321]" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+    <main className="min-h-screen max-w-full overflow-x-hidden bg-fundo text-texto" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
       <UrlFeedback />
       <div className="flex min-h-screen">
         <StudentSidebar firstName={firstName} image={session.user.image ?? null} />
@@ -151,7 +158,7 @@ export default async function StudentPage() {
             </div>
             <div className="flex items-center gap-[4px]">
               {staffRole && (
-                <Link href={staffRole === 'admin' ? '/admin' : '/admin/questoes'} className="inline-flex h-[32px] items-center rounded-[16px] bg-gradient-to-br from-[#eaf1ec] to-[#dbe9e0] px-[12px] text-[12px] font-semibold text-[#1d4d41] no-underline">
+                <Link href={staffRole === 'admin' ? '/admin' : '/admin/questoes'} className="inline-flex h-[32px] items-center rounded-[16px] bg-gradient-to-br from-[#eaf1ec] to-[#dbe9e0] px-[12px] text-[12px] font-semibold text-marca no-underline">
                   {staffRole === 'admin' ? 'Administração' : 'Revisão'}
                 </Link>
               )}
@@ -170,13 +177,13 @@ export default async function StudentPage() {
             <div className="flex min-w-0 flex-col gap-[16px]">
               <div className="flex min-h-[32px] items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <span className={cn('block text-[13px] font-bold leading-[16px] text-[#1d4d41]', activity ? 'truncate' : 'line-clamp-2')}>{greeting}</span>
-                  {activity && <span title={week ? `${week.week} questões esta semana` : undefined} className="block truncate text-[11px] leading-[14px] text-[#6b756e]">{activity}</span>}
+                  <span className={cn('block text-[13px] font-bold leading-[16px] text-marca', activity ? 'truncate' : 'line-clamp-2')}>{greeting}</span>
+                  {activity && <span title={week ? `${week.week} questões esta semana` : undefined} className="block truncate text-[11px] leading-[14px] text-texto-2">{activity}</span>}
                 </div>
                 <Link
                   href="/aluno/percurso"
                   aria-label={`Mudar percurso: ${chipLabel}`}
-                  className="inline-flex h-[32px] flex-none items-center gap-[2px] rounded-[16px] bg-gradient-to-br from-[#eaf1ec] to-[#d9e8de] pl-[12px] pr-[8px] text-[12px] font-semibold text-[#1d4d41] no-underline"
+                  className="inline-flex h-[32px] flex-none items-center gap-[2px] rounded-[16px] bg-gradient-to-br from-[#eaf1ec] to-[#d9e8de] pl-[12px] pr-[8px] text-[12px] font-semibold text-marca no-underline"
                 >
                   {chipLabel}
                   <Ic name="chev" size={14} />
@@ -185,25 +192,27 @@ export default async function StudentPage() {
 
               <Avisos items={avisos} />
 
+              {plan.length > 0 && <PlanoHoje items={plan} />}
+
               {resume && <ContinuarCard resume={resume} />}
 
               <section aria-label="O que queres fazer?" className={cn('rounded-[20px] bg-white p-[14px]', soft)}>
                 <div className="flex flex-col gap-[10px]">
-                  <Link href="/biblioteca" className={cn(rowBase, 'bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] text-[#1d4d41]')}>
+                  <Link href="/biblioteca" className={cn(rowBase, 'bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] text-marca')}>
                     <span className={cn(iconBox, 'bg-white/[0.7]')}>
                       <Ic name="book" />
                     </span>
                     Biblioteca
                     <Ic name="up" className="ml-auto opacity-[.55]" />
                   </Link>
-                  <Link href="/aluno/simulador" className={cn(rowBase, 'bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] text-[#1d4d41]')}>
+                  <Link href="/aluno/simulador" className={cn(rowBase, 'bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] text-marca')}>
                     <span className={cn(iconBox, 'bg-white/[0.7]')}>
                       <Ic name="test" />
                     </span>
                     Simulador
                     <Ic name="up" className={'ml-auto opacity-[.55]'} />
                   </Link>
-                  <Link href="/jonas" className={cn(rowBase, 'bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] text-[#1d4d41]')}>
+                  <Link href="/jonas" className={cn(rowBase, 'bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] text-marca')}>
                     <span className={cn(iconBox, 'bg-white/[0.7]')}>
                       <Ic name="spark" />
                     </span>

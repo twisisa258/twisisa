@@ -10,9 +10,9 @@ import { track } from '@/lib/analytics'
 import { Spinner } from '@/components/ui/spinner'
 import { normalizeEmail, passwordStrength, provisionalName, safeNext, suggestEmail, validateEmail, validatePassword } from '@/lib/identity'
 
-const inputClass = 'w-full rounded-xl border bg-white px-4 py-3 text-[15px] outline-none transition focus:border-[#1d4d41]'
+const inputClass = 'w-full rounded-xl border bg-white px-4 py-3 text-[15px] outline-none transition focus:border-marca'
 const STRENGTH_LABEL = ['', 'Fraca', 'Razoável', 'Boa', 'Forte']
-const STRENGTH_COLOR = ['bg-[#e3e5dc]', 'bg-[#c9503c]', 'bg-[#d99a2b]', 'bg-[#7fae5a]', 'bg-[#1d4d41]']
+const STRENGTH_COLOR = ['bg-linha', 'bg-[#c9503c]', 'bg-[#d99a2b]', 'bg-[#7fae5a]', 'bg-marca']
 
 // Registo e entrada. O registo é curto (e-mail, palavra-passe, Termos); nome, data de nascimento e o resto vêm no onboarding.
 // O servidor volta a validar tudo (lib/auth.ts, hooks.before): esta validação só poupa uma viagem à rede.
@@ -101,9 +101,9 @@ export function AuthForm({ mode, googleEnabled, next }: { mode: 'sign-in' | 'sig
           />
           {touched.email && emailError && <p className="text-[13px] text-[#b03a28]">{emailError}</p>}
           {suggestion && (
-            <p className="text-[13px] text-[#6e756f]">
+            <p className="text-[13px] text-texto-2">
               Querias dizer{' '}
-              <button type="button" onClick={() => setEmail(suggestion)} className="font-semibold text-[#1d4d41] underline">{suggestion}</button>?
+              <button type="button" onClick={() => setEmail(suggestion)} className="font-semibold text-marca underline">{suggestion}</button>?
             </p>
           )}
         </div>
@@ -126,7 +126,7 @@ export function AuthForm({ mode, googleEnabled, next }: { mode: 'sign-in' | 'sig
               type="button"
               onClick={() => setShowPassword((current) => !current)}
               aria-label={showPassword ? 'Esconder a palavra-passe' : 'Mostrar a palavra-passe'}
-              className="absolute right-1 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center text-[#6e756f]"
+              className="absolute right-1 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center text-texto-2"
             >
               {showPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
             </button>
@@ -134,9 +134,9 @@ export function AuthForm({ mode, googleEnabled, next }: { mode: 'sign-in' | 'sig
           {signUp && password.length > 0 && (
             <div className="flex items-center gap-2" aria-live="polite">
               <div className="flex flex-1 gap-1" aria-hidden="true">
-                {[1, 2, 3, 4].map((level) => <span key={level} className={`h-1 flex-1 rounded-full ${strength >= level ? STRENGTH_COLOR[strength] : 'bg-[#e3e5dc]'}`} />)}
+                {[1, 2, 3, 4].map((level) => <span key={level} className={`h-1 flex-1 rounded-full ${strength >= level ? STRENGTH_COLOR[strength] : 'bg-linha'}`} />)}
               </div>
-              <span className="w-[62px] text-right text-[12px] text-[#6e756f]">{STRENGTH_LABEL[strength]}</span>
+              <span className="w-[62px] text-right text-[12px] text-texto-2">{STRENGTH_LABEL[strength]}</span>
             </div>
           )}
           {signUp && touched.password && passwordError && <p className="text-[13px] text-[#b03a28]">{passwordError}</p>}
@@ -144,27 +144,27 @@ export function AuthForm({ mode, googleEnabled, next }: { mode: 'sign-in' | 'sig
 
         {signUp ? (
           <label className="flex items-start gap-3 text-[13px] leading-5 text-[#4d5851]">
-            <input type="checkbox" checked={accepted} onChange={(event) => setAccepted(event.target.checked)} className="mt-0.5 size-5 shrink-0 accent-[#1d4d41]" />
+            <input type="checkbox" checked={accepted} onChange={(event) => setAccepted(event.target.checked)} className="mt-0.5 size-5 shrink-0 accent-marca" />
             <span>
-              Aceito os <Link href="/termos" target="_blank" className="font-semibold text-[#1d4d41] underline">Termos</Link> e a <Link href="/privacidade" target="_blank" className="font-semibold text-[#1d4d41] underline">Privacidade</Link>.
+              Aceito os <Link href="/termos" target="_blank" className="font-semibold text-marca underline">Termos</Link> e a <Link href="/privacidade" target="_blank" className="font-semibold text-marca underline">Privacidade</Link>.
             </span>
           </label>
         ) : (
           <div className="flex items-center justify-between gap-3">
             <label className="flex items-center gap-2.5 text-[13px] text-[#4d5851]">
-              <input type="checkbox" checked={shared} onChange={(event) => setShared(event.target.checked)} className="size-5 shrink-0 accent-[#1d4d41]" />
+              <input type="checkbox" checked={shared} onChange={(event) => setShared(event.target.checked)} className="size-5 shrink-0 accent-marca" />
               Computador partilhado
             </label>
-            <Link href="/esqueci-a-senha" className="text-[13px] font-semibold text-[#1d4d41]">Esqueceste?</Link>
+            <Link href="/esqueci-a-senha" className="text-[13px] font-semibold text-marca">Esqueceste?</Link>
           </div>
         )}
 
-        <button type="submit" disabled={!valid || busy} aria-busy={loading} className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1d4d41] px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#153e34] disabled:opacity-50">
+        <button type="submit" disabled={!valid || busy} aria-busy={loading} className="inline-flex items-center justify-center gap-2 rounded-full bg-marca px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#153e34] disabled:opacity-50">
           {loading ? <><Spinner />{signUp ? 'A criar a conta…' : 'A entrar…'}</> : signUp ? 'Criar conta' : 'Entrar'}
         </button>
       </form>
 
-      <div className="flex items-center gap-3 text-[12px] text-[#8a918a]" aria-hidden="true"><span className="h-px flex-1 bg-[#e3e5dc]" />ou<span className="h-px flex-1 bg-[#e3e5dc]" /></div>
+      <div className="flex items-center gap-3 text-[12px] text-texto-2" aria-hidden="true"><span className="h-px flex-1 bg-linha" />ou<span className="h-px flex-1 bg-linha" /></div>
 
       {/* Sem as chaves da Google (GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET) o botão fica desactivado. */}
       <button
@@ -173,11 +173,11 @@ export function AuthForm({ mode, googleEnabled, next }: { mode: 'sign-in' | 'sig
         disabled={!googleEnabled || busy || (signUp && !accepted)}
         aria-busy={googleLoading}
         title={googleEnabled ? undefined : 'Entrar com Google estará disponível em breve'}
-        className="inline-flex items-center justify-center gap-2.5 rounded-full border border-[#dfe1d9] bg-white px-5 py-3 text-sm font-semibold text-[#202321] transition hover:bg-[#f6f7f2] disabled:cursor-not-allowed disabled:opacity-50"
+        className="inline-flex items-center justify-center gap-2.5 rounded-full border border-[#dfe1d9] bg-white px-5 py-3 text-sm font-semibold text-texto transition hover:bg-[#f6f7f2] disabled:cursor-not-allowed disabled:opacity-50"
       >
         {googleLoading ? <Spinner /> : <GoogleMark />}
         Continuar com Google
-        {!googleEnabled && <span className="rounded-full bg-[#f1f2ec] px-2 py-0.5 text-[11px] font-semibold text-[#6e756f]">Em breve</span>}
+        {!googleEnabled && <span className="rounded-full bg-[#f1f2ec] px-2 py-0.5 text-[11px] font-semibold text-texto-2">Em breve</span>}
       </button>
     </div>
   )

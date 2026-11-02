@@ -267,7 +267,7 @@ export async function startAttempt(scope: StudentScope, mode: AttemptMode, subje
 
 // ───────────── Conteúdo de uma tentativa ─────────────
 
-type ItemRow = { position: number; question_id: string; option_order: string[]; answer_option_id: string | null; is_correct: boolean | null; points: number; statement: string; explanation: string | null; subject: string }
+type ItemRow = { position: number; question_id: string; option_order: string[]; answer_option_id: string | null; is_correct: boolean | null; points: number; statement: string; explanation: string | null; subject: string; topic: string | null; hints: { level: number; content: string }[] | null; marked: boolean }
 
 const toImage = (row: { url: string; alt_text: string; caption: string | null; width: number | null; height: number | null }): PlayImage => ({
   url: row.url,
@@ -281,8 +281,10 @@ const toImage = (row: { url: string; alt_text: string; caption: string | null; w
 async function loadContent(attemptId: string, reveal: (row: ItemRow) => boolean, light = false): Promise<PlayItem[]> {
   const rows = (
     await pool.query(
-      `SELECT i.position, i.question_id, i.option_order, i.answer_option_id, i.is_correct, i.points::float8 AS points, q.statement, q.explanation, s.name AS subject
-       FROM attempt_items i JOIN questions q ON q.id = i.question_id JOIN library_subjects s ON s.id = q.subject_id
+      `SELECT i.position, i.question_id, i.option_order, i.answer_option_id, i.is_correct, i.points::float8 AS points, q.statement, q.explanation, s.name AS subject, t.name AS topic,
+              (SELECT json_agg(json_build_object('level', h.level, 'content', h.content) ORDER BY h.level) FROM hint_events h WHERE h.attempt_id = i.attempt_id AND h.position = i.position) AS hints,
+              EXISTS (SELECT 1 FROM study_marks m WHERE m.user_id = a.user_id AND m.question_id = i.question_id AND m.done_at IS NULL) AS marked
+       FROM attempt_items i JOIN attempts a ON a.id = i.attempt_id JOIN questions q ON q.id = i.question_id JOIN library_subjects s ON s.id = q.subject_id LEFT JOIN topics t ON t.id = q.topic_id
        WHERE i.attempt_id = $1 ORDER BY i.position`,
       [attemptId],
     )
@@ -308,6 +310,10 @@ async function loadContent(attemptId: string, reveal: (row: ItemRow) => boolean,
     const correct = own.find((o) => o.is_correct)
     return {
       position: row.position,
+      questionId: row.question_id,
+      topic: row.topic ?? null,
+      hints: (row.hints ?? []).map((h) => ({ level: h.level as 1 | 2 | 3, content: h.content })),
+      marked: row.marked === true,
       subject: row.subject,
       statement: row.statement,
       images: images.filter((m) => m.usage === 'statement').map(toImage),
@@ -369,7 +375,7 @@ export async function submitAnswer(userId: string, attemptId: string, position: 
   // A primeira resposta conta e fica fechada (todos os modos). Pontos = peso da questão nesta sessão, só se acertar.
   const saved = await pool.query(
     `UPDATE attempt_items SET answer_option_id = $3, is_correct = (SELECT is_correct FROM question_options WHERE id = $3), answered_at = now(),
-       points = CASE WHEN (SELECT is_correct FROM question_options WHERE id = $3) THEN weight ELSE 0 END
+       points = CASE WHEN (SELECT is_correct FROM question_options WHERE id = $3) THEN weight * GREATEST(0.25, 1 - 0.25 * (SELECT count(*) FROM hint_events h WHERE h.attempt_id = $1 AND h.position = $2)) ELSE 0 END
      WHERE attempt_id = $1 AND position = $2 AND answer_option_id IS NULL RETURNING is_correct`,
     [attemptId, position, optionId],
   )

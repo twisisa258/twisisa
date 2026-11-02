@@ -6,7 +6,7 @@ import { Check, Copy } from 'lucide-react'
 /** Avatar do Jonas: círculo verde com a inicial. */
 export function JonasAvatar({ size = 28 }: { size?: number }) {
   return (
-    <span aria-hidden="true" style={{ width: size, height: size, fontSize: Math.round(size * 0.46) }} className="flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#4a8a76] to-[#1d4d41] font-semibold text-white shadow-[0_1px_2px_rgba(20,50,40,0.2)]">
+    <span aria-hidden="true" style={{ width: size, height: size, fontSize: Math.round(size * 0.46) }} className="flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#4a8a76] to-marca font-semibold text-white shadow-[0_1px_2px_rgba(20,50,40,0.2)]">
       J
     </span>
   )
@@ -42,7 +42,7 @@ export function CopyButton({ text, className = '' }: { text: string; className?:
           // sem permissão da área de transferência: nada a fazer
         }
       }}
-      className={`inline-flex h-8 items-center gap-1.5 rounded-full px-2.5 text-xs font-semibold text-[#68716a] transition-colors hover:bg-[#eef1e9] hover:text-[#1d4d41] ${className}`}
+      className={`inline-flex h-8 items-center gap-1.5 rounded-full px-2.5 text-xs font-semibold text-texto-2 transition-colors hover:bg-[#eef1e9] hover:text-marca ${className}`}
     >
       {copied ? <Check size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
       {copied ? 'Copiado' : 'Copiar'}

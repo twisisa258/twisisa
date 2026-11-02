@@ -14,9 +14,9 @@ const nf = new Intl.NumberFormat('pt-PT')
 
 function Stat({ label, value, hint, alert = false }: { label: string; value: number; hint?: string; alert?: boolean }) {
   return (
-    <div className={`min-w-0 rounded-2xl border p-3.5 sm:p-5 ${alert ? 'border-[#ead9ae] bg-[#fbf6e8]' : 'border-[#e3e5dc] bg-white'}`}>
-      <p className={`text-xl font-semibold tracking-tight sm:text-3xl ${alert ? 'text-[#805f19]' : 'text-[#1d4d41]'}`}>{nf.format(value)}</p>
-      <p className="mt-1 truncate text-xs leading-4 text-[#737c75] sm:text-sm">{label}</p>
+    <div className={`min-w-0 rounded-2xl border p-3.5 sm:p-5 ${alert ? 'border-[#ead9ae] bg-[#fbf6e8]' : 'border-linha bg-white'}`}>
+      <p className={`text-xl font-semibold tracking-tight sm:text-3xl ${alert ? 'text-aviso-texto' : 'text-marca'}`}>{nf.format(value)}</p>
+      <p className="mt-1 truncate text-xs leading-4 text-texto-2 sm:text-sm">{label}</p>
       {hint && <p className="mt-0.5 hidden truncate text-xs text-[#9aa39c] sm:block">{hint}</p>}
     </div>
   )
@@ -69,7 +69,7 @@ export default async function AdminHomePage({ searchParams }: { searchParams: Pr
                   <li key={entry.id} className="flex items-center justify-between gap-3 py-3">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium leading-5">{entry.title}</p>
-                      {entry.subtitle && <p className="mt-0.5 truncate text-xs text-[#737c75]">{entry.subtitle}</p>}
+                      {entry.subtitle && <p className="mt-0.5 truncate text-xs text-texto-2">{entry.subtitle}</p>}
                     </div>
                     <time dateTime={entry.at.toISOString()} className="shrink-0 text-xs text-[#9aa39c]">{timeAgo(entry.at)}</time>
                   </li>
@@ -86,9 +86,9 @@ export default async function AdminHomePage({ searchParams }: { searchParams: Pr
                 <Link href={row.href} className="flex items-center gap-3 rounded-xl px-2 py-3.5 hover:bg-[#f7f8f4] sm:px-3">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold leading-5">{row.label}</p>
-                    <p className="mt-0.5 truncate text-xs text-[#737c75]">{nf.format(row.on)} {row.unit}{row.total !== row.on ? ` · ${nf.format(row.total)} no total` : ''}</p>
+                    <p className="mt-0.5 truncate text-xs text-texto-2">{nf.format(row.on)} {row.unit}{row.total !== row.on ? ` · ${nf.format(row.total)} no total` : ''}</p>
                   </div>
-                  <span className="shrink-0 text-lg font-semibold tracking-tight text-[#1d4d41]">{nf.format(row.on)}</span>
+                  <span className="shrink-0 text-lg font-semibold tracking-tight text-marca">{nf.format(row.on)}</span>
                   <ChevronRight size={18} aria-hidden="true" className="shrink-0 text-[#9aa39c]" />
                 </Link>
               </li>

@@ -2,6 +2,7 @@ import { pool } from '@/lib/db'
 import { getSimulatorHub, type StudentScope } from '@/lib/simulator'
 import { getCourse, getCourseSubjects } from '@/lib/target-course'
 import {
+  DAILY_GOAL,
   MIN_SAMPLE,
   WEAK_BELOW,
   accuracyOf,
@@ -42,9 +43,11 @@ export type DesafiosSnapshot = {
   readiness: number | null
   weak: { id: string; name: string; accuracy: number } | null
   errorCount: number
+  /** Meta diária do aluno (questões por dia). */
+  goal: number
 }
 
-export async function getDesafios(input: { scope: StudentScope; targetCourseId: string | null }): Promise<DesafiosSnapshot> {
+export async function getDesafios(input: { scope: StudentScope; targetCourseId: string | null; dailyGoal?: number | null }): Promise<DesafiosSnapshot> {
   const { scope } = input
   const admission = scope.track === 'admissao'
 
@@ -101,9 +104,10 @@ export async function getDesafios(input: { scope: StudentScope; targetCourseId: 
     return { id: item.id, name: item.name, weight: item.weight, answered30: s?.answered30 ?? 0, correct30: s?.correct30 ?? 0, answeredWeek: s?.answeredWeek ?? 0, answeredToday: s?.answeredToday ?? 0 }
   })
 
-  const streak = computeStreak(days, today)
+  const goal = input.dailyGoal && input.dailyGoal > 0 ? input.dailyGoal : DAILY_GOAL
+  const streak = computeStreak(days, today, goal)
   const subjectOfDay = pickSubjectOfDay(subjects, today)
-  const missions = buildMissions({ today, days, subjects, fromCourse: !!validCourse, subjectOfDay })
+  const missions = buildMissions({ today, days, subjects, fromCourse: !!validCourse, subjectOfDay, goal })
 
   const weak = subjects
     .filter((s) => s.answered30 >= MIN_SAMPLE && accuracyOf(s) * 100 < WEAK_BELOW)
@@ -135,5 +139,6 @@ export async function getDesafios(input: { scope: StudentScope; targetCourseId: 
     readiness: validCourse ? totalReadiness(subjects) : null,
     weak: weak ? { id: weak.id, name: weak.name, accuracy: Math.round(accuracyOf(weak) * 100) } : null,
     errorCount: hub.errorCount,
+    goal,
   }
 }

@@ -7,7 +7,7 @@ import { StudentMobileSidebar } from '@/components/student-mobile-sidebar'
 export function StudentMenu({ firstName, image = null }: { firstName: string; image?: string | null }) {
   const [open, setOpen] = useState(false)
   return <>
-    <button type="button" aria-label="Abrir menu do estudante" aria-expanded={open} onClick={() => setOpen(true)} className="flex size-9 items-center justify-center rounded-full text-[#68716a] transition-colors hover:bg-[#eef0e9] hover:text-[#1d4d41] lg:hidden"><Menu /></button>
+    <button type="button" aria-label="Abrir menu do estudante" aria-expanded={open} onClick={() => setOpen(true)} className="flex size-9 items-center justify-center rounded-full text-texto-2 transition-colors hover:bg-[#eef0e9] hover:text-marca lg:hidden"><Menu /></button>
     <StudentMobileSidebar firstName={firstName} image={image} open={open} onClose={() => setOpen(false)} />
   </>
 }

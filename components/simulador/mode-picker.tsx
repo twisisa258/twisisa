@@ -23,7 +23,7 @@ export function ModePicker({ modes, current, subjectId }: { modes: AttemptMode[]
             replace
             scroll={false}
             href={`/aluno/simulador?d=${encodeURIComponent(subjectId)}&m=${mode}`}
-            className={cn('flex h-11 items-center justify-center gap-2 rounded-xl text-[14px] font-medium transition-all duration-200', active ? 'bg-white text-[#1d4d41] shadow-[0_2px_6px_rgba(20,50,40,0.10)]' : 'text-[#68716a]')}
+            className={cn('flex h-11 items-center justify-center gap-2 rounded-xl text-[14px] font-medium transition-all duration-200', active ? 'bg-white text-marca shadow-[0_2px_6px_rgba(20,50,40,0.10)]' : 'text-texto-2')}
           >
             <Icon size={16} aria-hidden />
             {label}

@@ -13,14 +13,14 @@ import { SelectField } from '@/components/ui/select-field'
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Módulos | Administração | Twisisa' }
 
-const field = 'mt-1 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 py-2.5 text-sm outline-none focus:border-[#1d4d41] focus:ring-2 focus:ring-[#1d4d41]/10'
+const field = 'mt-1 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 py-2.5 text-sm outline-none focus:border-marca focus:ring-2 focus:ring-marca/10'
 const fmt = new Intl.DateTimeFormat('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' })
 
 const SHORT: Record<string, string> = { '10': '10ª', '12': '12ª', admissao: 'Admissão' }
 const FULL: Record<string, string> = { '10': '10ª classe', '12': '12ª classe', admissao: 'Admissão ao ensino superior' }
 const TONE: Record<ModuleStatus, string> = {
-  active: 'bg-[#e6f0e9] text-[#1d4d41]',
-  soon: 'bg-[#f4eddb] text-[#805f19]',
+  active: 'bg-[#e6f0e9] text-marca',
+  soon: 'bg-[#f4eddb] text-aviso-texto',
   hidden: 'bg-[#f1f1ee] text-[#6b716c]',
 }
 const statusLabel = (status: ModuleStatus) => MODULE_STATUSES.find((item) => item.value === status)?.label ?? status
@@ -84,7 +84,7 @@ export default async function AdminModulosPage({ searchParams }: { searchParams:
                 </div>
               )
             })()}
-            <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#1d4d41] px-5 py-3 text-sm font-semibold text-white hover:bg-[#163e34]">Guardar</button>
+            <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-marca px-5 py-3 text-sm font-semibold text-white hover:bg-marca-escura">Guardar</button>
           </FeedbackForm>
         </RouteModal>
       )}
@@ -102,7 +102,7 @@ export default async function AdminModulosPage({ searchParams }: { searchParams:
                     <div className="min-w-0 flex-1">
                       <p className="flex items-center gap-2 text-sm font-semibold leading-5">
                         <span className="truncate">{item.label}</span>
-                        {isNew && <span className="shrink-0 rounded-full bg-[#1d4d41] px-2 py-0.5 text-[10px] font-semibold text-white">Novidade</span>}
+                        {isNew && <span className="shrink-0 rounded-full bg-marca px-2 py-0.5 text-[10px] font-semibold text-white">Novidade</span>}
                       </p>
                       <div className="mt-1.5 flex flex-wrap gap-1.5">
                         {TRACKS.map((track) => {

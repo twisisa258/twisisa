@@ -51,10 +51,10 @@ const BATCH = 20
 const SIGN_TTL_MS = 30 * 60 * 1000
 const EMPTY: Fields = { category: '', subject: '', level: '', institution: '', year: '', course: '' }
 
-const input = 'h-10 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 text-sm outline-none transition-colors focus:border-[#1d4d41] focus:ring-2 focus:ring-[#1d4d41]/10 disabled:opacity-60'
+const input = 'h-10 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 text-sm outline-none transition-colors focus:border-marca focus:ring-2 focus:ring-marca/10 disabled:opacity-60'
 const btn = 'inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl px-4 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40'
-const btnSolid = `${btn} bg-[#1d4d41] text-white hover:bg-[#163e34]`
-const btnLine = `${btn} border border-[#c9d7cd] bg-white text-[#1d4d41] hover:bg-[#f1f4ef]`
+const btnSolid = `${btn} bg-marca text-white hover:bg-marca-escura`
+const btnLine = `${btn} border border-[#c9d7cd] bg-white text-marca hover:bg-[#f1f4ef]`
 
 const extensionOf = (name: string) => name.toLowerCase().split('.').pop() ?? ''
 const rowKey = (file: File, path: string) => `${path}|${file.size}|${file.lastModified}`
@@ -123,7 +123,7 @@ const RowItem = memo(function RowItem({ row, defaults, detect, lookups, locked, 
   const busy = row.status === 'a_enviar' || row.status === 'a_publicar'
   return (
     <li className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 [contain-intrinsic-size:auto_64px] [content-visibility:auto] sm:px-5">
-      <input type="checkbox" checked={row.selected} disabled={locked || row.status === 'publicado'} onChange={(event) => onSelect(row.key, event.target.checked)} aria-label={`Selecionar ${row.file.name}`} className="size-4 shrink-0 accent-[#1d4d41]" />
+      <input type="checkbox" checked={row.selected} disabled={locked || row.status === 'publicado'} onChange={(event) => onSelect(row.key, event.target.checked)} aria-label={`Selecionar ${row.file.name}`} className="size-4 shrink-0 accent-marca" />
       <div className="min-w-0 flex-1 basis-60">
         <input
           value={row.title}
@@ -131,32 +131,32 @@ const RowItem = memo(function RowItem({ row, defaults, detect, lookups, locked, 
           disabled={locked || row.status === 'publicado'}
           maxLength={180}
           aria-label={`Título de ${row.file.name}`}
-          className="w-full rounded-lg border border-transparent bg-transparent px-2 py-1 text-sm font-medium outline-none hover:border-[#dfe3d9] focus:border-[#1d4d41] focus:bg-white disabled:opacity-70"
+          className="w-full rounded-lg border border-transparent bg-transparent px-2 py-1 text-sm font-medium outline-none hover:border-[#dfe3d9] focus:border-marca focus:bg-white disabled:opacity-70"
         />
-        <p className="truncate px-2 text-xs text-[#737c75]" title={row.path}>{row.path} · {(row.file.size / 1048576).toFixed(1)} MB</p>
+        <p className="truncate px-2 text-xs text-texto-2" title={row.path}>{row.path} · {(row.file.size / 1048576).toFixed(1)} MB</p>
       </div>
       <div className="flex min-w-0 flex-wrap items-center gap-1.5">
         {chips.map((chip, index) => (
-          <span key={index} title={chip.detected ? 'Detetado pelo nome ou pasta' : undefined} className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${chip.missing ? 'bg-[#fbeeee] text-[#9a3030]' : chip.detected ? 'border border-dashed border-[#b9c8bd] bg-white text-[#526057]' : 'bg-[#e6f0e9] text-[#1d4d41]'}`}>{chip.text}</span>
+          <span key={index} title={chip.detected ? 'Detetado pelo nome ou pasta' : undefined} className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${chip.missing ? 'bg-[#fbeeee] text-erro-texto' : chip.detected ? 'border border-dashed border-[#b9c8bd] bg-white text-[#526057]' : 'bg-[#e6f0e9] text-marca'}`}>{chip.text}</span>
         ))}
       </div>
       <div className="flex w-32 shrink-0 items-center justify-end gap-1.5 text-xs" aria-live="polite">
-        {row.status === 'a_enviar' && <><Spinner className="size-3.5 text-[#1d4d41]" /><span className="text-[#526057]">{row.progress}%</span></>}
-        {row.status === 'a_publicar' && <><Spinner className="size-3.5 text-[#1d4d41]" /><span className="text-[#526057]">A publicar</span></>}
-        {row.status === 'publicado' && <span className="inline-flex items-center gap-1 font-semibold text-[#1d4d41]"><Check size={14} aria-hidden="true" />Publicado</span>}
+        {row.status === 'a_enviar' && <><Spinner className="size-3.5 text-marca" /><span className="text-[#526057]">{row.progress}%</span></>}
+        {row.status === 'a_publicar' && <><Spinner className="size-3.5 text-marca" /><span className="text-[#526057]">A publicar</span></>}
+        {row.status === 'publicado' && <span className="inline-flex items-center gap-1 font-semibold text-marca"><Check size={14} aria-hidden="true" />Publicado</span>}
         {row.status === 'erro' && (
           <span className="flex flex-col items-end gap-0.5 text-right">
-            <span className="font-medium text-[#9a3030]">{row.message || 'Falhou'}</span>
-            {row.file.size <= MAX_MB * 1048576 && <button type="button" onClick={() => onRetry(row.key)} disabled={locked} className="inline-flex items-center gap-1 font-semibold text-[#1d4d41] underline disabled:opacity-40"><RotateCcw size={12} aria-hidden="true" />Repetir</button>}
+            <span className="font-medium text-erro-texto">{row.message || 'Falhou'}</span>
+            {row.file.size <= MAX_MB * 1048576 && <button type="button" onClick={() => onRetry(row.key)} disabled={locked} className="inline-flex items-center gap-1 font-semibold text-marca underline disabled:opacity-40"><RotateCcw size={12} aria-hidden="true" />Repetir</button>}
           </span>
         )}
         {row.status === 'existe' && (
           <span className="flex flex-col items-end gap-0.5 text-right">
-            <span className="font-medium text-[#805f19]">Já existe</span>
-            <button type="button" onClick={() => onAllowDuplicate(row.key)} disabled={locked} className="font-semibold text-[#1d4d41] underline disabled:opacity-40">Enviar mesmo assim</button>
+            <span className="font-medium text-aviso-texto">Já existe</span>
+            <button type="button" onClick={() => onAllowDuplicate(row.key)} disabled={locked} className="font-semibold text-marca underline disabled:opacity-40">Enviar mesmo assim</button>
           </span>
         )}
-        {!busy && row.status === 'pendente' && <span className="text-[#737c75]">Por enviar</span>}
+        {!busy && row.status === 'pendente' && <span className="text-texto-2">Por enviar</span>}
       </div>
     </li>
   )
@@ -499,9 +499,9 @@ export function MaterialBulk({ catalog }: { catalog: Catalog }) {
         onDragOver={(event) => { event.preventDefault(); setDragging(true) }}
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
-        className={`flex flex-1 flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed px-6 py-16 text-center transition-colors ${dragging ? 'border-[#1d4d41] bg-[#eef3ee]' : 'border-[#c9d7cd] bg-white'}`}
+        className={`flex flex-1 flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed px-6 py-16 text-center transition-colors ${dragging ? 'border-marca bg-[#eef3ee]' : 'border-[#c9d7cd] bg-white'}`}
       >
-        <span className="flex size-14 items-center justify-center rounded-2xl bg-[#e6f0e9] text-[#1d4d41]"><Upload size={26} aria-hidden="true" /></span>
+        <span className="flex size-14 items-center justify-center rounded-2xl bg-[#e6f0e9] text-marca"><Upload size={26} aria-hidden="true" /></span>
         <div>
           <h2 className="text-lg font-semibold tracking-tight">Arrasta os documentos para aqui</h2>
           <p className="mt-1 max-w-md text-sm text-[#5f6d63]">Podes escolher vários ficheiros, ou uma pasta inteira. Depois classificas tudo de uma vez, sem repetir.</p>
@@ -510,8 +510,8 @@ export function MaterialBulk({ catalog }: { catalog: Catalog }) {
           <button type="button" onClick={() => filesInput.current?.click()} className={btnSolid}><Upload size={16} aria-hidden="true" />Escolher ficheiros</button>
           <button type="button" onClick={() => folderInput.current?.click()} className={btnLine}><FolderOpen size={16} aria-hidden="true" />Escolher pasta</button>
         </div>
-        <p className="text-xs text-[#737c75]">PDF, Word, PowerPoint, Excel ou imagem. Até {MAX_MB} MB cada. Se as pastas tiverem o nome da disciplina, do ano ou da instituição, detetamo-los.</p>
-        {notice && <p role="status" className="text-sm text-[#805f19]">{notice}</p>}
+        <p className="text-xs text-texto-2">PDF, Word, PowerPoint, Excel ou imagem. Até {MAX_MB} MB cada. Se as pastas tiverem o nome da disciplina, do ano ou da instituição, detetamo-los.</p>
+        {notice && <p role="status" className="text-sm text-aviso-texto">{notice}</p>}
         <input ref={filesInput} type="file" multiple accept={ACCEPT} onChange={onPick} className="sr-only" tabIndex={-1} />
         <input ref={folderInput} type="file" multiple onChange={onPick} className="sr-only" tabIndex={-1} {...({ webkitdirectory: '' } as Record<string, string>)} />
       </div>
@@ -527,23 +527,23 @@ export function MaterialBulk({ catalog }: { catalog: Catalog }) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4" onDragOver={(event) => event.preventDefault()} onDrop={onDrop}>
-      <section className="rounded-2xl border border-[#e3e5dc] bg-white p-4 sm:p-5" aria-label="Para todos">
+      <section className="rounded-2xl border border-linha bg-white p-4 sm:p-5" aria-label="Para todos">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div>
             <h2 className="text-sm font-semibold">Para todos os documentos</h2>
-            <p className="text-xs text-[#737c75]">Define uma vez. O que deixares em branco é detetado pelo nome e pelas pastas.</p>
+            <p className="text-xs text-texto-2">Define uma vez. O que deixares em branco é detetado pelo nome e pelas pastas.</p>
           </div>
-          <label className="flex items-center gap-2 text-xs font-medium text-[#526057]"><input type="checkbox" checked={detect} onChange={(event) => setDetect(event.target.checked)} className="size-4 accent-[#1d4d41]" />Detetar pelo nome e pasta</label>
+          <label className="flex items-center gap-2 text-xs font-medium text-[#526057]"><input type="checkbox" checked={detect} onChange={(event) => setDetect(event.target.checked)} className="size-4 accent-marca" />Detetar pelo nome e pasta</label>
         </div>
         <FieldInputs values={defaults} onChange={(key, value) => setDefaults((previous) => ({ ...previous, [key]: value }))} catalog={catalog} blank="Não definir" disabled={running} />
       </section>
 
-      <section className="flex min-h-[18rem] min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#e3e5dc] bg-white" aria-label="Documentos">
+      <section className="flex min-h-[18rem] min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-linha bg-white" aria-label="Documentos">
         <div className="flex flex-wrap items-center gap-2 border-b border-[#edf0e9] px-4 py-3 sm:px-5">
-          <input type="checkbox" checked={allVisibleSelected} onChange={(event) => toggleVisible(event.target.checked)} disabled={running || visible.length === 0} aria-label="Selecionar todos os visíveis" className="size-4 accent-[#1d4d41]" />
+          <input type="checkbox" checked={allVisibleSelected} onChange={(event) => toggleVisible(event.target.checked)} disabled={running || visible.length === 0} aria-label="Selecionar todos os visíveis" className="size-4 accent-marca" />
           <div role="group" aria-label="Filtro" className="flex flex-wrap gap-1">
             {filters.filter((item) => item.id === 'todos' || item.count > 0).map((item) => (
-              <button key={item.id} type="button" aria-pressed={filter === item.id} onClick={() => setFilter(item.id)} className={`rounded-full px-3 py-1 text-xs font-semibold ${filter === item.id ? 'bg-[#1d4d41] text-white' : 'bg-[#eef0ea] text-[#526057] hover:bg-[#e3e7de]'}`}>{item.label} {item.count}</button>
+              <button key={item.id} type="button" aria-pressed={filter === item.id} onClick={() => setFilter(item.id)} className={`rounded-full px-3 py-1 text-xs font-semibold ${filter === item.id ? 'bg-marca text-white' : 'bg-[#eef0ea] text-[#526057] hover:bg-[#e3e7de]'}`}>{item.label} {item.count}</button>
             ))}
           </div>
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Procurar" aria-label="Procurar na lista" className={`${input} ml-auto h-9 max-w-48`} />
@@ -555,18 +555,18 @@ export function MaterialBulk({ catalog }: { catalog: Catalog }) {
 
         {counts.selected > 0 && !running && (
           <div className="border-b border-[#edf0e9] bg-[#f6f9f6] px-4 py-3 sm:px-5">
-            <p className="mb-2 text-xs font-semibold text-[#1d4d41]">{counts.selected} {counts.selected === 1 ? 'selecionado' : 'selecionados'}: aplica um valor a todos de uma vez</p>
+            <p className="mb-2 text-xs font-semibold text-marca">{counts.selected} {counts.selected === 1 ? 'selecionado' : 'selecionados'}: aplica um valor a todos de uma vez</p>
             <FieldInputs values={apply} onChange={(key, value) => setApply((previous) => ({ ...previous, [key]: value }))} catalog={catalog} blank="Não alterar" />
             <div className="mt-3 flex flex-wrap gap-2">
               <button type="button" onClick={applyToSelected} disabled={!Object.values(apply).some((value) => value.trim())} className={`${btnSolid} min-h-9 px-4 text-xs`}>Aplicar aos selecionados</button>
               <button type="button" onClick={clearOverrides} className={`${btnLine} min-h-9 px-3 text-xs`}>Repor classificação</button>
-              <button type="button" onClick={removeSelected} className={`${btnLine} min-h-9 px-3 text-xs text-[#9a3030]`}><Trash2 size={13} aria-hidden="true" />Tirar da lista</button>
+              <button type="button" onClick={removeSelected} className={`${btnLine} min-h-9 px-3 text-xs text-erro-texto`}><Trash2 size={13} aria-hidden="true" />Tirar da lista</button>
             </div>
           </div>
         )}
 
         {visible.length === 0 ? (
-          <p className="m-6 text-center text-sm text-[#737c75]">Nenhum documento neste filtro.</p>
+          <p className="m-6 text-center text-sm text-texto-2">Nenhum documento neste filtro.</p>
         ) : (
           <ul className="min-h-0 flex-1 divide-y divide-[#edf0e9] overflow-y-auto">
             {visible.map((row) => <RowItem key={row.key} row={row} defaults={defaults} detect={detect} lookups={lookups} locked={running} onSelect={onSelect} onTitle={onTitle} onRetry={onRetry} onAllowDuplicate={onAllowDuplicate} />)}
@@ -578,19 +578,19 @@ export function MaterialBulk({ catalog }: { catalog: Catalog }) {
         <div className="min-w-0 flex-1 basis-56" aria-live="polite">
           {running ? (
             <>
-              <div className="h-1.5 overflow-hidden rounded-full bg-[#e6f0e9]"><div className="h-full rounded-full bg-[#1d4d41] transition-[width] duration-300" style={{ width: `${pct}%` }} /></div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-[#e6f0e9]"><div className="h-full rounded-full bg-marca transition-[width] duration-300" style={{ width: `${pct}%` }} /></div>
               <p className="mt-1.5 text-xs text-[#526057]">A publicar: {runDone} de {runSize}{counts.errors > 0 ? `, ${counts.errors} com erro` : ''}. Não feches esta página.</p>
             </>
           ) : (
             <p className="text-sm text-[#526057]">
-              {counts.done > 0 && <span className="font-semibold text-[#1d4d41]">{counts.done} publicados. </span>}
+              {counts.done > 0 && <span className="font-semibold text-marca">{counts.done} publicados. </span>}
               {counts.ready > 0 ? `${counts.ready} prontos a publicar` : counts.done > 0 && counts.errors === 0 && counts.incomplete === 0 ? 'Tudo publicado.' : 'Nada pronto a publicar'}
-              {counts.incomplete > 0 && <span className="text-[#9a3030]"> · {counts.incomplete} sem categoria</span>}
-              {counts.errors > 0 && <span className="text-[#9a3030]"> · {counts.errors} com erro</span>}
+              {counts.incomplete > 0 && <span className="text-erro-texto"> · {counts.incomplete} sem categoria</span>}
+              {counts.errors > 0 && <span className="text-erro-texto"> · {counts.errors} com erro</span>}
               {checking && <span> · a verificar duplicados…</span>}
             </p>
           )}
-          {notice && !running && <p role="status" className="mt-0.5 text-xs text-[#805f19]">{notice}</p>}
+          {notice && !running && <p role="status" className="mt-0.5 text-xs text-aviso-texto">{notice}</p>}
         </div>
         {!running && counts.errors > 0 && <button type="button" onClick={retryErrors} className={btnLine}><RotateCcw size={15} aria-hidden="true" />Repetir erros</button>}
         {!running && finished > 0 && counts.ready === 0 && <Link href="/admin/materiais" className={btnLine}>Ver materiais</Link>}

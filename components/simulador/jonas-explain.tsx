@@ -13,26 +13,27 @@ import type { PlayImage } from '@/lib/simulator-shared'
 type Msg = { id: string; role: 'user' | 'assistant'; content: string }
 
 // Atalhos depois da explicação: o Jonas aprofunda sem o aluno sair do Simulador.
-const SHORTCUTS: { action: Exclude<ExplainAction, 'passo' | 'pergunta'>; label: string }[] = [
+const SHORTCUTS: { action: Exclude<ExplainAction, 'passo' | 'pergunta' | 'porque'>; label: string }[] = [
   { action: 'devagar', label: 'Mais devagar' },
   { action: 'exemplo', label: 'Dá um exemplo' },
   { action: 'outras', label: 'As outras opções' },
   { action: 'resumo', label: 'Resumo' },
 ]
 
-const chip = 'inline-flex h-9 shrink-0 items-center rounded-full bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] px-3.5 text-[13px] font-semibold text-[#1d4d41] shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_1px_4px_rgba(29,77,65,0.10)] ring-1 ring-[#1d4d41]/10 transition active:scale-[0.98] hover:from-[#e2eee7] hover:to-[#cbe0d3] disabled:opacity-50'
+const chip = 'inline-flex h-9 shrink-0 items-center rounded-full bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] px-3.5 text-[13px] font-semibold text-marca shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_1px_4px_rgba(29,77,65,0.10)] ring-1 ring-marca/10 transition active:scale-[0.98] hover:from-[#e2eee7] hover:to-[#cbe0d3] disabled:opacity-50'
 
 /**
  * Folha com a explicação do Jonas para UMA questão já respondida. Fica montada enquanto a questão está no ecrã:
  * fechar e abrir de novo não repete o pedido. Se o Jonas não estiver disponível, mostra a explicação escrita pela equipa (se existir).
  */
-export function JonasExplainSheet({ attemptId, position, open, onClose, officialExplanation, images }: { attemptId: string; position: number; open: boolean; onClose: () => void; officialExplanation: string | null; images: PlayImage[] }) {
+export function JonasExplainSheet({ attemptId, position, open, onClose, officialExplanation, images, startWith = null }: { attemptId: string; position: number; open: boolean; onClose: () => void; officialExplanation: string | null; startWith?: 'porque' | null; images: PlayImage[] }) {
   const [messages, setMessages] = useState<Msg[]>([])
   const [loading, setLoading] = useState(false)
   const [streaming, setStreaming] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [input, setInput] = useState('')
   const started = useRef(false)
+  const [passoDone, setPassoDone] = useState(startWith === null)
   const abortRef = useRef<AbortController | null>(null)
   const body = useRef<HTMLDivElement>(null)
   const stick = useRef(true)
@@ -58,6 +59,7 @@ export function JonasExplainSheet({ attemptId, position, open, onClose, official
       const stamp = Date.now()
       const assistantId = `a-${stamp}`
       const showUser = action !== 'passo'
+      if (action === 'passo') setPassoDone(true)
       setMessages((previous) => [...previous, ...(showUser ? [{ id: `u-${stamp}`, role: 'user' as const, content: action === 'pergunta' ? text : EXPLAIN_LABELS[action] }] : []), { id: assistantId, role: 'assistant', content: '' }])
       stick.current = true
       const controller = new AbortController()
@@ -88,9 +90,12 @@ export function JonasExplainSheet({ attemptId, position, open, onClose, official
         if (response.ok) {
           const data = (await response.json()) as { messages: Msg[] }
           if (!cancelled && data.messages.some((message) => message.role === 'assistant')) {
-            // O primeiro pedido («passo a passo») não se mostra como balão: a resposta já o diz.
-            setMessages(data.messages.filter((message, index) => !(index === 0 && message.role === 'user' && message.content === EXPLAIN_LABELS.passo)))
+            // O pedido «passo a passo» não se mostra como balão: a resposta já o diz.
+            setMessages(data.messages.filter((message) => !(message.role === 'user' && message.content === EXPLAIN_LABELS.passo)))
+            if (data.messages.some((message) => message.role === 'user' && message.content === EXPLAIN_LABELS.passo)) setPassoDone(true)
             setLoading(false)
+            // Veio de «Porque errei» e ainda não foi respondido: pede agora, sem repetir o que já está guardado.
+            if (startWith === 'porque' && !data.messages.some((message) => message.role === 'user' && message.content === EXPLAIN_LABELS.porque)) await ask('porque')
             return
           }
         }
@@ -99,12 +104,12 @@ export function JonasExplainSheet({ attemptId, position, open, onClose, official
       }
       if (cancelled) return
       setLoading(false)
-      await ask('passo')
+      await ask(startWith === 'porque' ? 'porque' : 'passo')
     })()
     return () => {
       cancelled = true
     }
-  }, [open, attemptId, position, ask])
+  }, [open, attemptId, position, ask, startWith])
 
   function onScroll() {
     const el = body.current
@@ -122,7 +127,7 @@ export function JonasExplainSheet({ attemptId, position, open, onClose, official
   function retry() {
     const last = messages[messages.length - 1]
     // Sem nenhuma resposta ainda: repete o passo a passo; com conversa, deixa o aluno escolher outro atalho.
-    if (!messages.some((message) => message.role === 'assistant')) void ask('passo')
+    if (!messages.some((message) => message.role === 'assistant')) void ask(startWith === 'porque' ? 'porque' : 'passo')
     else if (last?.role === 'user') void ask('pergunta', last.content)
     else setError(null)
   }
@@ -138,9 +143,9 @@ export function JonasExplainSheet({ attemptId, position, open, onClose, official
           <JonasAvatar size={30} />
           <div className="min-w-0 flex-1">
             <p className="text-[15px] font-semibold leading-5">Jonas</p>
-            <p className="text-[12px] leading-4 text-[#7d887f]">Explicação passo a passo</p>
+            <p className="text-[12px] leading-4 text-[#7d887f]">{startWith === 'porque' ? 'Porque errei' : 'Explicação passo a passo'}</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="Fechar" autoFocus className="flex size-10 items-center justify-center rounded-full text-[#68716a] hover:bg-[#eef0e9]"><X size={19} aria-hidden="true" /></button>
+          <button type="button" onClick={onClose} aria-label="Fechar" autoFocus className="flex size-10 items-center justify-center rounded-full text-texto-2 hover:bg-[#eef0e9]"><X size={19} aria-hidden="true" /></button>
         </div>
 
         <div ref={body} onScroll={onScroll} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-3">
@@ -151,7 +156,7 @@ export function JonasExplainSheet({ attemptId, position, open, onClose, official
             {messages.map((message) =>
               message.role === 'user' ? (
                 <div key={message.id} className="flex justify-end">
-                  <p className="max-w-[88%] whitespace-pre-wrap break-words rounded-2xl rounded-br-md bg-gradient-to-br from-[#2f7260] to-[#1d4d41] px-3.5 py-2 text-[14.5px] leading-6 text-white">{message.content}</p>
+                  <p className="max-w-[88%] whitespace-pre-wrap break-words rounded-2xl rounded-br-md bg-gradient-to-br from-[#2f7260] to-marca px-3.5 py-2 text-[14.5px] leading-6 text-white">{message.content}</p>
                 </div>
               ) : (
                 <div key={message.id} aria-busy={streaming && message === messages[messages.length - 1]}>
@@ -163,7 +168,7 @@ export function JonasExplainSheet({ attemptId, position, open, onClose, official
 
           {showOfficial && (
             <div className="mt-3 rounded-2xl bg-[#f6f8f3] p-4 text-[15px] leading-7 text-[#2b332d]">
-              <p className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#1d4d41]"><Lightbulb size={13} aria-hidden="true" />Explicação da equipa</p>
+              <p className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-marca"><Lightbulb size={13} aria-hidden="true" />Explicação da equipa</p>
               <MathText text={officialExplanation} />
             </div>
           )}
@@ -179,16 +184,17 @@ export function JonasExplainSheet({ attemptId, position, open, onClose, official
         <div className="flex-none space-y-2.5 border-t border-[#eef0e9] px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
           {hasAnswer && (
             <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-0.5 [scrollbar-width:none]">
+              {!passoDone && <button type="button" disabled={streaming} onClick={() => void ask('passo')} className={chip}>Passo a passo</button>}
               {SHORTCUTS.map((shortcut) => (
                 <button key={shortcut.action} type="button" disabled={streaming} onClick={() => void ask(shortcut.action)} className={chip}>{shortcut.label}</button>
               ))}
             </div>
           )}
-          <form onSubmit={submit} className="flex items-center gap-2 rounded-full bg-[#f4f6f1] p-1.5 pl-4 ring-1 ring-black/[0.04] focus-within:ring-2 focus-within:ring-[#1d4d41]/25">
-            <Sparkles size={15} className="shrink-0 text-[#1d4d41]" aria-hidden="true" />
+          <form onSubmit={submit} className="flex items-center gap-2 rounded-full bg-[#f4f6f1] p-1.5 pl-4 ring-1 ring-black/[0.04] focus-within:ring-2 focus-within:ring-marca/25">
+            <Sparkles size={15} className="shrink-0 text-marca" aria-hidden="true" />
             <label htmlFor={`jonas-q-${position}`} className="sr-only">Pergunta ao Jonas sobre esta questão</label>
             <input id={`jonas-q-${position}`} value={input} maxLength={1000} onChange={(event) => setInput(event.target.value)} placeholder="Pergunta ao Jonas sobre esta questão…" className="h-9 min-w-0 flex-1 bg-transparent text-[14.5px] outline-none placeholder:text-[#98a19a]" />
-            <button type="submit" disabled={!input.trim() || streaming || loading} aria-label="Enviar pergunta" className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2f7260] to-[#1d4d41] text-white disabled:opacity-35"><ArrowUp size={17} aria-hidden="true" /></button>
+            <button type="submit" disabled={!input.trim() || streaming || loading} aria-label="Enviar pergunta" className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2f7260] to-marca text-white disabled:opacity-35"><ArrowUp size={17} aria-hidden="true" /></button>
           </form>
         </div>
       </div>
@@ -202,7 +208,7 @@ export function ExplainButton({ attemptId, position, officialExplanation, images
   const close = useCallback(() => setOpen(false), [])
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className="inline-flex h-10 items-center gap-2 rounded-full bg-gradient-to-br from-[#2f7260] to-[#1d4d41] px-4 text-[13.5px] font-semibold text-white shadow-[0_2px_6px_rgba(29,77,65,0.25)] transition active:scale-[0.98] hover:from-[#2a6858] hover:to-[#183f35]">
+      <button type="button" onClick={() => setOpen(true)} className="inline-flex h-10 items-center gap-2 rounded-full bg-gradient-to-br from-[#2f7260] to-marca px-4 text-[13.5px] font-semibold text-white shadow-[0_2px_6px_rgba(29,77,65,0.25)] transition active:scale-[0.98] hover:from-[#2a6858] hover:to-[#183f35]">
         <Sparkles size={15} aria-hidden="true" />Ver explicação
       </button>
       <JonasExplainSheet attemptId={attemptId} position={position} open={open} onClose={close} officialExplanation={officialExplanation} images={images} />

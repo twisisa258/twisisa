@@ -3,7 +3,7 @@ import { pageMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = pageMetadata({
   title: 'Termos de utilização | Twisisa',
-  description: 'Condições de utilização da plataforma Twisisa: conta, comunidade, materiais de estudo, planos e pagamentos.',
+  description: 'Condições de utilização da plataforma Twisisa: conta, materiais de estudo, planos e pagamentos.',
   path: '/termos',
   index: true,
 })

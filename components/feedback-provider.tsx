@@ -74,16 +74,16 @@ function FeedbackDialog({ feedback, onClose }: { feedback: Feedback; onClose: ()
         aria-describedby={messageId}
         className="relative w-full max-w-sm rounded-3xl bg-white p-6 text-center shadow-xl animate-in fade-in zoom-in-95 slide-in-from-bottom-4 motion-reduce:animate-none"
       >
-        <span className={`mx-auto flex size-12 items-center justify-center rounded-full ${isError ? 'bg-[#fbeeee] text-[#9a3030]' : 'bg-[#edf3ee] text-[#1d4d41]'}`}>
+        <span className={`mx-auto flex size-12 items-center justify-center rounded-full ${isError ? 'bg-[#fbeeee] text-erro-texto' : 'bg-[#edf3ee] text-marca'}`}>
           {isError ? <CircleAlert size={26} /> : <CircleCheck size={26} />}
         </span>
         <h2 id={titleId} className="mt-4 text-lg font-semibold text-[#202923]">{feedback.title}</h2>
-        <p id={messageId} className="mt-1.5 text-sm leading-6 text-[#68736a]">{feedback.message}</p>
+        <p id={messageId} className="mt-1.5 text-sm leading-6 text-texto-2">{feedback.message}</p>
         <button
           ref={buttonRef}
           type="button"
           onClick={onClose}
-          className={`mt-5 inline-flex h-11 w-full items-center justify-center rounded-full px-5 text-sm font-semibold text-white ${isError ? 'bg-[#9a3030] hover:bg-[#7f2626]' : 'bg-[#1d4d41] hover:bg-[#163e34]'}`}
+          className={`mt-5 inline-flex h-11 w-full items-center justify-center rounded-full px-5 text-sm font-semibold text-white ${isError ? 'bg-erro-texto hover:bg-[#7f2626]' : 'bg-marca hover:bg-marca-escura'}`}
         >
           {isError ? 'Fechar' : 'Ok'}
         </button>

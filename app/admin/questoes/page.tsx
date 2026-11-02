@@ -149,11 +149,11 @@ export default async function AdminQuestoesPage({ searchParams }: { searchParams
                   <li>A disciplina e o tema têm de existir, com o mesmo nome, e a disciplina tem de estar no percurso indicado.</li>
                   <li>O modelo traz 3 linhas de exemplo marcadas com <strong>[EXEMPLO]</strong>: apaga-as antes de importar.</li>
                 </ul>
-                <Link href="/admin/questoes/modelo" prefetch={false} className="inline-flex items-center gap-2 text-sm font-semibold text-[#1d4d41] hover:underline"><Download size={16} aria-hidden="true" /> Descarregar o modelo (com exemplos)</Link>
+                <Link href="/admin/questoes/modelo" prefetch={false} className="inline-flex items-center gap-2 text-sm font-semibold text-marca hover:underline"><Download size={16} aria-hidden="true" /> Descarregar o modelo (com exemplos)</Link>
                 <label className="text-sm font-medium">Ficheiro CSV *
-                  <input name="csv" type="file" accept=".csv,text/csv" required className="mt-1 block w-full rounded-xl border border-[#dfe3d9] bg-white p-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-[#edf3ee] file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-[#1d4d41]" />
+                  <input name="csv" type="file" accept=".csv,text/csv" required className="mt-1 block w-full rounded-xl border border-[#dfe3d9] bg-white p-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-[#edf3ee] file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-marca" />
                 </label>
-                <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#1d4d41] px-5 py-3 text-sm font-semibold text-white hover:bg-[#163e34]">Importar</button>
+                <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-marca px-5 py-3 text-sm font-semibold text-white hover:bg-marca-escura">Importar</button>
               </FeedbackForm>
             </FormModal>
             <FormModal label="Adicionar" title="Adicionar questão" description="Em 3 passos: enunciado, opções e classificação.">
@@ -178,10 +178,10 @@ export default async function AdminQuestoesPage({ searchParams }: { searchParams
             <p className="text-[15px] leading-7"><MathText text={preview.statement} /></p>
             <ul className="grid gap-2">
               {preview.options.map((option, index) => (
-                <li key={index} className={`flex items-start gap-3 rounded-2xl border px-4 py-3 text-sm ${option.isCorrect ? 'border-[#1d4d41] bg-[#edf3ee]' : 'border-[#e3e5dc]'}`}>
-                  <span className="font-semibold text-[#1d4d41]">{LETTERS[index]}</span>
+                <li key={index} className={`flex items-start gap-3 rounded-2xl border px-4 py-3 text-sm ${option.isCorrect ? 'border-marca bg-[#edf3ee]' : 'border-linha'}`}>
+                  <span className="font-semibold text-marca">{LETTERS[index]}</span>
                   <span className="min-w-0 flex-1"><MathText text={option.body} /></span>
-                  {option.isCorrect && <CheckCircle2 size={18} aria-label="Resposta correta" className="shrink-0 text-[#1d4d41]" />}
+                  {option.isCorrect && <CheckCircle2 size={18} aria-label="Resposta correta" className="shrink-0 text-marca" />}
                 </li>
               ))}
             </ul>
@@ -197,13 +197,13 @@ export default async function AdminQuestoesPage({ searchParams }: { searchParams
 
       {drafts.length > 0 && (
         <section aria-label="Questões por concluir" className="shrink-0 rounded-2xl border border-[#ecdfb8] bg-[#faf5e6] px-4 py-2.5">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#805f19]">Por concluir ({drafts.length})</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-aviso-texto">Por concluir ({drafts.length})</p>
           <ul className="divide-y divide-[#efe6c9]">
             {drafts.slice(0, 5).map((draft) => (
               <li key={draft.id} className="flex items-center gap-3 py-2">
                 <Link href={href(tab.tab, q, page, `continuar=${draft.id}`)} className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">{plainExcerpt(draft.payload.statement || draft.payload.options.find((option) => option.body.trim())?.body || 'Sem enunciado', 90)}</p>
-                  <p className="mt-0.5 text-xs text-[#737c75]">Passo {draft.payload.step + 1} de 3 · {relativeTime(draft.updatedAt)}</p>
+                  <p className="mt-0.5 text-xs text-texto-2">Passo {draft.payload.step + 1} de 3 · {relativeTime(draft.updatedAt)}</p>
                 </Link>
                 <RowMenu
                   label="Ações da questão por concluir"
@@ -215,7 +215,7 @@ export default async function AdminQuestoesPage({ searchParams }: { searchParams
               </li>
             ))}
           </ul>
-          {drafts.length > 5 && <p className="pb-0.5 text-xs text-[#737c75]">+ {drafts.length - 5} mais antigas: aparecem quando concluíres ou descartares estas.</p>}
+          {drafts.length > 5 && <p className="pb-0.5 text-xs text-texto-2">+ {drafts.length - 5} mais antigas: aparecem quando concluíres ou descartares estas.</p>}
         </section>
       )}
 
@@ -272,11 +272,11 @@ export default async function AdminQuestoesPage({ searchParams }: { searchParams
                   }
                 >
                   <p className="line-clamp-2 text-sm font-medium leading-5">{plainExcerpt(item.statement)}</p>
-                  <p className="mt-1 truncate text-xs text-[#737c75]">{item.subjectName} · {item.scopeLabel} · {difficultyLabel(item.difficulty)}{item.examYear ? ` · ${item.examYear}` : ''}</p>
+                  <p className="mt-1 truncate text-xs text-texto-2">{item.subjectName} · {item.scopeLabel} · {difficultyLabel(item.difficulty)}{item.examYear ? ` · ${item.examYear}` : ''}</p>
                   {/* Marcas internas: só aqui, no admin. */}
                   <p className="mt-1.5 flex flex-wrap gap-1.5">
                     <span className="rounded-full bg-[#eef0ea] px-2 py-0.5 text-[10px] font-semibold text-[#5f6d63]">{originLabel(item.origin)}</span>
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${item.answerSource === 'sugestao' ? 'bg-[#f4eddb] text-[#805f19]' : 'bg-[#e6f0e9] text-[#1d4d41]'}`}>{reviewLabel(item)}</span>
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${item.answerSource === 'sugestao' ? 'bg-[#f4eddb] text-aviso-texto' : 'bg-[#e6f0e9] text-marca'}`}>{reviewLabel(item)}</span>
                     {item.version > 1 && <span className="rounded-full bg-[#eef0ea] px-2 py-0.5 text-[10px] font-semibold text-[#5f6d63]">v{item.version}</span>}
                   </p>
                 </SelectableRow>

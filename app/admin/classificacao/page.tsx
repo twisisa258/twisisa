@@ -12,7 +12,7 @@ import { EmptyState } from '@/components/states/empty-state'
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Classificação | Administração | Twisisa' }
 
-const input = 'mt-1 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 py-2.5 text-sm outline-none focus:border-[#1d4d41] focus:ring-2 focus:ring-[#1d4d41]/10'
+const input = 'mt-1 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 py-2.5 text-sm outline-none focus:border-marca focus:ring-2 focus:ring-marca/10'
 
 const TABS = {
   categorias: { key: 'categorias', label: 'Categorias', kind: 'categoria', singular: 'categoria', plural: 'categorias', placeholder: 'Ex.: Exames anteriores' },
@@ -33,8 +33,8 @@ function ClassItemForm({ tab, editing }: { tab: Tab; editing: ClassRow | null })
       {editing && <input type="hidden" name="id" value={editing.id} />}
       <label className="text-sm font-medium">Nome *<input name="name" required minLength={2} maxLength={80} defaultValue={editing?.name ?? ''} className={input} placeholder={tab.placeholder} /></label>
       {tab.kind === 'categoria' && <label className="text-sm font-medium">Descrição<input name="description" maxLength={300} defaultValue={editing?.description ?? ''} className={input} placeholder="Texto curto (opcional)" /></label>}
-      <p className="-mt-2 text-xs text-[#737c75]">{editing ? 'Para mudar a posição, usa Subir e Descer na lista.' : `Vai para o fim da lista; depois podes reorganizar com Subir e Descer.`}</p>
-      <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#1d4d41] px-5 py-3 text-sm font-semibold text-white hover:bg-[#163e34]">{editing ? 'Guardar alterações' : `Criar ${tab.singular}`}</button>
+      <p className="-mt-2 text-xs text-texto-2">{editing ? 'Para mudar a posição, usa Subir e Descer na lista.' : `Vai para o fim da lista; depois podes reorganizar com Subir e Descer.`}</p>
+      <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-marca px-5 py-3 text-sm font-semibold text-white hover:bg-marca-escura">{editing ? 'Guardar alterações' : `Criar ${tab.singular}`}</button>
     </FeedbackForm>
   )
 }
@@ -103,7 +103,7 @@ export default async function AdminClassificacaoPage({ searchParams }: { searchP
                 <li key={item.id} className={`flex items-center gap-3 py-3 ${item.active ? '' : 'opacity-70'}`}>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium leading-5">{item.name}</p>
-                    <p className="mt-0.5 truncate text-xs text-[#737c75]">{item.inUse} {item.inUse === 1 ? 'material' : 'materiais'}{item.description ? ` · ${item.description}` : ''}</p>
+                    <p className="mt-0.5 truncate text-xs text-texto-2">{item.inUse} {item.inUse === 1 ? 'material' : 'materiais'}{item.description ? ` · ${item.description}` : ''}</p>
                   </div>
                   {!item.active && <span className="shrink-0 rounded-full bg-[#f1f1ee] px-2.5 py-1 text-[11px] font-semibold text-[#6b716c]">Arquivado</span>}
                   <RowMenu

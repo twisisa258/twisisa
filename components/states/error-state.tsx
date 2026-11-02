@@ -17,13 +17,13 @@ export function ErrorState({
 }) {
   return (
     <div role="alert" className="rounded-3xl border border-[#f0d6d6] bg-white px-5 py-10 text-center">
-      <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#fbeeee] text-[#9a3030]">
+      <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#fbeeee] text-erro-texto">
         <CircleAlert size={24} aria-hidden="true" />
       </span>
       <h2 className="mt-4 text-base font-semibold text-[#202923]">{title}</h2>
-      <p className="mx-auto mt-1.5 max-w-sm text-sm leading-6 text-[#68736a]">{description}</p>
+      <p className="mx-auto mt-1.5 max-w-sm text-sm leading-6 text-texto-2">{description}</p>
       {onRetry && (
-        <button type="button" onClick={onRetry} className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-[#1d4d41] px-5 text-sm font-semibold text-white hover:bg-[#163e34]">
+        <button type="button" onClick={onRetry} className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-marca px-5 text-sm font-semibold text-white hover:bg-marca-escura">
           Tentar de novo
         </button>
       )}

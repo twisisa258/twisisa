@@ -25,7 +25,7 @@ import { saveCandidate, savePersonal, saveSchool } from './actions'
 
 export const metadata = { title: 'O meu perfil | Twisisa', description: 'Gere as tuas informações pessoais e preferências.' }
 
-const linkButton = 'inline-flex h-10 items-center rounded-xl border border-[#dfe3d9] bg-white px-4 text-sm font-semibold text-[#1d4d41] transition-colors hover:bg-[#f1f4ef]'
+const linkButton = 'inline-flex h-10 items-center rounded-xl border border-[#dfe3d9] bg-white px-4 text-sm font-semibold text-marca transition-colors hover:bg-[#f1f4ef]'
 
 export default async function PerfilPage() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -90,15 +90,15 @@ export default async function PerfilPage() {
           <Field label="@Nickname" hint="O teu identificador único: 3 a 20 letras, números, _ ou ponto.">
             <input name="nickname" maxLength={21} defaultValue={current?.nickname ? `@${current.nickname}` : ''} placeholder="@juvencio" autoCapitalize="none" autoCorrect="off" className={fieldClass} />
           </Field>
-          <Field label={<>Telefone <span className="font-normal text-[#737c75]">(opcional)</span></>}>
+          <Field label={<>Telefone <span className="font-normal text-texto-2">(opcional)</span></>}>
             <input name="phone" type="tel" maxLength={30} defaultValue={current?.phone ?? ''} placeholder="+258 84 000 0000" autoComplete="tel" className={fieldClass} />
           </Field>
           <Field label="Email">
             <input value={session.user.email} readOnly aria-readonly="true" className={fieldClass} />
           </Field>
-          <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-[#f8f8f5] p-3 text-sm">
-            <input type="checkbox" name="showInRanking" defaultChecked={current?.showInRanking ?? true} className="mt-0.5 size-4 accent-[#1d4d41]" />
-            <span><span className="font-medium text-[#202321]">Aparecer no ranking</span><span className="block text-xs text-[#737c75]">Mostramos só o teu nome abreviado e o @nickname.</span></span>
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-fundo p-3 text-sm">
+            <input type="checkbox" name="showInRanking" defaultChecked={current?.showInRanking ?? true} className="mt-0.5 size-4 accent-marca" />
+            <span><span className="font-medium text-texto">Aparecer no ranking</span><span className="block text-xs text-texto-2">Mostramos só o teu nome abreviado e o @nickname.</span></span>
           </label>
         </SectionForm>
       ),
@@ -128,7 +128,7 @@ export default async function PerfilPage() {
       done: has('percurso') && (!isAdmission || (has('instituicao') && has('curso'))),
       content: (
         <div className="grid gap-4">
-          <p className="text-sm text-[#68716a]">
+          <p className="text-sm text-texto-2">
             {levelName ? `${levelName}${isAdmission ? (institution ? ` · ${institution.name}` : ' · sem instituição escolhida') : ''}` : 'Ainda não escolheste o que estás a preparar.'}
           </p>
           <div>
@@ -137,7 +137,7 @@ export default async function PerfilPage() {
           {isAdmission && (
             <div className="grid gap-4 border-t border-[#eceee7] pt-4">
               {institutionCourses.length === 0 ? (
-                <p className="text-sm text-[#68716a]">Ainda não há cursos desta instituição na plataforma.</p>
+                <p className="text-sm text-texto-2">Ainda não há cursos desta instituição na plataforma.</p>
               ) : (
                 <SectionForm sectionId="percurso" action={saveCandidate}>
                   <Field label="Curso alvo" custom>
@@ -148,8 +148,8 @@ export default async function PerfilPage() {
                   </Field>
                 </SectionForm>
               )}
-              {courseSubjects.length > 0 && <p className="text-xs text-[#68716a]">Provas do curso: {courseSubjects.map((subject) => subject.name).join(', ')}.</p>}
-              <p className="text-sm text-[#68716a]">Não sabes o curso? <Link href={ORIENTACAO_HREF} className="font-semibold text-[#1d4d41] hover:underline">Faz o teste vocacional</Link> e escolhe entre 5 sugestões.</p>
+              {courseSubjects.length > 0 && <p className="text-xs text-texto-2">Provas do curso: {courseSubjects.map((subject) => subject.name).join(', ')}.</p>}
+              <p className="text-sm text-texto-2">Não sabes o curso? <Link href={ORIENTACAO_HREF} className="font-semibold text-marca hover:underline">Faz o teste vocacional</Link> e escolhe entre 5 sugestões.</p>
             </div>
           )}
         </div>
@@ -169,7 +169,7 @@ export default async function PerfilPage() {
       summary: plus ? 'Plus ativo' : 'Gratuito',
       content: (
         <div className="grid gap-4">
-          <p className="text-sm text-[#68716a]">{plus ? 'Tens o Twisisa Plus ativo.' : 'Estás no plano gratuito.'}</p>
+          <p className="text-sm text-texto-2">{plus ? 'Tens o Twisisa Plus ativo.' : 'Estás no plano gratuito.'}</p>
           <div>
             <Link href="/planos" className={linkButton}><BookOpen className="mr-2 size-4" aria-hidden="true" />{plus ? 'Ver o meu plano' : 'Ver planos'}</Link>
           </div>
@@ -185,20 +185,20 @@ export default async function PerfilPage() {
           <AvatarUploader name={name} image={session.user.image ?? null} />
           <div className="min-w-0 flex-1">
             <h1 className="truncate text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">{name}</h1>
-            <p className="truncate text-sm text-[#68716a]">{current?.nickname ? `@${current.nickname}` : session.user.email}</p>
+            <p className="truncate text-sm text-texto-2">{current?.nickname ? `@${current.nickname}` : session.user.email}</p>
             <div className="mt-3">
               <div className="h-1.5 overflow-hidden rounded-full bg-[#e3e6dc]" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent} aria-label="Perfil completo">
-                <div className="h-full rounded-full bg-[#1d4d41] transition-[width] duration-500 motion-reduce:transition-none" style={{ width: `${percent}%` }} />
+                <div className="h-full rounded-full bg-marca transition-[width] duration-500 motion-reduce:transition-none" style={{ width: `${percent}%` }} />
               </div>
-              <p className="mt-1.5 flex items-center gap-1 text-xs text-[#68716a]">
+              <p className="mt-1.5 flex items-center gap-1 text-xs text-texto-2">
                 {complete ? (
-                  <><Check size={13} className="text-[#1d4d41]" aria-hidden="true" />Perfil completo</>
+                  <><Check size={13} className="text-marca" aria-hidden="true" />Perfil completo</>
                 ) : (
                   <>{doneCount} de {steps.length} · falta {missing.slice(0, 2).join(' e ')}{missing.length > 2 ? '…' : ''}</>
                 )}
               </p>
               {rank && (
-                <Link href="/aluno/ranking" className="mt-1 inline-block text-xs font-semibold text-[#1d4d41] hover:underline">#{rank.position} no ranking da semana · {formatPoints(rank.points)} pts</Link>
+                <Link href="/aluno/ranking" className="mt-1 inline-block text-xs font-semibold text-marca hover:underline">#{rank.position} no ranking da semana · {formatPoints(rank.points)} pts</Link>
               )}
             </div>
           </div>

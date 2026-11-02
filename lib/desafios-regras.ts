@@ -54,8 +54,8 @@ export type Streak = {
 
 // Sequência = dias seguidos com a meta diária cumprida. Continua «viva» até ao fim do dia de hoje:
 // se hoje ainda não cumpriste mas ontem sim, conta até à meia-noite. Falhar um dia inteiro põe tudo a zero.
-export function computeStreak(days: DayRow[], today: string): Streak {
-  const goalDays = days.filter((row) => row.answered >= DAILY_GOAL).map((row) => row.day).sort()
+export function computeStreak(days: DayRow[], today: string, goal: number = DAILY_GOAL): Streak {
+  const goalDays = days.filter((row) => row.answered >= goal).map((row) => row.day).sort()
   const set = new Set(goalDays)
   const runs: { length: number; end: string }[] = []
   for (const day of goalDays) {
@@ -123,30 +123,33 @@ export type MissionInput = {
   /** true: as disciplinas vêm das provas do curso escolhido (admissão). */
   fromCourse: boolean
   subjectOfDay: SubjectStat | null
+  /** Meta diária do aluno (escolhida no onboarding). Sem valor, usa DAILY_GOAL. */
+  goal?: number
 }
 
 export function buildMissions(input: MissionInput): { daily: Mission[]; weekly: Mission[]; weekDaysLeft: number; todayAnswered: number; todayCorrect: number; weekPoints: number; weekGoalDays: number } {
   const { today, days, subjects, fromCourse, subjectOfDay } = input
+  const goal = input.goal ?? DAILY_GOAL
   const todayRow = days.find((row) => row.day === today)
   const answered = todayRow?.answered ?? 0
   const correct = todayRow?.correct ?? 0
   const accuracy = answered > 0 ? Math.round((correct / answered) * 100) : 0
 
   const daily: Mission[] = [
-    { id: 'd-meta', title: `Responder a ${DAILY_GOAL} questões`, detail: null, current: Math.min(answered, DAILY_GOAL), target: DAILY_GOAL, unit: 'questões', status: answered >= DAILY_GOAL ? 'feita' : 'em_curso', href: '/aluno/simulador' },
+    { id: 'd-meta', title: `Responder a ${goal} questões`, detail: null, current: Math.min(answered, goal), target: goal, unit: 'questões', status: answered >= goal ? 'feita' : 'em_curso', href: '/aluno/simulador' },
   ]
   if (subjectOfDay) {
     daily.push({ id: 'd-disciplina', title: `${subjectOfDay.name}: ${DAILY_SUBJECT_GOAL} questões`, detail: 'Disciplina do dia', current: Math.min(subjectOfDay.answeredToday, DAILY_SUBJECT_GOAL), target: DAILY_SUBJECT_GOAL, unit: 'questões', status: subjectOfDay.answeredToday >= DAILY_SUBJECT_GOAL ? 'feita' : 'em_curso', href: `/aluno/simulador?d=${encodeURIComponent(subjectOfDay.id)}` })
   }
-  const precisionDone = answered >= DAILY_GOAL && accuracy >= DAILY_ACCURACY
-  daily.push({ id: 'd-precisao', title: `Acertar ${DAILY_ACCURACY}% hoje`, detail: answered >= DAILY_GOAL ? `${correct} certas em ${answered}` : `Conta a partir de ${DAILY_GOAL} respostas`, current: answered >= DAILY_GOAL ? accuracy : 0, target: DAILY_ACCURACY, unit: '%', status: precisionDone ? 'feita' : 'em_curso', href: '/aluno/simulador' })
+  const precisionDone = answered >= goal && accuracy >= DAILY_ACCURACY
+  daily.push({ id: 'd-precisao', title: `Acertar ${DAILY_ACCURACY}% hoje`, detail: answered >= goal ? `${correct} certas em ${answered}` : `Conta a partir de ${goal} respostas`, current: answered >= goal ? accuracy : 0, target: DAILY_ACCURACY, unit: '%', status: precisionDone ? 'feita' : 'em_curso', href: '/aluno/simulador' })
 
   const weekStart = weekStartOf(today)
   const weekRows = days.filter((row) => row.day >= weekStart && row.day <= today)
-  const weekGoalDays = weekRows.filter((row) => row.answered >= DAILY_GOAL).length
+  const weekGoalDays = weekRows.filter((row) => row.answered >= goal).length
   const weekPoints = Math.round(weekRows.reduce((sum, row) => sum + row.points, 0) * 10) / 10
   // Dias que ainda podem contar: os que faltam até domingo, sem repetir hoje se já está cumprido.
-  const todayMet = answered >= DAILY_GOAL
+  const todayMet = answered >= goal
   const weekDaysLeft = 6 - weekdayIndex(today) + (todayMet ? 0 : 1)
   const impossible = weekGoalDays + weekDaysLeft < WEEK_DAYS_GOAL
 

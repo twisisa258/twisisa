@@ -60,7 +60,7 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
         {failed || !hub ? (
           <div role="alert" className="rounded-2xl bg-white px-5 py-8 text-center shadow-[0_1px_3px_rgba(20,50,40,0.08)]">
             <h2 className="text-base font-semibold">Não foi possível carregar</h2>
-            <Link href="/aluno/simulador" className="mt-4 inline-flex h-11 items-center justify-center rounded-full bg-[#1d4d41] px-5 text-sm font-semibold text-white">Tentar de novo</Link>
+            <Link href="/aluno/simulador" className="mt-4 inline-flex h-11 items-center justify-center rounded-full bg-marca px-5 text-sm font-semibold text-white">Tentar de novo</Link>
           </div>
         ) : hub.totalQuestions === 0 || enabled.length === 0 ? (
           <EmptyState title="O Simulador abre em breve" description="Enquanto isso, estuda com os materiais da Biblioteca." actionLabel="Ver a Biblioteca" actionHref="/biblioteca" />
@@ -70,9 +70,9 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
               <Link href={`/aluno/simulador/sessao/${open.id}`} className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgba(20,50,40,0.10)] transition active:scale-[0.99]">
                 <span className="min-w-0 flex-1">
                   <span className="block text-[15px] font-semibold">Continuar</span>
-                  <span className="block truncate text-[13px] text-[#7d857e]">{MODE_META[open.mode].label}{open.subject ? ` · ${open.subject}` : ''} · {open.answered}/{open.total}</span>
+                  <span className="block truncate text-[13px] text-texto-2">{MODE_META[open.mode].label}{open.subject ? ` · ${open.subject}` : ''} · {open.answered}/{open.total}</span>
                 </span>
-                <ArrowRight size={18} className="shrink-0 text-[#1d4d41]" aria-hidden />
+                <ArrowRight size={18} className="shrink-0 text-marca" aria-hidden />
               </Link>
             )}
 
@@ -97,7 +97,7 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
             )}
 
             {modules.some((item) => item.key === 'historico' && item.status === 'active') && (
-              <Link href="/aluno/simulador/historico" className="block px-1 text-[13px] font-medium text-[#7d857e] hover:text-[#1d4d41]">Ver histórico</Link>
+              <Link href="/aluno/simulador/historico" className="block px-1 text-[13px] font-medium text-texto-2 hover:text-marca">Ver histórico</Link>
             )}
           </>
         )}

@@ -1,4 +1,4 @@
-import { DAILY_GOAL, WEEK_DAYS_GOAL, formatLeft, plural } from '@/lib/desafios-regras'
+import { WEEK_DAYS_GOAL, formatLeft, plural } from '@/lib/desafios-regras'
 import type { DesafiosSnapshot } from '@/lib/desafios'
 
 // Avisos e lembretes do aluno: cartões dinâmicos calculados a partir dos desafios (sem guardar nada).
@@ -12,7 +12,8 @@ const PRACTICE = '/aluno/simulador'
 
 export function buildAvisos(s: DesafiosSnapshot): Aviso[] {
   const avisos: Aviso[] = []
-  const left = DAILY_GOAL - s.todayAnswered
+  const goal = s.goal
+  const left = Math.max(0, goal - s.todayAnswered)
   const hoursLeft = s.secondsLeft / 3600
 
   if (s.streak.current > 0 && !s.streak.todayMet) {
@@ -35,14 +36,14 @@ export function buildAvisos(s: DesafiosSnapshot): Aviso[] {
       tone: 'warning',
       icon: 'flame',
       title: 'Perdeste a sequência',
-      text: `Eram ${plural(lost.length, 'dia seguido', 'dias seguidos')}. Voltou tudo a zero. Recomeça hoje.`,
+      text: `Chegaste a ${plural(lost.length, 'dia seguido', 'dias seguidos')}, e isso conta. Hoje começas outra, com a mesma meta.`,
       href: PRACTICE,
       cta: 'Recomeçar',
     })
   } else if (s.daysSinceActive === null) {
-    avisos.push({ id: 'first', tone: 'info', icon: 'target', title: 'Ainda não praticaste', text: `Faz as primeiras ${DAILY_GOAL} questões. Leva poucos minutos.`, href: PRACTICE, cta: 'Começar' })
+    avisos.push({ id: 'first', tone: 'info', icon: 'target', title: 'Ainda não praticaste', text: `Faz as primeiras ${goal} questões. Leva poucos minutos.`, href: PRACTICE, cta: 'Começar' })
   } else if (s.daysSinceActive >= 2) {
-    avisos.push({ id: 'inactive', tone: 'warning', icon: 'clock', title: `Há ${plural(s.daysSinceActive, 'dia', 'dias')} sem praticar`, text: `O teu ritmo está a cair. Faz as ${DAILY_GOAL} questões de hoje.`, href: PRACTICE, cta: 'Praticar' })
+    avisos.push({ id: 'inactive', tone: 'warning', icon: 'clock', title: `Há ${plural(s.daysSinceActive, 'dia', 'dias')} sem praticar`, text: `O teu ritmo está a cair. Faz as ${goal} questões de hoje.`, href: PRACTICE, cta: 'Praticar' })
   }
 
   if (s.admission && !s.course) {
@@ -64,9 +65,9 @@ export function buildAvisos(s: DesafiosSnapshot): Aviso[] {
   }
 
   if (s.streak.todayMet) {
-    avisos.push({ id: 'done', tone: 'success', icon: 'check', title: 'Meta de hoje cumprida', text: `Sequência: ${plural(s.streak.current, 'dia', 'dias')}. Amanhã a meta volta a ser ${DAILY_GOAL} questões.`, href: '/aluno/desafios', cta: 'Ver desafios' })
+    avisos.push({ id: 'done', tone: 'success', icon: 'check', title: 'Meta de hoje cumprida', text: `Sequência: ${plural(s.streak.current, 'dia', 'dias')}. Amanhã a meta volta a ser ${goal} questões.`, href: '/aluno/desafios', cta: 'Ver desafios' })
   } else if (s.streak.current === 0 && s.todayAnswered > 0) {
-    avisos.push({ id: 'daily', tone: 'info', icon: 'target', title: 'Meta de hoje', text: `${s.todayAnswered} de ${DAILY_GOAL} questões. Faltam ${left}.`, href: PRACTICE, cta: 'Continuar' })
+    avisos.push({ id: 'daily', tone: 'info', icon: 'target', title: 'Meta de hoje', text: `${s.todayAnswered} de ${goal} questões. Faltam ${left}.`, href: PRACTICE, cta: 'Continuar' })
   }
   return avisos
 }

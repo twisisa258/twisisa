@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { BookOpen, ClipboardCheck, Flame, LayoutDashboard, Sparkles, Trophy, UserRound } from 'lucide-react'
+import { BookOpen, Bookmark, ClipboardCheck, Flame, LayoutDashboard, Library, Sparkles, Trophy, UserRound } from 'lucide-react'
 
 // Menu único do estudante: o computador (StudentSidebar) e o telemóvel (StudentMobileSidebar) usam esta mesma lista,
 // por isso todas as páginas do estudante têm as mesmas ligações, na mesma ordem e com a página atual marcada.
@@ -13,6 +13,12 @@ const MAIN = [
   { href: '/aluno/desafios', label: 'Desafios', icon: Flame },
   { href: '/aluno/ranking', label: 'Ranking', icon: Trophy },
   { href: '/jonas', label: 'Jonas', icon: Sparkles },
+] as const
+
+// O que o aluno guardou: questões para rever e materiais da Biblioteca.
+const SAVED = [
+  { href: '/aluno/estudar-depois', label: 'Estudar depois', icon: Bookmark },
+  { href: '/aluno/favoritos', label: 'Materiais guardados', icon: Library },
 ] as const
 
 const PERSONAL = [
@@ -30,7 +36,7 @@ function Group({ label, items, onNavigate }: { label: string; items: readonly It
   const pathname = usePathname()
   return (
     <div>
-      <p className="px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#929991]">{label}</p>
+      <p className="px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-texto-2">{label}</p>
       <nav className="mt-3 flex flex-col gap-1" aria-label={label}>
         {items.map((item) => {
           const active = isActive(pathname, item)
@@ -43,8 +49,8 @@ function Group({ label, items, onNavigate }: { label: string; items: readonly It
               aria-current={active ? 'page' : undefined}
               className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
                 active
-                  ? 'bg-gradient-to-br from-[#2a6a57] to-[#1d4d41] font-medium text-white shadow-[0_6px_16px_-8px_rgba(29,77,65,0.7)]'
-                  : 'text-[#68716a] hover:bg-white hover:text-[#1d4d41]'
+                  ? 'bg-gradient-to-br from-[#2a6a57] to-marca font-medium text-white shadow-[0_6px_16px_-8px_rgba(29,77,65,0.7)]'
+                  : 'text-texto-2 hover:bg-white hover:text-marca'
               }`}
             >
               <Icon size={17} />
@@ -61,6 +67,7 @@ export function StudentNavGroups({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex flex-1 flex-col gap-8">
       <Group label="Estudar" items={MAIN} onNavigate={onNavigate} />
+      <Group label="Guardado" items={SAVED} onNavigate={onNavigate} />
       <Group label="A minha conta" items={PERSONAL} onNavigate={onNavigate} />
     </div>
   )

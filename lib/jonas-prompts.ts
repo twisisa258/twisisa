@@ -45,8 +45,8 @@ ${lines.length ? `\nContexto do aluno:\n${lines.join('\n')}` : ''}`
 
 // ───────────── Explicação de uma questão do Simulador ─────────────
 
-export type ExplainAction = 'passo' | 'devagar' | 'exemplo' | 'outras' | 'resumo' | 'pergunta'
-export const EXPLAIN_ACTIONS: ExplainAction[] = ['passo', 'devagar', 'exemplo', 'outras', 'resumo', 'pergunta']
+export type ExplainAction = 'passo' | 'devagar' | 'exemplo' | 'outras' | 'resumo' | 'porque' | 'pergunta'
+export const EXPLAIN_ACTIONS: ExplainAction[] = ['passo', 'devagar', 'exemplo', 'outras', 'resumo', 'porque', 'pergunta']
 export const isExplainAction = (value: unknown): value is ExplainAction => EXPLAIN_ACTIONS.includes(value as ExplainAction)
 
 /** O que o aluno vê (e fica guardado) quando toca num atalho. */
@@ -56,6 +56,7 @@ export const EXPLAIN_LABELS: Record<Exclude<ExplainAction, 'pergunta'>, string> 
   exemplo: 'Dá-me um exemplo parecido.',
   outras: 'Porque é que as outras opções estão erradas?',
   resumo: 'Faz-me um resumo do que preciso de saber.',
+  porque: 'Porque é que errei?',
 }
 
 const EXPLAIN_INSTRUCTIONS: Record<Exclude<ExplainAction, 'pergunta'>, (wasCorrect: boolean) => string> = {
@@ -67,6 +68,10 @@ const EXPLAIN_INSTRUCTIONS: Record<Exclude<ExplainAction, 'pergunta'>, (wasCorre
   exemplo: () => 'Cria um exercício novo, parecido mas com números e contexto diferentes, e resolve-o passo a passo. Não repitas esta questão.',
   outras: () => 'Explica, uma a uma e em frases curtas, porque é que cada uma das outras opções está errada (e que engano comum leva a escolhê-la).',
   resumo: () => 'Resume em no máximo 3 pontos o que o aluno precisa de saber para resolver questões deste tipo.',
+  porque: (wasCorrect) =>
+    wasCorrect
+      ? 'O aluno acertou. Diz em duas frases o que o terá feito escolher bem e que armadilha desta questão convém continuar a evitar.'
+      : 'O aluno errou. Em no máximo 4 frases curtas e sem culpar: (1) diz qual foi provavelmente o raciocínio que levou à opção que escolheu; (2) mostra em que passo esse raciocínio falha; (3) dá um hábito simples para não repetir o engano (ex.: confirmar o sinal, as unidades, reler o que se pede). Se a opção escolhida corresponde a um erro típico, dá-lhe nome. Não resolvas a questão toda: o aluno pode pedir o passo a passo a seguir.',
 }
 
 export type ExplainQuestion = {

@@ -104,7 +104,7 @@ export function LibrarySearch({ scope, initialQuery = '', placeholder = 'Pesquis
           event.preventDefault()
           run(value)
         }}
-        className="flex h-12 items-center gap-3 rounded-2xl bg-white px-3.5 shadow-[0_1px_2px_rgba(20,50,40,0.05),0_10px_26px_-14px_rgba(20,50,40,0.22)] focus-within:ring-2 focus-within:ring-[#1d4d41]/25"
+        className="flex h-12 items-center gap-3 rounded-2xl bg-white px-3.5 shadow-[0_1px_2px_rgba(20,50,40,0.05),0_10px_26px_-14px_rgba(20,50,40,0.22)] focus-within:ring-2 focus-within:ring-marca/25"
       >
         <Search size={18} className="shrink-0 text-[#5f6a63]" aria-hidden="true" />
         <input
@@ -135,7 +135,7 @@ export function LibrarySearch({ scope, initialQuery = '', placeholder = 'Pesquis
               setOpen(true)
             }}
             aria-label="Limpar pesquisa"
-            className="flex size-8 shrink-0 items-center justify-center rounded-full text-[#788178] hover:bg-[#f1f4ef]"
+            className="flex size-8 shrink-0 items-center justify-center rounded-full text-texto-2 hover:bg-[#f1f4ef]"
           >
             <X size={16} />
           </button>
@@ -155,31 +155,31 @@ export function LibrarySearch({ scope, initialQuery = '', placeholder = 'Pesquis
               <li key={row.key} role="presentation">
                 {heading === 'recent' && (
                   <div className="flex items-center justify-between px-3 pb-1 pt-2">
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#929991]">Recentes</span>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-texto-2">Recentes</span>
                     {!term && (
-                      <button type="button" onClick={() => void clearHistory()} className="text-[11px] font-semibold text-[#1d4d41]">
+                      <button type="button" onClick={() => void clearHistory()} className="text-[11px] font-semibold text-marca">
                         Limpar
                       </button>
                     )}
                   </div>
                 )}
-                {heading === 'popular' && <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#929991]">Em alta</p>}
-                {heading === 'item' && <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#929991]">Materiais</p>}
+                {heading === 'popular' && <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-texto-2">Em alta</p>}
+                {heading === 'item' && <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-texto-2">Materiais</p>}
                 <button
                   type="button"
                   role="option"
                   aria-selected={index === active}
                   onClick={() => run(row.term)}
                   onPointerMove={() => setActive(index)}
-                  className={`flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2 text-left ${index === active ? 'bg-[#f1f4ef]' : ''} ${row.kind === 'all' ? 'font-semibold text-[#1d4d41]' : 'text-[#202321]'}`}
+                  className={`flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2 text-left ${index === active ? 'bg-[#f1f4ef]' : ''} ${row.kind === 'all' ? 'font-semibold text-marca' : 'text-texto'}`}
                 >
-                  {row.kind === 'recent' && <Clock size={16} className="shrink-0 text-[#788178]" />}
-                  {row.kind === 'popular' && <TrendingUp size={16} className="shrink-0 text-[#788178]" />}
-                  {row.kind === 'item' && <FileText size={16} className="shrink-0 text-[#788178]" />}
+                  {row.kind === 'recent' && <Clock size={16} className="shrink-0 text-texto-2" />}
+                  {row.kind === 'popular' && <TrendingUp size={16} className="shrink-0 text-texto-2" />}
+                  {row.kind === 'item' && <FileText size={16} className="shrink-0 text-texto-2" />}
                   {row.kind === 'all' && <Search size={16} className="shrink-0" />}
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm">{row.label}</span>
-                    {row.meta && <span className="block truncate text-xs text-[#788178]">{row.meta}</span>}
+                    {row.meta && <span className="block truncate text-xs text-texto-2">{row.meta}</span>}
                   </span>
                 </button>
               </li>

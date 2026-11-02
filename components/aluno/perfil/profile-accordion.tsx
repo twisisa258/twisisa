@@ -63,15 +63,15 @@ export function ProfileAccordion({ items }: { items: AccordionItem[] }) {
                   aria-expanded={open}
                   aria-controls={`perfil-${item.id}-painel`}
                   onClick={() => setOpenId(open ? null : item.id)}
-                  className="flex min-h-[68px] w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#f8f8f5] focus-visible:bg-[#f8f8f5] focus-visible:outline-none sm:px-5"
+                  className="flex min-h-[68px] w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-fundo focus-visible:bg-fundo focus-visible:outline-none sm:px-5"
                 >
-                  <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#eef3ee] text-[#1d4d41] [&>svg]:size-[18px]">{item.icon}</span>
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#eef3ee] text-marca [&>svg]:size-[18px]">{item.icon}</span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-semibold text-[#202321]">{item.title}</span>
-                    <span className={`block truncate text-xs ${flash ? 'font-semibold text-[#1d4d41]' : 'text-[#68716a]'}`}>{flash ? 'Guardado' : item.summary}</span>
+                    <span className="block text-sm font-semibold text-texto">{item.title}</span>
+                    <span className={`block truncate text-xs ${flash ? 'font-semibold text-marca' : 'text-texto-2'}`}>{flash ? 'Guardado' : item.summary}</span>
                   </span>
                   {item.done === true && (
-                    <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#1d4d41] text-white" role="img" aria-label="Completo"><Check size={12} strokeWidth={3} aria-hidden="true" /></span>
+                    <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-marca text-white" role="img" aria-label="Completo"><Check size={12} strokeWidth={3} aria-hidden="true" /></span>
                   )}
                   {item.done === false && <span className="size-5 shrink-0 rounded-full border-[1.5px] border-dashed border-[#b9c0b4]" role="img" aria-label="Por completar" />}
                   <ChevronDown size={18} aria-hidden="true" className={`shrink-0 text-[#9aa29c] transition-transform duration-200 motion-reduce:transition-none ${open ? 'rotate-180' : ''}`} />

@@ -95,7 +95,7 @@ export function RowMenu({ label, items }: { label: string; items: RowMenuItem[] 
   }
 
   const row = 'flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm disabled:cursor-not-allowed disabled:opacity-40'
-  const tone = (item: RowMenuItem) => (item.tone === 'danger' ? 'text-[#9a3030] hover:bg-[#fbeeee]' : 'text-[#2f3a33] hover:bg-[#f1f4ef]')
+  const tone = (item: RowMenuItem) => (item.tone === 'danger' ? 'text-erro-texto hover:bg-[#fbeeee]' : 'text-[#2f3a33] hover:bg-[#f1f4ef]')
 
   return (
     <div ref={rootRef} className="relative shrink-0">
@@ -111,13 +111,13 @@ export function RowMenu({ label, items }: { label: string; items: RowMenuItem[] 
         <MoreVertical size={18} aria-hidden="true" />
       </button>
       {open && pos && (
-        <div role="menu" aria-label={label} style={pos} className="fixed z-30 w-52 rounded-xl border border-[#e3e5dc] bg-white p-1 shadow-lg">
+        <div role="menu" aria-label={label} style={pos} className="fixed z-30 w-52 rounded-xl border border-linha bg-white p-1 shadow-lg">
           {items.map((item, index) =>
             confirming === index ? (
               <div key={item.label} className="p-2">
                 <p className="text-xs font-medium text-[#2f3a33]">{item.label}?</p>
                 <div className="mt-2 flex gap-1.5">
-                  <button type="button" onClick={() => run(item)} disabled={pending} className={`rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60 ${item.tone === 'danger' ? 'bg-[#9a3030] hover:bg-[#7f2626]' : 'bg-[#1d4d41] hover:bg-[#163e34]'}`}>{pending ? 'A processar…' : item.confirm}</button>
+                  <button type="button" onClick={() => run(item)} disabled={pending} className={`rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60 ${item.tone === 'danger' ? 'bg-erro-texto hover:bg-[#7f2626]' : 'bg-marca hover:bg-marca-escura'}`}>{pending ? 'A processar…' : item.confirm}</button>
                   <button type="button" onClick={() => setConfirming(null)} disabled={pending} className="rounded-lg px-3 py-1.5 text-xs font-semibold text-[#526057] hover:bg-[#f1f4ef]">Cancelar</button>
                 </div>
               </div>

@@ -4,7 +4,7 @@ import { StudentSidebarSkeleton } from './student-shell'
 /** /aluno usa o mesmo menu das outras páginas do estudante, mas o seu próprio cabeçalho. O cartão «Continuar» só existe quando há o que continuar, por isso não aparece aqui. */
 export function AlunoSkeleton() {
   return (
-    <main role="status" aria-live="polite" aria-busy="true" aria-label="A carregar o teu painel" className="min-h-screen max-w-full overflow-x-hidden bg-[#f8f8f5]">
+    <main role="status" aria-live="polite" aria-busy="true" aria-label="A carregar o teu painel" className="min-h-screen max-w-full overflow-x-hidden bg-fundo">
       <div className="flex min-h-screen">
         <StudentSidebarSkeleton />
         <div className="w-0 min-w-0 flex-1 overflow-x-clip">

@@ -44,7 +44,7 @@ export default async function NovoMaterialPage() {
         icon={Upload}
         title="Adicionar materiais"
         description="Escolhe vários ficheiros ou uma pasta e classifica tudo de uma vez."
-        action={<Link href="/admin/materiais" className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-[#c9d7cd] bg-white/80 px-4 text-sm font-semibold text-[#1d4d41] shadow-sm hover:bg-white"><ArrowLeft size={16} aria-hidden="true" />Materiais</Link>}
+        action={<Link href="/admin/materiais" className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-[#c9d7cd] bg-white/80 px-4 text-sm font-semibold text-marca shadow-sm hover:bg-white"><ArrowLeft size={16} aria-hidden="true" />Materiais</Link>}
       />
       {catalog ? <MaterialBulk catalog={catalog} /> : <AdminLoadError href="/admin/materiais/novo" />}
     </AdminPage>

@@ -267,7 +267,7 @@ export function JonasChat({ firstName, trackLabel, subjects, initialConversation
   const empty = messages.length === 0
 
   return (
-    <div className="fixed inset-0 flex bg-[#f8f8f5] text-[#202321]">
+    <div className="fixed inset-0 flex bg-fundo text-texto">
       {drawer && <button type="button" aria-label="Fechar o histórico" onClick={() => setDrawer(false)} className="fixed inset-0 z-30 bg-black/30 lg:hidden" />}
 
       <aside
@@ -280,14 +280,14 @@ export function JonasChat({ firstName, trackLabel, subjects, initialConversation
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex min-h-14 shrink-0 items-center gap-1 border-b border-[#eceee7] bg-[#f8f8f5]/95 px-2 pt-[env(safe-area-inset-top)] backdrop-blur sm:px-4">
+        <header className="flex min-h-14 shrink-0 items-center gap-1 border-b border-[#eceee7] bg-fundo/95 px-2 pt-[env(safe-area-inset-top)] backdrop-blur sm:px-4">
           <Link href="/aluno" aria-label="Voltar ao painel" className="flex size-10 shrink-0 items-center justify-center rounded-full text-[#5d675f] hover:bg-[#eceee7]"><ArrowLeft size={19} aria-hidden="true" /></Link>
           <button type="button" onClick={toggleSidebar} aria-label="Abrir ou fechar o histórico" className="flex size-10 shrink-0 items-center justify-center rounded-full text-[#5d675f] hover:bg-[#eceee7]"><PanelLeft size={19} aria-hidden="true" /></button>
           <div className="min-w-0 flex-1 px-1.5">
             <h1 className="truncate text-[15px] font-semibold leading-5">{active?.title ?? 'Jonas'}</h1>
             {subjectName && <p className="truncate text-[11.5px] leading-4 text-[#7d887f]">{subjectName}</p>}
           </div>
-          <button type="button" onClick={newChat} aria-label="Nova conversa" className="flex size-10 shrink-0 items-center justify-center rounded-full text-[#1d4d41] hover:bg-[#e4ece6]"><SquarePen size={19} aria-hidden="true" /></button>
+          <button type="button" onClick={newChat} aria-label="Nova conversa" className="flex size-10 shrink-0 items-center justify-center rounded-full text-marca hover:bg-[#e4ece6]"><SquarePen size={19} aria-hidden="true" /></button>
         </header>
 
         <div ref={scroller} onScroll={onScroll} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
@@ -303,7 +303,7 @@ export function JonasChat({ firstName, trackLabel, subjects, initialConversation
                 {subjects.length > 0 && (
                   <label className="mt-5 block">
                     <span className="sr-only">Disciplina (opcional)</span>
-                    <select value={subjectId ?? ''} onChange={(event) => setSubjectId(event.target.value || null)} className="h-10 w-full max-w-xs rounded-xl border border-[#dfe3d9] bg-white px-3 text-[14px] text-[#202321] outline-none focus:border-[#1d4d41]">
+                    <select value={subjectId ?? ''} onChange={(event) => setSubjectId(event.target.value || null)} className="h-10 w-full max-w-xs rounded-xl border border-[#dfe3d9] bg-white px-3 text-[14px] text-texto outline-none focus:border-marca">
                       <option value="">Todas as disciplinas</option>
                       {subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name}</option>)}
                     </select>
@@ -312,7 +312,7 @@ export function JonasChat({ firstName, trackLabel, subjects, initialConversation
                 <ul className="mt-5 space-y-2">
                   {STARTERS.map(({ text, prefill }) => (
                     <li key={text}>
-                      <button type="button" onClick={() => fill(prefill(subjects.find((item) => item.id === subjectId)?.name ?? null))} className="w-full rounded-xl border border-[#e1e4db] bg-white px-4 py-3 text-left text-[14.5px] leading-5 text-[#202321] transition hover:border-[#1d4d41]/40 active:scale-[0.99]">{text}</button>
+                      <button type="button" onClick={() => fill(prefill(subjects.find((item) => item.id === subjectId)?.name ?? null))} className="w-full rounded-xl border border-[#e1e4db] bg-white px-4 py-3 text-left text-[14.5px] leading-5 text-texto transition hover:border-marca/40 active:scale-[0.99]">{text}</button>
                     </li>
                   ))}
                 </ul>
@@ -324,7 +324,7 @@ export function JonasChat({ firstName, trackLabel, subjects, initialConversation
                   if (message.role === 'user') {
                     return (
                       <li key={message.id} className="flex justify-end">
-                        <div className="max-w-[88%] whitespace-pre-wrap break-words rounded-2xl rounded-br-md bg-gradient-to-br from-[#2f7260] to-[#1d4d41] px-4 py-2.5 text-[15.5px] leading-6 text-white">{message.content}</div>
+                        <div className="max-w-[88%] whitespace-pre-wrap break-words rounded-2xl rounded-br-md bg-gradient-to-br from-[#2f7260] to-marca px-4 py-2.5 text-[15.5px] leading-6 text-white">{message.content}</div>
                       </li>
                     )
                   }
@@ -338,7 +338,7 @@ export function JonasChat({ firstName, trackLabel, subjects, initialConversation
                           <div className="-ml-2.5 mt-1.5 flex items-center gap-1">
                             <CopyButton text={message.content} />
                             {isLast && !streaming && (
-                              <button type="button" onClick={() => void send('', true)} className="inline-flex h-8 items-center gap-1.5 rounded-full px-2.5 text-xs font-semibold text-[#68716a] transition-colors hover:bg-[#eef1e9] hover:text-[#1d4d41]"><RotateCcw size={13} aria-hidden="true" />Responder de novo</button>
+                              <button type="button" onClick={() => void send('', true)} className="inline-flex h-8 items-center gap-1.5 rounded-full px-2.5 text-xs font-semibold text-texto-2 transition-colors hover:bg-[#eef1e9] hover:text-marca"><RotateCcw size={13} aria-hidden="true" />Responder de novo</button>
                             )}
                           </div>
                         )}
@@ -351,10 +351,10 @@ export function JonasChat({ firstName, trackLabel, subjects, initialConversation
           </div>
         </div>
 
-        <div className="relative shrink-0 bg-gradient-to-t from-[#f8f8f5] via-[#f8f8f5] to-transparent px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 sm:px-6">
+        <div className="relative shrink-0 bg-gradient-to-t from-fundo via-fundo to-transparent px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 sm:px-6">
           <div className="mx-auto w-full max-w-[760px]">
             {showJump && !empty && (
-              <button type="button" onClick={jumpToEnd} aria-label="Ir para o fim da conversa" className="absolute -top-11 left-1/2 flex size-9 -translate-x-1/2 items-center justify-center rounded-full bg-white text-[#1d4d41] shadow-[0_2px_10px_rgba(20,50,40,0.18)] ring-1 ring-black/[0.05]"><ArrowDown size={17} aria-hidden="true" /></button>
+              <button type="button" onClick={jumpToEnd} aria-label="Ir para o fim da conversa" className="absolute -top-11 left-1/2 flex size-9 -translate-x-1/2 items-center justify-center rounded-full bg-white text-marca shadow-[0_2px_10px_rgba(20,50,40,0.18)] ring-1 ring-black/[0.05]"><ArrowDown size={17} aria-hidden="true" /></button>
             )}
             {error && (
               <div role="alert" className="mb-2 flex items-center gap-2 rounded-2xl bg-[#fcefee] py-2 pl-4 pr-2 text-[13.5px] text-[#8e3730]">
@@ -363,13 +363,13 @@ export function JonasChat({ firstName, trackLabel, subjects, initialConversation
                 <button type="button" onClick={() => setError(null)} aria-label="Fechar o aviso" className="flex size-8 shrink-0 items-center justify-center rounded-full hover:bg-white/70"><X size={15} aria-hidden="true" /></button>
               </div>
             )}
-            <form onSubmit={submit} className="flex items-end gap-2 rounded-[26px] bg-white p-2 shadow-[0_2px_12px_rgba(20,50,40,0.10)] ring-1 ring-black/[0.05] focus-within:ring-2 focus-within:ring-[#1d4d41]/25">
+            <form onSubmit={submit} className="flex items-end gap-2 rounded-[26px] bg-white p-2 shadow-[0_2px_12px_rgba(20,50,40,0.10)] ring-1 ring-black/[0.05] focus-within:ring-2 focus-within:ring-marca/25">
               <label htmlFor="jonas-input" className="sr-only">Mensagem para o Jonas</label>
               <textarea id="jonas-input" ref={textarea} rows={1} value={input} maxLength={4000} onChange={(event) => setInput(event.target.value)} onKeyDown={onKeyDown} placeholder={empty ? 'Escreve a tua dúvida…' : 'Continua a conversa…'} className="max-h-44 min-h-10 min-w-0 flex-1 resize-none bg-transparent px-3 py-2 text-[15.5px] leading-6 outline-none placeholder:text-[#98a19a]" />
               {streaming ? (
                 <button type="button" onClick={stop} aria-label="Parar a resposta" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#202923] text-white"><Square size={13} fill="currentColor" aria-hidden="true" /></button>
               ) : (
-                <button type="submit" disabled={!input.trim() || opening} aria-label="Enviar mensagem" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2f7260] to-[#1d4d41] text-white shadow-[0_2px_6px_rgba(29,77,65,0.25)] transition disabled:opacity-35 disabled:shadow-none"><ArrowUp size={18} aria-hidden="true" /></button>
+                <button type="submit" disabled={!input.trim() || opening} aria-label="Enviar mensagem" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2f7260] to-marca text-white shadow-[0_2px_6px_rgba(29,77,65,0.25)] transition disabled:opacity-35 disabled:shadow-none"><ArrowUp size={18} aria-hidden="true" /></button>
               )}
             </form>
             <p className="mt-2 text-center text-[11px] text-[#8a948c]">O Jonas pode errar. Confirma sempre com o teu professor.</p>

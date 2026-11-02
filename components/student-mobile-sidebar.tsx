@@ -36,7 +36,7 @@ export function StudentMobileSidebar({ firstName, image = null, open, onClose }:
       <aside className="relative flex h-full w-[min(86vw,360px)] min-w-0 max-w-full flex-col overflow-y-auto overflow-x-hidden bg-[#f3f4ef] px-4 py-5 shadow-2xl">
         <div className="flex items-center justify-between px-3">
           <Link href="/aluno" onClick={onClose} className="text-lg font-semibold tracking-[-0.04em]">Twisisa</Link>
-          <button type="button" aria-label="Fechar menu" onClick={onClose} className="flex size-9 items-center justify-center rounded-full text-[#68716a] transition-colors hover:bg-white hover:text-[#1d4d41]"><X /></button>
+          <button type="button" aria-label="Fechar menu" onClick={onClose} className="flex size-9 items-center justify-center rounded-full text-texto-2 transition-colors hover:bg-white hover:text-marca"><X /></button>
         </div>
         <div className="mt-10 flex flex-1 flex-col">
           <StudentNavGroups onNavigate={onClose} />

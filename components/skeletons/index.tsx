@@ -5,7 +5,7 @@ export { Skeleton, SkeletonRegion }
 /** Cartão de módulo (página Exames). */
 export function ModuleCardSkeleton() {
   return (
-    <div className="rounded-3xl border border-[#e3e5dc] bg-white p-4">
+    <div className="rounded-3xl border border-linha bg-white p-4">
       <Skeleton className="size-11 rounded-2xl" />
       <Skeleton className="mt-4 h-4 w-2/3" />
       <Skeleton className="mt-2 h-3 w-full" />
@@ -17,7 +17,7 @@ export function ModuleCardSkeleton() {
 /** Cartão de instituição: logótipo + sigla. */
 export function InstitutionCardSkeleton() {
   return (
-    <div className="flex items-center gap-3 rounded-3xl border border-[#e3e5dc] bg-white p-4">
+    <div className="flex items-center gap-3 rounded-3xl border border-linha bg-white p-4">
       <Skeleton className="size-14 shrink-0 rounded-2xl" />
       <div className="flex-1">
         <Skeleton className="h-4 w-16" />
@@ -31,7 +31,7 @@ export function InstitutionCardSkeleton() {
 /** Linha de lista genérica (histórico, erros, materiais). */
 export function ListRowSkeleton() {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-[#e3e5dc] bg-white p-3">
+    <div className="flex items-center gap-3 rounded-2xl border border-linha bg-white p-3">
       <Skeleton className="size-10 shrink-0 rounded-xl" />
       <div className="flex-1">
         <Skeleton className="h-4 w-3/5" />
@@ -45,7 +45,7 @@ export function ListRowSkeleton() {
 /** Linha de ranking: posição, nome e pontos. */
 export function RankingRowSkeleton() {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-[#e3e5dc] bg-white p-3">
+    <div className="flex items-center gap-3 rounded-2xl border border-linha bg-white p-3">
       <Skeleton className="size-8 shrink-0 rounded-full" />
       <Skeleton className="size-10 shrink-0 rounded-full" />
       <div className="flex-1">
@@ -60,7 +60,7 @@ export function RankingRowSkeleton() {
 /** Questão com quatro opções. */
 export function QuestionSkeleton({ options = 4 }: { options?: number }) {
   return (
-    <div className="rounded-3xl border border-[#e3e5dc] bg-white p-5">
+    <div className="rounded-3xl border border-linha bg-white p-5">
       <Skeleton className="h-3 w-24" />
       <Skeleton className="mt-4 h-5 w-full" />
       <Skeleton className="mt-2 h-5 w-5/6" />
@@ -76,8 +76,8 @@ export function QuestionSkeleton({ options = 4 }: { options?: number }) {
 /** Tabela do admin. */
 export function AdminTableSkeleton({ rows = 6, columns = 4 }: { rows?: number; columns?: number }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-[#e3e5dc] bg-white">
-      <div className="flex gap-4 border-b border-[#e3e5dc] bg-[#f8f8f5] p-3">
+    <div className="overflow-hidden rounded-2xl border border-linha bg-white">
+      <div className="flex gap-4 border-b border-linha bg-fundo p-3">
         {Array.from({ length: columns }).map((_, i) => (
           <Skeleton key={i} className="h-3 flex-1" />
         ))}

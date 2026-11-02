@@ -15,8 +15,8 @@ export function ChipRow({ label, chips }: { label: string; chips: Chip[] }) {
               aria-current={chip.active ? 'true' : undefined}
               className={`inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 text-[13px] font-semibold ${
                 chip.active
-                  ? 'bg-gradient-to-br from-[#2a6a57] to-[#1d4d41] text-white shadow-[0_6px_16px_-8px_rgba(29,77,65,0.7)]'
-                  : 'bg-white text-[#465249] shadow-[0_1px_2px_rgba(20,50,40,0.05),0_8px_20px_-14px_rgba(20,50,40,0.25)] hover:text-[#1d4d41]'
+                  ? 'bg-gradient-to-br from-[#2a6a57] to-marca text-white shadow-[0_6px_16px_-8px_rgba(29,77,65,0.7)]'
+                  : 'bg-white text-[#465249] shadow-[0_1px_2px_rgba(20,50,40,0.05),0_8px_20px_-14px_rgba(20,50,40,0.25)] hover:text-marca'
               }`}
             >
               {chip.label}

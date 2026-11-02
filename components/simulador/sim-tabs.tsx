@@ -14,7 +14,7 @@ export function SimTabs({ active }: { active: (typeof TABS)[number]['key'] }) {
           key={key}
           href={href}
           aria-current={key === active ? 'page' : undefined}
-          className={cn('-mb-px border-b-2 pb-3 text-[15px] font-medium transition-colors', key === active ? 'border-[#1d4d41] text-[#1d4d41]' : 'border-transparent text-[#8a928b] hover:text-[#1d4d41]')}
+          className={cn('-mb-px border-b-2 pb-3 text-[15px] font-medium transition-colors', key === active ? 'border-marca text-marca' : 'border-transparent text-[#8a928b] hover:text-marca')}
         >
           {label}
         </Link>

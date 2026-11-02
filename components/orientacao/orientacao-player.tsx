@@ -10,7 +10,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { ANSWER_OPTIONS } from '@/lib/orientacao-shared'
 import { cn } from '@/lib/utils'
 
-const focusRing = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d4d41]'
+const focusRing = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca'
 
 // Uma pergunta por ecrã, três respostas. Cada resposta é guardada no servidor ao tocar: fechar o separador não perde nada
 // e o Início mostra «Continuar». Voltar atrás mantém as respostas e deixa mudar.
@@ -58,7 +58,7 @@ export function OrientacaoPlayer({ attemptId, questions, initial }: { attemptId:
   }
 
   return (
-    <main className="fixed inset-0 flex flex-col bg-[#f8f8f5] text-[#202321]">
+    <main className="fixed inset-0 flex flex-col bg-fundo text-texto">
       <header className="flex-none px-4 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <div className="mx-auto flex w-full max-w-[560px] items-center gap-2">
           <button
@@ -78,7 +78,7 @@ export function OrientacaoPlayer({ attemptId, questions, initial }: { attemptId:
           </Link>
         </div>
         <div role="progressbar" aria-label="Respondidas" aria-valuemin={0} aria-valuemax={total} aria-valuenow={answered} className="mx-auto mt-1 h-[6px] w-full max-w-[560px] overflow-hidden rounded-[3px] bg-[#e3e9df]">
-          <div className="h-full rounded-[3px] bg-[#1d4d41] transition-[width]" style={{ width: `${total > 0 ? (answered / total) * 100 : 0}%` }} />
+          <div className="h-full rounded-[3px] bg-marca transition-[width]" style={{ width: `${total > 0 ? (answered / total) * 100 : 0}%` }} />
         </div>
       </header>
 
@@ -86,7 +86,7 @@ export function OrientacaoPlayer({ attemptId, questions, initial }: { attemptId:
         <div className="mx-auto flex min-h-full w-full max-w-[560px] flex-col justify-center px-4 py-6">
           {question ? (
             <>
-              <p className="text-[14px] text-[#6b756e]">Gostas de…</p>
+              <p className="text-[14px] text-texto-2">Gostas de…</p>
               <h1 className="mt-2 text-[24px] font-semibold leading-[1.25] tracking-[-0.02em]">{question.body}</h1>
               <div className="mt-8 flex flex-col gap-3" role="group" aria-label="Resposta">
                 {ANSWER_OPTIONS.map((option) => {
@@ -100,7 +100,7 @@ export function OrientacaoPlayer({ attemptId, questions, initial }: { attemptId:
                       aria-pressed={selected}
                       className={cn(
                         'flex min-h-[56px] w-full items-center justify-between gap-3 rounded-2xl px-5 text-left text-[16px] font-semibold transition active:scale-[0.99] disabled:opacity-70',
-                        selected ? 'bg-[#1d4d41] text-white' : 'bg-white text-[#202321] shadow-[0_1px_2px_rgba(20,50,40,0.08)] ring-1 ring-[#1d4d41]/10',
+                        selected ? 'bg-marca text-white' : 'bg-white text-texto shadow-[0_1px_2px_rgba(20,50,40,0.08)] ring-1 ring-marca/10',
                         focusRing,
                       )}
                     >
@@ -113,7 +113,7 @@ export function OrientacaoPlayer({ attemptId, questions, initial }: { attemptId:
             </>
           ) : (
             <div className="text-center">
-              <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-[#d6e6dc] text-[#1d4d41]">
+              <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-[#d6e6dc] text-marca">
                 <Check size={26} aria-hidden />
               </span>
               <h1 className="mt-5 text-[24px] font-semibold tracking-[-0.02em]">Terminaste</h1>
@@ -123,7 +123,7 @@ export function OrientacaoPlayer({ attemptId, questions, initial }: { attemptId:
                 onClick={finish}
                 disabled={busy}
                 aria-busy={finishing}
-                className={cn('mt-8 inline-flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-[#1d4d41] px-6 text-[16px] font-semibold text-white disabled:opacity-70', focusRing)}
+                className={cn('mt-8 inline-flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-marca px-6 text-[16px] font-semibold text-white disabled:opacity-70', focusRing)}
               >
                 {finishing ? (
                   <>

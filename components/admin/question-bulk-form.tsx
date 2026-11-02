@@ -20,8 +20,8 @@ type Selection = {
 const SelectionContext = createContext<Selection | null>(null)
 
 const btn = 'inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-40'
-const btnSolid = `${btn} bg-[#1d4d41] text-white hover:bg-[#163e34]`
-const btnLine = `${btn} border border-[#c9d7cd] bg-white text-[#1d4d41] hover:bg-[#f1f4ef]`
+const btnSolid = `${btn} bg-marca text-white hover:bg-marca-escura`
+const btnLine = `${btn} border border-[#c9d7cd] bg-white text-marca hover:bg-[#f1f4ef]`
 const btnGhost = `${btn} text-[#526057] hover:bg-[#eef0ea]`
 
 // Faixa de revisão no topo da lista de questões.
@@ -161,12 +161,12 @@ export function QuestionBulkForm({
                 <p className="text-sm font-semibold text-[#2f3a33]">{headline}</p>
                 {isDraft && !selecting && total > 0 && (
                   <div role="progressbar" aria-label="Questões revistas" aria-valuemin={0} aria-valuemax={total} aria-valuenow={revised} className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-[#e6e9e1]">
-                    <div className="h-full rounded-full bg-[#1d4d41] transition-[width] duration-300" style={{ width: `${Math.round((revised / total) * 100)}%` }} />
+                    <div className="h-full rounded-full bg-marca transition-[width] duration-300" style={{ width: `${Math.round((revised / total) * 100)}%` }} />
                   </div>
                 )}
               </div>
             ) : (
-              <p className="min-w-[11rem] flex-1 text-xs text-[#737c75]">Para arquivar ou restaurar várias de uma vez, usa «Selecionar».</p>
+              <p className="min-w-[11rem] flex-1 text-xs text-texto-2">Para arquivar ou restaurar várias de uma vez, usa «Selecionar».</p>
             )}
 
             <div className="flex flex-wrap items-center gap-2">
@@ -177,7 +177,7 @@ export function QuestionBulkForm({
                   {isDraft && selRevised.length > 0 && <button type="button" onClick={askPublish} disabled={busy} className={btnSolid}>Publicar {selRevised.length}</button>}
                   {status === 'publicada' && hasSelection && <button type="button" onClick={askArchive} disabled={busy} className={btnSolid}><Archive size={14} aria-hidden="true" /> Arquivar {ids.length}</button>}
                   {status === 'arquivada' && hasSelection && <button type="button" onClick={() => run('rascunho', { ids })} disabled={busy} className={btnSolid}><ArchiveRestore size={14} aria-hidden="true" /> Restaurar {ids.length}</button>}
-                  {isDraft && canManage && hasSelection && <button type="button" onClick={askDelete} disabled={busy} className={`${btn} border border-[#efd8d8] bg-white text-[#9a3030] hover:bg-[#fbeeee]`}><Trash2 size={14} aria-hidden="true" /> Eliminar</button>}
+                  {isDraft && canManage && hasSelection && <button type="button" onClick={askDelete} disabled={busy} className={`${btn} border border-[#efd8d8] bg-white text-erro-texto hover:bg-[#fbeeee]`}><Trash2 size={14} aria-hidden="true" /> Eliminar</button>}
                   <button type="button" onClick={leave} disabled={busy} className={btnGhost}>Cancelar</button>
                 </>
               ) : (
@@ -215,12 +215,12 @@ export function SelectableRow({ id, label, state, menu, children }: { id: string
           aria-checked={checked}
           aria-label={`Selecionar questão: ${label}`}
           onClick={pick}
-          className={`flex size-6 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${checked ? 'border-[#1d4d41] bg-[#1d4d41] text-white' : 'border-[#c4cbc2] bg-white'}`}
+          className={`flex size-6 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${checked ? 'border-marca bg-marca text-white' : 'border-[#c4cbc2] bg-white'}`}
         >
           {checked && <Check size={14} aria-hidden="true" />}
         </button>
       ) : state === 'revised' ? (
-        <span title="Revista" className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#1d4d41] text-white"><Check size={14} aria-hidden="true" /><span className="sr-only">Revista</span></span>
+        <span title="Revista" className="flex size-6 shrink-0 items-center justify-center rounded-full bg-marca text-white"><Check size={14} aria-hidden="true" /><span className="sr-only">Revista</span></span>
       ) : state === 'pending' ? (
         <span title="Por rever" className="size-6 shrink-0 rounded-full border-2 border-dashed border-[#d3b968] bg-[#faf5e6]"><span className="sr-only">Por rever</span></span>
       ) : null}
@@ -268,7 +268,7 @@ function ConfirmDialog({ title, text, yes, no, danger, busy, run, onClose }: Con
         <p id={textId} className="mt-1.5 text-sm leading-6 text-[#526057]">{text}</p>
         <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <button ref={noRef} type="button" onClick={onClose} disabled={busy} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#dfe3d9] px-5 text-sm font-semibold text-[#2f3a33] hover:bg-[#f1f4ef] disabled:opacity-50">{no}</button>
-          <button ref={yesRef} type="button" onClick={run} disabled={busy} className={`inline-flex min-h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold text-white disabled:opacity-60 ${danger ? 'bg-[#9a3030] hover:bg-[#7f2626]' : 'bg-[#1d4d41] hover:bg-[#163e34]'}`}>{busy ? 'A processar…' : yes}</button>
+          <button ref={yesRef} type="button" onClick={run} disabled={busy} className={`inline-flex min-h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold text-white disabled:opacity-60 ${danger ? 'bg-erro-texto hover:bg-[#7f2626]' : 'bg-marca hover:bg-marca-escura'}`}>{busy ? 'A processar…' : yes}</button>
         </div>
       </div>
     </div>

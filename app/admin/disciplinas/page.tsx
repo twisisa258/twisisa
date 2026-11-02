@@ -13,13 +13,13 @@ import { EmptyState } from '@/components/states/empty-state'
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Disciplinas | Administração | Twisisa' }
 
-const input = 'mt-1 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 py-2.5 text-sm outline-none focus:border-[#1d4d41] focus:ring-2 focus:ring-[#1d4d41]/10'
+const input = 'mt-1 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 py-2.5 text-sm outline-none focus:border-marca focus:ring-2 focus:ring-marca/10'
 
 function Chip({ value, label, checked }: { value: string; label: string; checked: boolean }) {
   return (
     <label className="cursor-pointer">
       <input type="checkbox" name="scope" value={value} defaultChecked={checked} className="peer sr-only" />
-      <span className="inline-flex min-h-9 items-center rounded-full border border-[#dfe3d9] bg-white px-3.5 text-sm text-[#526057] transition peer-checked:border-[#1d4d41] peer-checked:bg-[#1d4d41] peer-checked:font-semibold peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-[#1d4d41]/30">{label}</span>
+      <span className="inline-flex min-h-9 items-center rounded-full border border-[#dfe3d9] bg-white px-3.5 text-sm text-[#526057] transition peer-checked:border-marca peer-checked:bg-marca peer-checked:font-semibold peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-marca/30">{label}</span>
     </label>
   )
 }
@@ -50,10 +50,10 @@ function SubjectForm({ editing, institutions }: { editing: SubjectRow | null; in
             {institutions.map((item) => <Chip key={item.id} value={`inst:${item.id}`} label={item.shortName} checked={selected.has(`inst:${item.id}`)} />)}
           </div>
         ) : (
-          <p className="mt-2 text-xs text-[#737c75]">Ainda não há instituições. Cria-as primeiro em Instituições.</p>
+          <p className="mt-2 text-xs text-texto-2">Ainda não há instituições. Cria-as primeiro em Instituições.</p>
         )}
       </fieldset>
-      <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#1d4d41] px-5 py-3 text-sm font-semibold text-white hover:bg-[#163e34]">{editing ? 'Guardar alterações' : 'Criar disciplina'}</button>
+      <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-marca px-5 py-3 text-sm font-semibold text-white hover:bg-marca-escura">{editing ? 'Guardar alterações' : 'Criar disciplina'}</button>
     </FeedbackForm>
   )
 }
@@ -109,8 +109,8 @@ export default async function AdminDisciplinasPage({ searchParams }: { searchPar
               <li key={item.id} className={`flex items-center gap-3 py-3 ${item.active ? '' : 'opacity-70'}`}>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium leading-5">{item.name}</p>
-                  <p className="mt-0.5 truncate text-xs text-[#737c75]">
-                    {item.scopes.length ? item.scopes.map((scope) => scope.label).join(' · ') : <span className="text-[#805f19]">Sem âmbito</span>}
+                  <p className="mt-0.5 truncate text-xs text-texto-2">
+                    {item.scopes.length ? item.scopes.map((scope) => scope.label).join(' · ') : <span className="text-aviso-texto">Sem âmbito</span>}
                     {` · ${item.materialCount} ${item.materialCount === 1 ? 'material' : 'materiais'} · ${item.topicCount} ${item.topicCount === 1 ? 'tema' : 'temas'}`}
                   </p>
                 </div>

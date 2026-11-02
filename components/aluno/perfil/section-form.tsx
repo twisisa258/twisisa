@@ -57,7 +57,7 @@ export function SectionForm({
       <button
         type="submit"
         disabled={pending}
-        className="mt-1 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#1d4d41] text-sm font-semibold text-white transition-colors hover:bg-[#173f35] disabled:opacity-80 sm:w-auto sm:min-w-40 sm:justify-self-end sm:px-6"
+        className="mt-1 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-marca text-sm font-semibold text-white transition-colors hover:bg-[#173f35] disabled:opacity-80 sm:w-auto sm:min-w-40 sm:justify-self-end sm:px-6"
       >
         {pending ? (
           <>

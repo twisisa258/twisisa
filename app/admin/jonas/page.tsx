@@ -15,8 +15,8 @@ export const metadata = { title: 'Jonas | Administração | Twisisa' }
 const nf = new Intl.NumberFormat('pt-PT')
 const fmt = new Intl.DateTimeFormat('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 
-const good = 'bg-[#e6f0e9] text-[#1d4d41]'
-const warn = 'bg-[#f4eddb] text-[#805f19]'
+const good = 'bg-[#e6f0e9] text-marca'
+const warn = 'bg-[#f4eddb] text-aviso-texto'
 const bad = 'bg-[#f7e4e4] text-[#8a2f2f]'
 
 const SOURCE_LABEL: Record<ModelSource, string> = {
@@ -37,10 +37,10 @@ function Badge({ tone, icon: Icon, children }: { tone: string; icon: LucideIcon;
 
 function Stat({ icon: Icon, value, label }: { icon: LucideIcon; value: number; label: string }) {
   return (
-    <div className="min-w-0 rounded-2xl border border-[#e3e5dc] bg-white p-3.5 sm:p-4">
+    <div className="min-w-0 rounded-2xl border border-linha bg-white p-3.5 sm:p-4">
       <Icon size={18} aria-hidden="true" className="text-[#6f9a88]" />
-      <p className="mt-2 text-xl font-semibold tracking-tight text-[#1d4d41] sm:text-2xl">{nf.format(value)}</p>
-      <p className="mt-0.5 text-xs leading-4 text-[#737c75]">{label}</p>
+      <p className="mt-2 text-xl font-semibold tracking-tight text-marca sm:text-2xl">{nf.format(value)}</p>
+      <p className="mt-0.5 text-xs leading-4 text-texto-2">{label}</p>
     </div>
   )
 }
@@ -66,7 +66,7 @@ export default async function AdminJonasPage() {
   return (
     <JonasShell active="estado">
       {data === null ? (
-        <div className="rounded-2xl border border-[#e3e5dc] bg-white">
+        <div className="rounded-2xl border border-linha bg-white">
           <AdminLoadError href="/admin/jonas" />
         </div>
       ) : (
@@ -99,7 +99,7 @@ export default async function AdminJonasPage() {
             <CardTitle
               icon={Layers}
               badge={
-                <Link href="/admin/jonas/modelo" className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold text-[#1d4d41] hover:bg-[#f1f4ef]">
+                <Link href="/admin/jonas/modelo" className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold text-marca hover:bg-[#f1f4ef]">
                   <Pencil size={14} aria-hidden="true" />
                   Alterar
                 </Link>
@@ -107,16 +107,16 @@ export default async function AdminJonasPage() {
             >
               Modelos em uso
             </CardTitle>
-            <ol className="mt-3 divide-y divide-[#edf0e9] rounded-xl border border-[#e3e5dc] bg-[#fbfbf8]">
+            <ol className="mt-3 divide-y divide-[#edf0e9] rounded-xl border border-linha bg-[#fbfbf8]">
               {data.runtime.models.map((model, index) => (
                 <li key={model} className="flex items-center gap-3 px-3 py-2.5 text-sm">
-                  <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-white text-xs font-semibold text-[#1d4d41] ring-1 ring-[#dfe3d9]">{index + 1}</span>
+                  <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-white text-xs font-semibold text-marca ring-1 ring-[#dfe3d9]">{index + 1}</span>
                   <span className="min-w-0 flex-1 truncate font-mono text-[13px] font-semibold">{model}</span>
-                  <span className="shrink-0 text-xs text-[#737c75]">{index === 0 ? 'Principal' : 'Alternativo'}</span>
+                  <span className="shrink-0 text-xs text-texto-2">{index === 0 ? 'Principal' : 'Alternativo'}</span>
                 </li>
               ))}
             </ol>
-            <p className="mt-3 text-xs leading-5 text-[#737c75]">
+            <p className="mt-3 text-xs leading-5 text-texto-2">
               {SOURCE_LABEL[data.runtime.modelSource]}. Esforço de raciocínio: {EFFORT_LABEL[data.runtime.reasoningEffort]}.
               {data.settings.updatedAt && data.settings.updatedBy ? ` Última alteração: ${fmt.format(data.settings.updatedAt)} por ${data.settings.updatedBy}.` : ''}
             </p>
@@ -131,7 +131,7 @@ export default async function AdminJonasPage() {
                 <Stat icon={GraduationCap} value={data.usage.explanations} label="Explicações no Simulador" />
               </>
             ) : (
-              <p className="col-span-full rounded-2xl border border-[#e3e5dc] bg-white p-4 text-sm text-[#5f6d63]">O uso não está disponível (confirma que a migração 0019 foi aplicada).</p>
+              <p className="col-span-full rounded-2xl border border-linha bg-white p-4 text-sm text-[#5f6d63]">O uso não está disponível (confirma que a migração 0019 foi aplicada).</p>
             )}
           </section>
 

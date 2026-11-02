@@ -15,15 +15,15 @@ import { EmptyState } from '@/components/states/empty-state'
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Temas | Administração | Twisisa' }
 
-const input = 'mt-1 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 py-2.5 text-sm outline-none focus:border-[#1d4d41] focus:ring-2 focus:ring-[#1d4d41]/10'
+const input = 'mt-1 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 py-2.5 text-sm outline-none focus:border-marca focus:ring-2 focus:ring-marca/10'
 
 function TopicForm({ editing, subjects }: { editing: TopicRow | null; subjects: SubjectRow[] }) {
   // Só disciplinas activas (mais a do tema em edição, mesmo arquivada).
   const usable = subjects.filter((item) => item.active || item.id === editing?.subjectId)
   if (usable.length === 0) {
     return (
-      <p className="text-sm text-[#68736a]">
-        Ainda não há disciplinas. Cria primeiro uma em <Link href="/admin/disciplinas" className="font-semibold text-[#1d4d41] hover:underline">Disciplinas</Link>: cada tema pertence a uma disciplina.
+      <p className="text-sm text-texto-2">
+        Ainda não há disciplinas. Cria primeiro uma em <Link href="/admin/disciplinas" className="font-semibold text-marca hover:underline">Disciplinas</Link>: cada tema pertence a uma disciplina.
       </p>
     )
   }
@@ -50,7 +50,7 @@ function TopicForm({ editing, subjects }: { editing: TopicRow | null; subjects: 
         />
       </div>
       <label className="text-sm font-medium">Nome do tema *<input name="name" required minLength={2} maxLength={120} defaultValue={editing?.name ?? ''} className={input} placeholder="Ex.: Funções quadráticas" /></label>
-      <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#1d4d41] px-5 py-3 text-sm font-semibold text-white hover:bg-[#163e34]">{editing ? 'Guardar alterações' : 'Criar tema'}</button>
+      <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-marca px-5 py-3 text-sm font-semibold text-white hover:bg-marca-escura">{editing ? 'Guardar alterações' : 'Criar tema'}</button>
     </FeedbackForm>
   )
 }
@@ -113,7 +113,7 @@ export default async function AdminTemasPage({ searchParams }: { searchParams: P
                 <li key={item.id} className={`flex items-center gap-3 py-3 ${item.active ? '' : 'opacity-70'}`}>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium leading-5">{item.name}</p>
-                    <p className="mt-0.5 truncate text-xs text-[#737c75]">{item.subjectName}{scopes ? ` · ${scopes}` : ''}</p>
+                    <p className="mt-0.5 truncate text-xs text-texto-2">{item.subjectName}{scopes ? ` · ${scopes}` : ''}</p>
                   </div>
                   {!item.active && <span className="shrink-0 rounded-full bg-[#f1f1ee] px-2.5 py-1 text-[11px] font-semibold text-[#6b716c]">Arquivado</span>}
                   <RowMenu

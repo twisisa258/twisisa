@@ -66,7 +66,7 @@ function ModalFrame({ title, description, onClose, returnFocusRef, children }: {
         <div className="flex shrink-0 items-start justify-between gap-3 border-b border-[#edf0e9] px-5 py-4 sm:px-6">
           <div className="min-w-0">
             <h2 id="form-modal-title" className="text-lg font-semibold">{title}</h2>
-            {description && <p className="mt-0.5 text-xs text-[#737c75]">{description}</p>}
+            {description && <p className="mt-0.5 text-xs text-texto-2">{description}</p>}
           </div>
           <button type="button" onClick={onClose} aria-label="Fechar" className="-mr-2 flex size-10 shrink-0 items-center justify-center rounded-full text-[#526057] hover:bg-[#f1f4ef]">
             <X size={20} aria-hidden="true" />
@@ -113,8 +113,8 @@ export function FormModal({
         title={variant === 'secondary' ? label : undefined}
         className={
           variant === 'secondary'
-            ? 'inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-[#c9d7cd] bg-white/80 text-[#1d4d41] shadow-sm hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d4d41]'
-            : 'inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#1d4d41] px-4 text-sm font-semibold text-white shadow-sm hover:bg-[#163e34] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d4d41]'
+            ? 'inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-[#c9d7cd] bg-white/80 text-marca shadow-sm hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca'
+            : 'inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-marca px-4 text-sm font-semibold text-white shadow-sm hover:bg-marca-escura focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca'
         }
       >
         {icon === 'upload' ? <Upload size={18} aria-hidden="true" /> : <Plus size={18} aria-hidden="true" />}

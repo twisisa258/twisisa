@@ -30,7 +30,7 @@ export type EditorValue = {
   variant?: string
 }
 
-const field = 'mt-1 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 py-2.5 text-sm outline-none focus:border-[#1d4d41] focus:ring-2 focus:ring-[#1d4d41]/10'
+const field = 'mt-1 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 py-2.5 text-sm outline-none focus:border-marca focus:ring-2 focus:ring-marca/10'
 const STEPS = ['Enunciado', 'Opções', 'Classificação']
 const LETTERS = ['A', 'B', 'C', 'D', 'E']
 const TRACKS: Choice[] = [
@@ -247,7 +247,7 @@ export function QuestionForm({
   }
 
   const button = 'inline-flex min-h-11 flex-1 items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold'
-  const ghost = 'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[#dfe3d9] px-4 py-3 text-sm font-semibold text-[#1d4d41] hover:bg-[#f1f4ef]'
+  const ghost = 'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[#dfe3d9] px-4 py-3 text-sm font-semibold text-marca hover:bg-[#f1f4ef]'
   const originChoices = editing?.origin === 'ia' ? [...origins, { value: 'ia', label: 'Criada pela IA' }].filter((c, i, all) => all.findIndex((x) => x.value === c.value) === i) : origins.filter((c) => c.value !== 'ia')
   const sourceChoices = answerSources.filter((c) => c.value !== 'sugestao' || editing?.answerSource === 'sugestao')
 
@@ -262,25 +262,25 @@ export function QuestionForm({
           {STEPS.map((label, index) => (
             <li key={label}>
               <button type="button" onClick={() => go(index)} aria-current={index === step ? 'step' : undefined} className="block w-full text-left">
-                <span className={`block h-1.5 rounded-full ${index <= step ? 'bg-[#1d4d41]' : 'bg-[#e3e5dc]'}`} />
-                <span className={`mt-1.5 block truncate text-xs font-semibold ${index === step ? 'text-[#1d4d41]' : 'text-[#9aa39c]'}`}>{index + 1}. {label}</span>
+                <span className={`block h-1.5 rounded-full ${index <= step ? 'bg-marca' : 'bg-linha'}`} />
+                <span className={`mt-1.5 block truncate text-xs font-semibold ${index === step ? 'text-marca' : 'text-[#9aa39c]'}`}>{index + 1}. {label}</span>
               </button>
             </li>
           ))}
         </ol>
-        <button type="button" onClick={() => setPreview((value) => !value)} aria-pressed={preview} aria-label={preview ? 'Esconder a pré-visualização' : 'Pré-visualizar como aluno'} title="Pré-visualizar como aluno" className="flex size-10 shrink-0 items-center justify-center rounded-full border border-[#dfe3d9] text-[#1d4d41] hover:bg-[#f1f4ef]">
+        <button type="button" onClick={() => setPreview((value) => !value)} aria-pressed={preview} aria-label={preview ? 'Esconder a pré-visualização' : 'Pré-visualizar como aluno'} title="Pré-visualizar como aluno" className="flex size-10 shrink-0 items-center justify-center rounded-full border border-[#dfe3d9] text-marca hover:bg-[#f1f4ef]">
           {preview ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
         </button>
       </div>
 
       {preview && (
-        <div className="grid gap-3 rounded-2xl border border-[#e3e5dc] bg-[#fafbf8] p-4">
+        <div className="grid gap-3 rounded-2xl border border-linha bg-[#fafbf8] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-[#9aa39c]">Como o aluno vê</p>
           {statement.trim() ? <MathText text={statement} className="text-[15px] leading-7" /> : <p className="text-sm text-[#9aa39c]">Ainda sem enunciado.</p>}
           <ul className="grid gap-2">
             {filled.map((option, index) => (
-              <li key={option.key} className="flex items-start gap-3 rounded-xl border border-[#e3e5dc] bg-white px-3 py-2.5 text-sm">
-                <span className="font-semibold text-[#1d4d41]">{LETTERS[index]}</span>
+              <li key={option.key} className="flex items-start gap-3 rounded-xl border border-linha bg-white px-3 py-2.5 text-sm">
+                <span className="font-semibold text-marca">{LETTERS[index]}</span>
                 <MathText text={option.body} />
               </li>
             ))}
@@ -293,9 +293,9 @@ export function QuestionForm({
         <label className="text-sm font-medium">Enunciado *
           <textarea name="statement" rows={7} maxLength={12000} value={statement} onChange={(event) => setStatement(event.target.value)} className={field} placeholder="Escreve a pergunta. Fórmulas entre cifrões: $x^2 + 1$" />
         </label>
-        <p className="-mt-2 text-xs text-[#737c75]">Fórmulas: <code>$x^2$</code> na linha, <code>$$\frac{'{a}'}{'{b}'}$$</code> em bloco. Para um cifrão normal escreve <code>\$</code>.</p>
+        <p className="-mt-2 text-xs text-texto-2">Fórmulas: <code>$x^2$</code> na linha, <code>$$\frac{'{a}'}{'{b}'}$$</code> em bloco. Para um cifrão normal escreve <code>\$</code>.</p>
         {statement.trim() && (
-          <div className="rounded-2xl border border-[#e3e5dc] bg-[#fafbf8] p-4">
+          <div className="rounded-2xl border border-linha bg-[#fafbf8] p-4">
             <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#9aa39c]">Pré-visualização</p>
             <MathText text={statement} className="text-[15px] leading-7" />
           </div>
@@ -307,10 +307,10 @@ export function QuestionForm({
         <fieldset className="grid gap-3">
           <legend className="text-sm font-medium">Opções (marca a correta) *</legend>
           {options.map((option, index) => (
-            <div key={option.key} className="rounded-2xl border border-[#e3e5dc] p-3">
+            <div key={option.key} className="rounded-2xl border border-linha p-3">
               <div className="flex items-center gap-3">
-                <label className="flex shrink-0 items-center gap-2 text-sm font-semibold text-[#1d4d41]">
-                  <input type="radio" name="correct" value={index} checked={correct === index} onChange={() => setCorrect(index)} className="size-4 accent-[#1d4d41]" />
+                <label className="flex shrink-0 items-center gap-2 text-sm font-semibold text-marca">
+                  <input type="radio" name="correct" value={index} checked={correct === index} onChange={() => setCorrect(index)} className="size-4 accent-marca" />
                   {LETTERS[index]}
                 </label>
                 <textarea
@@ -320,7 +320,7 @@ export function QuestionForm({
                   value={option.body}
                   onChange={(event) => setOptions((current) => current.map((item, i) => (i === index ? { ...item, body: event.target.value } : item)))}
                   aria-label={`Opção ${LETTERS[index]}`}
-                  className="min-w-0 flex-1 rounded-xl border border-[#dfe3d9] bg-white px-3 py-2 text-sm outline-none focus:border-[#1d4d41] focus:ring-2 focus:ring-[#1d4d41]/10"
+                  className="min-w-0 flex-1 rounded-xl border border-[#dfe3d9] bg-white px-3 py-2 text-sm outline-none focus:border-marca focus:ring-2 focus:ring-marca/10"
                 />
                 {options.length > 2 && (
                   <button type="button" onClick={() => removeOption(index)} aria-label={`Remover opção ${LETTERS[index]}`} className="flex size-9 shrink-0 items-center justify-center rounded-full text-[#9a4b43] hover:bg-[#fbeceb]">
@@ -328,8 +328,8 @@ export function QuestionForm({
                   </button>
                 )}
               </div>
-              <label className="mt-2 flex items-center gap-2 text-xs text-[#737c75]">
-                <input type="checkbox" name="fixed" value={index} checked={option.fixed} onChange={(event) => setOptions((current) => current.map((item, i) => (i === index ? { ...item, fixed: event.target.checked } : item)))} className="size-3.5 accent-[#1d4d41]" />
+              <label className="mt-2 flex items-center gap-2 text-xs text-texto-2">
+                <input type="checkbox" name="fixed" value={index} checked={option.fixed} onChange={(event) => setOptions((current) => current.map((item, i) => (i === index ? { ...item, fixed: event.target.checked } : item)))} className="size-3.5 accent-marca" />
                 Posição fixa (não embaralhar), ex.: «Nenhuma das anteriores»
               </label>
               {option.body.includes('$') && <p className="mt-2 border-t border-[#edf0e9] pt-2 text-sm"><MathText text={option.body} /></p>}
@@ -339,7 +339,7 @@ export function QuestionForm({
             <button
               type="button"
               onClick={() => { setOptions((current) => [...current, { key: nextKey, body: '', fixed: false }]); setNextKey((value) => value + 1) }}
-              className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#c9d1c7] text-sm font-semibold text-[#1d4d41] hover:bg-[#f1f4ef]"
+              className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-dashed border-[#c9d1c7] text-sm font-semibold text-marca hover:bg-[#f1f4ef]"
             >
               <Plus size={16} aria-hidden="true" /> Adicionar opção
             </button>
@@ -348,7 +348,7 @@ export function QuestionForm({
         <div className="text-sm font-medium">
           <span>Origem da resposta</span>
           <SelectField name="answerSource" label="Origem da resposta" triggerClassName={field} defaultValue={base?.answerSource ?? 'confirmada'} onValueChange={setAnswerSource} options={sourceChoices} />
-          {answerSource === 'sugestao' && <p className="mt-1.5 text-xs font-normal text-[#805f19]">Verifica a opção marcada e muda para «Confirmada por mim» para poder publicar.</p>}
+          {answerSource === 'sugestao' && <p className="mt-1.5 text-xs font-normal text-aviso-texto">Verifica a opção marcada e muda para «Confirmada por mim» para poder publicar.</p>}
         </div>
         <label className="text-sm font-medium">Explicação (aparece depois de responder)
           <textarea name="explanation" rows={3} maxLength={4000} value={explanation} onChange={(event) => setExplanation(event.target.value)} className={field} placeholder="Porque é que esta é a resposta certa (opcional)" />
@@ -413,13 +413,13 @@ export function QuestionForm({
               onValueChange={setVariant}
               options={[{ value: '', label: 'Sem variante (só completa misturas)' }, ...variantOptions.map((item) => ({ value: item.name, label: item.name }))]}
             />
-            <span className="mt-1 block text-xs font-normal text-[#737c75]">Esta disciplina tem variantes: para publicar, a questão tem de ter uma. Sem variante, nunca aparece quando o aluno escolhe uma variante.</span>
+            <span className="mt-1 block text-xs font-normal text-texto-2">Esta disciplina tem variantes: para publicar, a questão tem de ter uma. Sem variante, nunca aparece quando o aluno escolhe uma variante.</span>
           </div>
         )}
       </div>
 
       {isNew && saveState !== 'idle' && (
-        <p aria-live="polite" className={`-mb-2 text-xs ${saveState === 'failed' ? 'text-[#9a4b43]' : 'text-[#737c75]'}`}>
+        <p aria-live="polite" className={`-mb-2 text-xs ${saveState === 'failed' ? 'text-[#9a4b43]' : 'text-texto-2'}`}>
           {saveState === 'saving' ? 'A guardar…' : saveState === 'saved' ? 'Progresso guardado automaticamente.' : 'Não foi possível guardar automaticamente. Vou tentar de novo.'}
         </p>
       )}
@@ -429,15 +429,15 @@ export function QuestionForm({
       <div className="flex flex-wrap gap-2">
         {step > 0 && <button type="button" onClick={() => go(step - 1)} className={ghost}><ArrowLeft size={16} aria-hidden="true" /> Anterior</button>}
         {step < 2 ? (
-          <button type="button" onClick={() => go(step + 1)} className={`${button} bg-[#1d4d41] text-white hover:bg-[#163e34]`}>Seguinte <ArrowRight size={16} aria-hidden="true" className="ml-1.5" /></button>
+          <button type="button" onClick={() => go(step + 1)} className={`${button} bg-marca text-white hover:bg-marca-escura`}>Seguinte <ArrowRight size={16} aria-hidden="true" className="ml-1.5" /></button>
         ) : editing && editing.status !== 'rascunho' ? (
-          <button type="submit" onClick={() => setIntent('keep')} className={`${button} bg-[#1d4d41] text-white hover:bg-[#163e34]`}>
+          <button type="submit" onClick={() => setIntent('keep')} className={`${button} bg-marca text-white hover:bg-marca-escura`}>
             <Check size={16} aria-hidden="true" className="mr-1.5" /> Guardar alterações
           </button>
         ) : (
           <>
-            <button type="submit" onClick={() => setIntent('draft')} className={`${button} border border-[#dfe3d9] text-[#1d4d41] hover:bg-[#f1f4ef]`}>Guardar rascunho</button>
-            <button type="submit" onClick={() => setIntent('publish')} className={`${button} bg-[#1d4d41] text-white hover:bg-[#163e34]`}>Publicar</button>
+            <button type="submit" onClick={() => setIntent('draft')} className={`${button} border border-[#dfe3d9] text-marca hover:bg-[#f1f4ef]`}>Guardar rascunho</button>
+            <button type="submit" onClick={() => setIntent('publish')} className={`${button} bg-marca text-white hover:bg-marca-escura`}>Publicar</button>
           </>
         )}
       </div>

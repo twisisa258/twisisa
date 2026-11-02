@@ -32,7 +32,7 @@ export function CheckoutButton({ productId }: { productId: string }) {
   }
 
   return <div>
-    <button type="button" onClick={startCheckout} disabled={loading} aria-busy={loading} className="inline-flex items-center gap-2 rounded-full bg-[#1d4d41] px-6 py-3 font-semibold text-white disabled:opacity-60">
+    <button type="button" onClick={startCheckout} disabled={loading} aria-busy={loading} className="inline-flex items-center gap-2 rounded-full bg-marca px-6 py-3 font-semibold text-white disabled:opacity-60">
       {loading ? <><Spinner />A abrir pagamento…</> : 'Assinar Twisisa Plus'}
     </button>
   </div>

@@ -8,9 +8,9 @@ export function SectionRow({ title, href, items }: { title: string; href?: strin
   return (
     <section aria-label={title}>
       <div className="mb-3 flex items-center justify-between gap-3">
-        <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-[#202321]">{title}</h2>
+        <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-texto">{title}</h2>
         {href && (
-          <Link href={href} className="inline-flex h-8 items-center gap-0.5 rounded-full bg-gradient-to-br from-[#eaf1ec] to-[#d9e8de] pl-3 pr-2 text-xs font-semibold text-[#1d4d41]">
+          <Link href={href} className="inline-flex h-8 items-center gap-0.5 rounded-full bg-gradient-to-br from-[#eaf1ec] to-[#d9e8de] pl-3 pr-2 text-xs font-semibold text-marca">
             Ver mais
             <ChevronRight size={14} />
           </Link>

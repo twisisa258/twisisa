@@ -75,13 +75,13 @@ export default async function ArticlePage({ params }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-[#f8f8f5] px-5 py-8 text-[#202321] sm:px-8">
+    <main className="min-h-screen bg-fundo px-5 py-8 text-texto sm:px-8">
       <JsonLd data={jsonLd} />
       <article className="mx-auto max-w-2xl">
-        <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-semibold text-[#1d4d41]">
+        <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-semibold text-marca">
           <ArrowLeft size={16} /> Voltar ao blog
         </Link>
-        <p className="mt-14 text-xs font-semibold uppercase tracking-[0.18em] text-[#1d4d41]">{article.category}</p>
+        <p className="mt-14 text-xs font-semibold uppercase tracking-[0.18em] text-marca">{article.category}</p>
         <h1 className="mt-4 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">{article.title}</h1>
         <div className="mt-8 space-y-5 text-base leading-8 text-[#626a62]">
           {article.paragraphs.map((paragraph) => (

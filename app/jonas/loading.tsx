@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="fixed inset-0 flex bg-[#f8f8f5]" aria-busy="true" aria-label="A abrir o Jonas">
+    <div className="fixed inset-0 flex bg-fundo" aria-busy="true" aria-label="A abrir o Jonas">
       <div className="hidden w-[300px] shrink-0 space-y-3 border-r border-[#e6e9e0] bg-[#f2f4ee] p-3 lg:block">
         <div className="h-11 animate-pulse rounded-full bg-[#dfe6da]" />
         <div className="h-10 animate-pulse rounded-full bg-[#e8ece2]" />

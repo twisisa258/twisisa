@@ -18,13 +18,13 @@ export function JonasShell({ active, children }: { active: 'estado' | 'modelo'; 
   )
 }
 
-export const jonasCard = 'rounded-2xl border border-[#e3e5dc] bg-white p-4 sm:p-5'
+export const jonasCard = 'rounded-2xl border border-linha bg-white p-4 sm:p-5'
 
 export function CardTitle({ icon: Icon, children, badge }: { icon: LucideIcon; children: React.ReactNode; badge?: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-3">
       <h2 className="flex min-w-0 items-center gap-2.5 text-sm font-semibold">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#e6f0e9] text-[#1d4d41]">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#e6f0e9] text-marca">
           <Icon size={18} aria-hidden="true" />
         </span>
         <span className="truncate">{children}</span>

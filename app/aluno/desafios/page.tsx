@@ -14,11 +14,11 @@ export const dynamic = 'force-dynamic'
 
 export default async function DesafiosPage() {
   const { scope, firstName } = await requireSimulatorScope()
-  const [profile] = await db.select({ targetCourseId: studentProfiles.targetCourseId }).from(studentProfiles).where(eq(studentProfiles.userId, scope.userId)).limit(1)
+  const [profile] = await db.select({ targetCourseId: studentProfiles.targetCourseId, dailyGoal: studentProfiles.dailyGoal }).from(studentProfiles).where(eq(studentProfiles.userId, scope.userId)).limit(1)
 
   let data: DesafiosSnapshot | null = null
   try {
-    data = await getDesafios({ scope, targetCourseId: profile?.targetCourseId ?? null })
+    data = await getDesafios({ scope, targetCourseId: profile?.targetCourseId ?? null, dailyGoal: profile?.dailyGoal ?? null })
   } catch (error) {
     console.error('[DESAFIOS]', error)
   }
@@ -39,7 +39,7 @@ export default async function DesafiosPage() {
             <MissionList title="Hoje" hint={`acaba às 24:00`} missions={data.daily} />
             <MissionList title="Esta semana" hint={daysToSunday === 0 ? 'acaba hoje' : `acaba em ${daysToSunday} ${daysToSunday === 1 ? 'dia' : 'dias'}`} missions={data.weekly} />
             <ReadinessCard s={data} />
-            <Regras admission={data.admission} />
+            <Regras admission={data.admission} goal={data.goal} />
           </>
         )}
       </div>

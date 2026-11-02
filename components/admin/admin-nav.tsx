@@ -22,8 +22,8 @@ export function AdminNav({ variant, role = 'admin' }: { variant: 'sidebar' | 'pi
           ? 'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors'
           : 'inline-flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 text-sm transition-colors'
         const tone = variant === 'sidebar'
-          ? active ? 'bg-white font-semibold text-[#1d4d41]' : 'text-[#68716a] hover:bg-white hover:text-[#1d4d41]'
-          : active ? 'border-[#1d4d41] bg-[#1d4d41] font-semibold text-white' : 'border-[#dfe3d9] bg-white text-[#526057]'
+          ? active ? 'bg-white font-semibold text-marca' : 'text-texto-2 hover:bg-white hover:text-marca'
+          : active ? 'border-marca bg-marca font-semibold text-white' : 'border-[#dfe3d9] bg-white text-[#526057]'
         return (
           <Link key={href} href={href} aria-current={active ? 'page' : undefined} className={`${base} ${tone}`}>
             <Icon size={variant === 'sidebar' ? 18 : 16} aria-hidden="true" />
