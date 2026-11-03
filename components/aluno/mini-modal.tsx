@@ -7,18 +7,20 @@ import { X } from 'lucide-react'
 export function MiniModal({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
   const painel = useRef<HTMLDivElement>(null)
   const titleId = useId()
+  const aoFechar = useRef(onClose)
+  useEffect(() => { aoFechar.current = onClose })
 
   useEffect(() => {
     if (!open) return
     const antes = document.activeElement as HTMLElement | null
     painel.current?.focus()
-    const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose() }
+    const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') aoFechar.current() }
     document.addEventListener('keydown', onKey)
     return () => {
       document.removeEventListener('keydown', onKey)
       antes?.focus?.()
     }
-  }, [open, onClose])
+  }, [open])
 
   if (!open) return null
   return (

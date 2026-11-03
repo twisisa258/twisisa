@@ -5,7 +5,7 @@ import webpush from 'web-push'
 import { pool } from '@/lib/db'
 import { siteBaseUrl } from '@/lib/email'
 
-// Web push: o aluno liga no telemóvel (/aluno/lembretes) e o servidor envia com as chaves VAPID.
+// Web push: o aluno liga no telemóvel (modal de permissão e interruptor no perfil) e o servidor envia com as chaves VAPID.
 // Variáveis: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY e, opcional, VAPID_SUBJECT (mailto: ou https:).
 
 export type PushPayload = { title: string; body: string; url: string }
@@ -99,4 +99,8 @@ export async function removeSubscription(userId: string, endpoint: string) {
     `UPDATE notification_prefs SET push_enabled = EXISTS (SELECT 1 FROM push_subscriptions WHERE user_id = $1), updated_at = now() WHERE user_id = $1`,
     [userId],
   )
+}
+
+export async function removeAllSubscriptions(userId: string) {
+  await pool.query(`DELETE FROM push_subscriptions WHERE user_id = $1`, [userId])
 }

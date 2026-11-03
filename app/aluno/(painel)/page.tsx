@@ -22,6 +22,8 @@ import { AvisoFaixa } from '@/components/aluno/aviso-faixa'
 import { HojeHero } from '@/components/aluno/hoje-hero'
 import { Fechavel } from '@/components/aluno/fechavel'
 import { NovidadeModal } from '@/components/aluno/novidade-modal'
+import { InstalarApp } from '@/components/aluno/instalar-app'
+import { NotificacoesModal } from '@/components/aluno/notificacoes-modal'
 import { ParaHoje, buildPlan } from '@/components/aluno/plano-hoje'
 import { markCounts } from '@/lib/kit'
 import { requireStudent } from '@/lib/require-student'
@@ -148,6 +150,8 @@ export default async function StudentPage() {
   return (
     <main className="min-h-screen max-w-full overflow-x-hidden bg-fundo text-texto" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
       <UrlFeedback />
+      <NotificacoesModal publicKey={process.env.VAPID_PUBLIC_KEY ?? ''} />
+      <InstalarApp />
       {track && <NovidadeModal />}
       <div className="flex min-h-screen">
         <StudentSidebar firstName={firstName} image={session.user.image ?? null} />

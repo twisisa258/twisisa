@@ -26,7 +26,7 @@ export default async function CancelarLembretes({ searchParams }: { searchParams
           <>
             <h1 className="text-[22px] font-semibold tracking-[-0.03em]">Lembretes desligados</h1>
             <p className="mt-2 text-[15px] leading-6 text-texto-2">Não vais receber mais lembretes por e-mail. Podes voltar a ligá-los quando quiseres, na tua conta.</p>
-            <Link href="/aluno/lembretes" className="btn btn-secundario mt-5">Gerir lembretes</Link>
+            <Link href="/aluno/perfil" className="btn btn-secundario mt-5">Ir ao perfil</Link>
           </>
         ) : valid ? (
           <>
@@ -42,7 +42,7 @@ export default async function CancelarLembretes({ searchParams }: { searchParams
           <>
             <h1 className="text-[22px] font-semibold tracking-[-0.03em]">Ligação inválida</h1>
             <p className="mt-2 text-[15px] leading-6 text-texto-2">Esta ligação não funciona. Entra na tua conta para gerir os lembretes.</p>
-            <Link href="/aluno/lembretes" className="btn btn-secundario mt-5">Gerir lembretes</Link>
+            <Link href="/aluno/perfil" className="btn btn-secundario mt-5">Ir ao perfil</Link>
           </>
         )}
       </div>

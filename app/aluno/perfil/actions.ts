@@ -1,5 +1,6 @@
 'use server'
 
+import { randomBytes } from 'node:crypto'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { eq } from 'drizzle-orm'
@@ -9,6 +10,10 @@ import { studentProfiles, user } from '@/lib/db/schema'
 import { AppError, runAction, type ActionResult } from '@/lib/action-result'
 import { isUniqueViolation } from '@/lib/pg-errors'
 import { AVATAR_FOLDER, isProvince } from '@/lib/perfil'
+import { DEFAULT_STUDY_HOUR } from '@/lib/lembretes-shared'
+import { removeAllSubscriptions } from '@/lib/push'
+import { getCourseCombos } from '@/lib/combinacoes'
+import { resolveCombo } from '@/lib/combinacoes-pure'
 
 // Cada secção do perfil guarda-se sozinha: um erro numa não perde o que está nas outras.
 // O percurso e a instituição guardam-se em /aluno/percurso.
@@ -84,6 +89,7 @@ export async function saveCandidate(formData: FormData): Promise<ActionResult> {
     const courseId = String(formData.get('targetCourseId') ?? '').trim()
     let targetCourseId: string | null = null
     let targetCourse: string | null = null
+    let targetOptionId: string | null = null
     if (courseId) {
       const found = await pool.query(
         `SELECT c.name FROM courses c JOIN student_profiles sp ON sp.institution_id = c.institution_id WHERE c.id = $1 AND c.active AND sp.user_id = $2`,
@@ -92,14 +98,18 @@ export async function saveCandidate(formData: FormData): Promise<ActionResult> {
       if (!found.rows[0]) throw new AppError('Escolhe um curso da lista da tua instituição.')
       targetCourseId = courseId
       targetCourse = found.rows[0].name as string
+      const optionId = String(formData.get('targetOptionId') ?? '').trim() || null
+      const resolved = resolveCombo(await getCourseCombos(courseId), optionId)
+      if (resolved.needsChoice) throw new AppError('Escolhe a tua combinação de provas.')
+      targetOptionId = resolved.optionId
     }
     const parsedScore = Number(formData.get('targetScore'))
     const targetScore = Number.isInteger(parsedScore) && parsedScore >= 0 && parsedScore <= 20 ? parsedScore : 12
 
     await db
       .insert(studentProfiles)
-      .values({ userId: current.id, targetCourseId, targetCourse, targetScore })
-      .onConflictDoUpdate({ target: studentProfiles.userId, set: { targetCourseId, targetCourse, targetScore, updatedAt: new Date() } })
+      .values({ userId: current.id, targetCourseId, targetCourse, targetOptionId, targetScore })
+      .onConflictDoUpdate({ target: studentProfiles.userId, set: { targetCourseId, targetCourse, targetOptionId, targetScore, updatedAt: new Date() } })
 
     refresh()
     return 'Guardado.'
@@ -124,4 +134,22 @@ export async function saveAvatar(url: string): Promise<ActionResult> {
     refresh()
     return image ? 'Foto atualizada.' : 'Foto removida.'
   }, 'Não foi possível guardar a foto. Tenta outra vez.')
+}
+
+// Interruptor dos lembretes. Ligado = e-mail de lembrete (o push liga-se no aparelho). Desligado = nada, e apagam-se os aparelhos registados.
+export async function setReminders(on: boolean): Promise<ActionResult> {
+  return runAction(async () => {
+    const current = await requireUser()
+    if (typeof on !== 'boolean') throw new AppError('Pedido inválido.')
+    await pool.query(
+      `INSERT INTO notification_prefs (user_id, email_enabled, push_enabled, categories, unsubscribe_token, study_hour)
+       VALUES ($1, $2, false, $3::jsonb, $4, $5)
+       ON CONFLICT (user_id) DO UPDATE SET email_enabled = $2, push_enabled = CASE WHEN $2 THEN notification_prefs.push_enabled ELSE false END,
+         categories = notification_prefs.categories || '{"study": true}'::jsonb, updated_at = now()`,
+      [current.id, on, JSON.stringify({ study: true, summary: true, promo: false }), randomBytes(24).toString('hex'), DEFAULT_STUDY_HOUR],
+    )
+    if (!on) await removeAllSubscriptions(current.id)
+    refresh()
+    return 'Guardado.'
+  }, 'Não foi possível guardar. Tenta outra vez.')
 }

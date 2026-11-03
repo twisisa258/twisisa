@@ -29,3 +29,18 @@ export function fechar(id: string, days?: number) {
 export function hoje() {
   return new Date().toLocaleDateString('sv-SE')
 }
+
+/**
+ * No máximo uma janela (modal) por dia, por aparelho. Quem chamar primeiro leva o dia; os outros ficam para amanhã.
+ * Ordem na página: notificações, instalar a app, novidade.
+ */
+export function reservarModalHoje(): boolean {
+  try {
+    const chave = PREFIXO + 'modal-dia'
+    if (window.localStorage.getItem(chave) === hoje()) return false
+    window.localStorage.setItem(chave, hoje())
+    return true
+  } catch {
+    return true
+  }
+}

@@ -1,6 +1,6 @@
 'use server'
 
-import { DEFAULT_STUDY_HOUR, isStudyHour } from '@/lib/lembretes-shared'
+import { DEFAULT_STUDY_HOUR } from '@/lib/lembretes-shared'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { randomBytes, randomUUID } from 'node:crypto'
@@ -12,8 +12,11 @@ import { getOnboardingState } from '@/lib/onboarding'
 import { isTrack } from '@/lib/percurso'
 import { getVisibleModules } from '@/lib/exam-modules'
 import { startAttempt } from '@/lib/simulator'
+import { getCourseCombos } from '@/lib/combinacoes'
+import { resolveCombo } from '@/lib/combinacoes-pure'
+import { listInstitutionCourses } from '@/lib/target-course'
 
-// Onboarding (3 ecrãs). Cada passo guarda-se no servidor ao avançar: se o estudante fechar a aplicação, retoma onde parou.
+// Onboarding (dois a cinco ecrãs, conforme o percurso). Cada passo guarda-se no servidor ao avançar: se o estudante fechar a aplicação, retoma onde parou.
 // As acções devolvem o resultado em vez de lançar (em produção o Next.js esconde as mensagens de erro lançadas).
 
 export type StepResult = { ok: true } | { ok: false; message: string; underAge?: boolean }
@@ -68,13 +71,12 @@ export async function saveAboutYou(input: { name: string; day: number; month: nu
   })
 }
 
-/** Ecrã 2: percurso, instituição (só admissão) e meta diária. */
-export async function saveTrackAndGoal(input: { track: string; institutionId: string | null; dailyGoal: number }): Promise<StepResult> {
+/** Percurso e, na admissão, a instituição. Ao mudar de instituição, o curso e a combinação ficam por escolher outra vez. */
+export async function saveTrack(input: { track: string; institutionId: string | null }): Promise<StepResult> {
   return step('Não foi possível guardar. Tenta outra vez.', async (user) => {
     const state = await getOnboardingState(user.id)
     if (!state.birthDate) throw new AppError('Falta o primeiro passo. Volta atrás e preenche a tua data de nascimento.')
     if (!isTrack(input?.track)) throw new AppError('Escolhe o que estás a preparar.')
-    if (!isDailyGoal(input.dailyGoal)) throw new AppError('Escolhe a tua meta diária.')
 
     let institutionId: string | null = null
     if (input.track === 'admissao') {
@@ -83,33 +85,87 @@ export async function saveTrackAndGoal(input: { track: string; institutionId: st
       const found = await pool.query('SELECT 1 FROM institutions WHERE id = $1 AND active = true', [institutionId])
       if (!found.rowCount) throw new AppError('Essa instituição já não está disponível. Escolhe outra.')
     }
-
+    const keepCourse = input.track === 'admissao' && state.institutionId === institutionId
     await pool.query(
-      `INSERT INTO student_profiles (user_id, track, institution_id, daily_goal) VALUES ($1, $2, $3, $4)
-       ON CONFLICT (user_id) DO UPDATE SET track = $2, institution_id = $3, daily_goal = $4, updated_at = now()`,
-      [user.id, input.track, institutionId, input.dailyGoal],
+      `INSERT INTO student_profiles (user_id, track, institution_id) VALUES ($1, $2, $3)
+       ON CONFLICT (user_id) DO UPDATE SET track = $2, institution_id = $3, updated_at = now(),
+         target_course_id = CASE WHEN $4 THEN student_profiles.target_course_id ELSE NULL END,
+         target_course = CASE WHEN $4 THEN student_profiles.target_course ELSE NULL END,
+         target_option_id = CASE WHEN $4 THEN student_profiles.target_option_id ELSE NULL END`,
+      [user.id, input.track, institutionId, keepCourse],
     )
     revalidatePath('/aluno')
   })
 }
 
-/** Ecrã 3: lembretes e hora preferida. Fecha o onboarding. O Web Push ainda não existe: fica sempre desligado. */
-export async function saveReminders(input: { choice: 'email' | 'none'; hour?: number }): Promise<StepResult> {
-  return step('Não foi possível guardar. Tenta outra vez.', async (user) => {
-    if (input?.choice !== 'email' && input?.choice !== 'none') throw new AppError('Escolhe uma opção.')
-    const hour = input.hour ?? DEFAULT_STUDY_HOUR
-    if (!isStudyHour(hour)) throw new AppError('Escolhe uma hora válida.')
-    const state = await getOnboardingState(user.id)
-    if (!state.birthDate || !state.track || !state.dailyGoal) throw new AppError('Faltam passos anteriores. Volta atrás.')
+/** Cursos da instituição que o aluno escolheu (lista vinda da base de dados). */
+export async function listCoursesOfMyInstitution(): Promise<{ ok: true; courses: { id: string; name: string; unit: string | null }[] } | { ok: false; message: string }> {
+  const session = await auth.api.getSession({ headers: await headers() }).catch(() => null)
+  if (!session?.user) return { ok: false, message: 'A tua sessão expirou. Inicia sessão outra vez.' }
+  try {
+    const state = await getOnboardingState(session.user.id)
+    if (!state.institutionId) return { ok: true, courses: [] }
+    return { ok: true, courses: await listInstitutionCourses(state.institutionId) }
+  } catch (error) {
+    console.error('[ONBOARDING] cursos', error)
+    return { ok: false, message: 'Não foi possível carregar os cursos. Tenta outra vez.' }
+  }
+}
 
-    // Só lembretes de estudo e resumo: nunca promoção (menores de 18 não recebem promoção; hoje ninguém recebe).
+/** Combinações de provas do curso. Se houver mais de uma, o aluno escolhe; se houver uma, fica escolhida sozinha. */
+export async function listCourseCombos(courseId: string): Promise<{ ok: true; combos: { optionId: string; label: string }[] } | { ok: false; message: string }> {
+  const session = await auth.api.getSession({ headers: await headers() }).catch(() => null)
+  if (!session?.user) return { ok: false, message: 'A tua sessão expirou. Inicia sessão outra vez.' }
+  try {
+    if (typeof courseId !== 'string' || courseId.length > 100) return { ok: true, combos: [] }
+    const combos = await getCourseCombos(courseId)
+    return { ok: true, combos: combos.map((combo) => ({ optionId: combo.optionId, label: combo.label })) }
+  } catch (error) {
+    console.error('[ONBOARDING] combinações', error)
+    return { ok: false, message: 'Não foi possível carregar as provas do curso. Tenta outra vez.' }
+  }
+}
+
+/** Curso e combinação de provas. courseId nulo = «ainda não sei» (o teste vocacional fica à espera no painel). */
+export async function saveCourse(input: { courseId: string | null; optionId: string | null }): Promise<StepResult> {
+  return step('Não foi possível guardar. Tenta outra vez.', async (user) => {
+    const state = await getOnboardingState(user.id)
+    if (state.track !== 'admissao' || !state.institutionId) throw new AppError('Escolhe primeiro a instituição.')
+    if (!input?.courseId) {
+      await pool.query(`UPDATE student_profiles SET target_course_id = NULL, target_course = NULL, target_option_id = NULL, updated_at = now() WHERE user_id = $1`, [user.id])
+      revalidatePath('/aluno')
+      return
+    }
+    const course = await pool.query('SELECT name FROM courses WHERE id = $1 AND institution_id = $2 AND active', [input.courseId, state.institutionId])
+    if (!course.rows[0]) throw new AppError('Escolhe um curso da lista da tua instituição.')
+    const resolved = resolveCombo(await getCourseCombos(input.courseId), typeof input.optionId === 'string' ? input.optionId : null)
+    if (resolved.needsChoice) throw new AppError('Escolhe a tua combinação de provas.')
+    await pool.query(
+      `UPDATE student_profiles SET target_course_id = $2, target_course = $3, target_option_id = $4, updated_at = now() WHERE user_id = $1`,
+      [user.id, input.courseId, course.rows[0].name, resolved.optionId],
+    )
+    revalidatePath('/aluno')
+    revalidatePath('/aluno/perfil')
+  })
+}
+
+/**
+ * Último passo: meta diária. Fecha o onboarding. Os lembretes vêm ligados por defeito (e-mail); o push depende da permissão
+ * do aluno e pede-se num modal no painel. Desliga-se no perfil.
+ */
+export async function saveGoal(input: { dailyGoal: number }): Promise<StepResult> {
+  return step('Não foi possível guardar. Tenta outra vez.', async (user) => {
+    const state = await getOnboardingState(user.id)
+    if (!state.birthDate || !state.track) throw new AppError('Faltam passos anteriores. Volta atrás.')
+    if (!isDailyGoal(input?.dailyGoal)) throw new AppError('Escolhe a tua meta diária.')
+    await pool.query(`UPDATE student_profiles SET daily_goal = $2, onboarded_at = coalesce(onboarded_at, now()), updated_at = now() WHERE user_id = $1`, [user.id, input.dailyGoal])
+
+    // Só lembretes de estudo e resumo: nunca promoção. Se já existia uma escolha, mantém-se.
     await pool.query(
       `INSERT INTO notification_prefs (user_id, email_enabled, push_enabled, categories, unsubscribe_token, study_hour)
-       VALUES ($1, $2, false, $3::jsonb, $4, $5)
-       ON CONFLICT (user_id) DO UPDATE SET email_enabled = $2, categories = $3::jsonb, study_hour = $5, updated_at = now()`,
-      [user.id, input.choice === 'email', JSON.stringify({ study: true, summary: true, promo: false }), randomBytes(24).toString('hex'), hour],
+       VALUES ($1, true, false, $2::jsonb, $3, $4) ON CONFLICT (user_id) DO NOTHING`,
+      [user.id, JSON.stringify({ study: true, summary: true, promo: false }), randomBytes(24).toString('hex'), DEFAULT_STUDY_HOUR],
     )
-    await pool.query(`UPDATE student_profiles SET onboarded_at = coalesce(onboarded_at, now()), updated_at = now() WHERE user_id = $1`, [user.id])
 
     // Boas-vindas na plataforma, uma só vez.
     const firstName = state.name.split(' ')[0] || 'estudante'

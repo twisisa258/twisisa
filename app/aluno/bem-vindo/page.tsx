@@ -6,9 +6,9 @@ import { provisionalName } from '@/lib/identity'
 import { OnboardingFlow } from '@/components/onboarding/onboarding-flow'
 
 export const dynamic = 'force-dynamic'
-export const metadata = { title: 'Bem-vindo | Twisisa', description: 'Três passos rápidos para começares a estudar.', robots: { index: false, follow: false } }
+export const metadata = { title: 'Bem-vindo | Twisisa', description: 'Poucos passos rápidos para começares a estudar.', robots: { index: false, follow: false } }
 
-// Onboarding: 3 ecrãs (docs/IDENTIDADE-ONBOARDING-RETENCAO.md, secção 3). Só há uma página; o passo vem do que falta no servidor.
+// Onboarding curto (docs/IDENTIDADE-ONBOARDING-RETENCAO.md, secção 3). Só há uma página; o passo vem do que falta no servidor.
 export default async function BemVindoPage() {
   const session = await requireSession(ONBOARDING_PATH)
   const state = await getOnboardingState(session.user.id)

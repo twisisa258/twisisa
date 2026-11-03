@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { getStudentSubjectIds } from '@/lib/combinacoes'
 import { AppError } from '@/lib/action-result'
 import { pool } from '@/lib/db'
 import type { Track } from '@/lib/percurso'
@@ -189,7 +190,9 @@ export async function startAttempt(scope: StudentScope, mode: AttemptMode, subje
 
   const size = options.size ?? (mode === 'pratica' ? PRACTICE_SIZE : ROUND_SIZE)
   const secondsPerQuestion = (options.quickSeconds ?? QUICK_SECONDS_PER_QUESTION) + QUICK_SERVER_MARGIN_SECONDS
-  const params = [...scopeParams(scope), scope.userId, subjectId, variant, topicId]
+  // Sem disciplina escolhida, a sessão gira à volta das disciplinas da combinação do aluno (se escolheu curso).
+  const mine = subjectId ? null : await getStudentSubjectIds(scope.userId)
+  const params = [...scopeParams(scope), scope.userId, subjectId, variant, topicId, mine]
   const poolRows = (
     await pool.query<PoolRow>(
       `SELECT q.id, q.exam_year, q.topic_id, q.variant, q.difficulty, v.difficulty AS variant_difficulty,
@@ -197,7 +200,7 @@ export async function startAttempt(scope: StudentScope, mode: AttemptMode, subje
        FROM questions q
        LEFT JOIN subject_variants v ON v.subject_id = q.subject_id AND v.name = q.variant
        LEFT JOIN student_question_stats st ON st.user_id = $4 AND st.question_id = q.id
-       WHERE ${SCOPE} AND ($5::text IS NULL OR q.subject_id = $5) AND ($6::text IS NULL OR q.variant = $6) AND ($7::text IS NULL OR q.topic_id = $7)
+       WHERE ${SCOPE} AND ($5::text IS NULL OR q.subject_id = $5) AND ($6::text IS NULL OR q.variant = $6) AND ($7::text IS NULL OR q.topic_id = $7) AND ($8::text[] IS NULL OR q.subject_id = ANY($8::text[]))
          ${mode === 'revisao' ? `AND st.last_result = 'wrong'` : ''}`,
       params,
     )

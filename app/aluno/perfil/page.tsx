@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { BookOpen, GraduationCap, Lock, School, Sparkles, UserRound, Check } from 'lucide-react'
+import { Bell, BookOpen, GraduationCap, Lock, School, Sparkles, UserRound, Check } from 'lucide-react'
 import { eq } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { db, pool } from '@/lib/db'
 import { institutions, studentProfiles } from '@/lib/db/schema'
 import { levelLabel } from '@/lib/percurso'
 import { PROVINCES, profileSteps } from '@/lib/perfil'
@@ -14,13 +14,14 @@ import { ORIENTACAO_HREF } from '@/lib/orientacao'
 import { getCourseSubjects, listInstitutionCourses } from '@/lib/target-course'
 import { formatPoints } from '@/lib/simulator-shared'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
-import { SelectField } from '@/components/ui/select-field'
+import { EscolhaBotoes } from '@/components/ui/escolha-botoes'
 import { AvatarUploader } from '@/components/aluno/perfil/avatar-uploader'
 import { Field, fieldClass } from '@/components/aluno/perfil/fields'
 import { PasswordForm } from '@/components/aluno/perfil/password-form'
 import { ProfileAccordion, type AccordionItem } from '@/components/aluno/perfil/profile-accordion'
 import { SectionForm } from '@/components/aluno/perfil/section-form'
-import { CoursePicker } from '@/components/aluno/perfil/course-picker'
+import { CursoCombinacao } from '@/components/aluno/perfil/curso-combinacao'
+import { LembretesSwitch } from '@/components/aluno/lembretes-switch'
 import { saveCandidate, savePersonal, saveSchool } from './actions'
 
 export const metadata = { title: 'O meu perfil | Twisisa', description: 'Gere as tuas informações pessoais e preferências.' }
@@ -46,6 +47,9 @@ export default async function PerfilPage() {
   const isAdmissionTrack = current?.track === 'admissao' && !!current.institutionId
   const institutionCourses = isAdmissionTrack ? await listInstitutionCourses(current.institutionId!).catch(() => []) : []
   const courseSubjects = current?.targetCourseId ? await getCourseSubjects(current.targetCourseId).catch(() => []) : []
+
+  const prefs = (await pool.query(`SELECT email_enabled, push_enabled FROM notification_prefs WHERE user_id = $1`, [session.user.id]).catch(() => ({ rows: [] }))).rows[0]
+  const remindersOn = prefs ? prefs.email_enabled === true || prefs.push_enabled === true : false
 
   const name = session.user.name
   const firstName = name.split(' ')[0]
@@ -112,7 +116,7 @@ export default async function PerfilPage() {
       content: (
         <SectionForm sectionId="escola" action={saveSchool}>
           <Field label="Província" custom>
-            <SelectField name="province" label="Província" placeholder="Escolhe a província" defaultValue={current?.province ?? ''} triggerClassName={fieldClass} options={PROVINCES.map((province) => ({ value: province, label: province }))} />
+            <EscolhaBotoes name="province" rotulo="Província" defaultValue={current?.province ?? null} options={PROVINCES.map((province) => ({ value: province, label: province }))} />
           </Field>
           <Field label="Escola">
             <input name="school" maxLength={120} defaultValue={current?.school ?? ''} placeholder="Ex.: Escola Secundária Josina Machel" className={fieldClass} />
@@ -141,10 +145,10 @@ export default async function PerfilPage() {
               ) : (
                 <SectionForm sectionId="percurso" action={saveCandidate}>
                   <Field label="Curso alvo" custom>
-                    <CoursePicker name="targetCourseId" courses={institutionCourses} defaultValue={current?.targetCourseId ?? null} />
+                    <CursoCombinacao courses={institutionCourses.map((course) => ({ id: course.id, label: course.name, detail: course.unit }))} defaultCourseId={current?.targetCourseId ?? null} defaultOptionId={current?.targetOptionId ?? null} />
                   </Field>
                   <Field label="Meta de nota" hint="Escala de 0 a 20." custom>
-                    <SelectField name="targetScore" label="Meta de nota" defaultValue={String(current?.targetScore ?? 12)} triggerClassName={fieldClass} options={[10, 12, 14, 16, 18, 20].map((score) => ({ value: String(score), label: String(score) }))} />
+                    <EscolhaBotoes name="targetScore" rotulo="Meta de nota" defaultValue={String(current?.targetScore ?? 12)} options={[10, 12, 14, 16, 18, 20].map((score) => ({ value: String(score), label: String(score) }))} />
                   </Field>
                 </SectionForm>
               )}
@@ -154,6 +158,13 @@ export default async function PerfilPage() {
           )}
         </div>
       ),
+    },
+    {
+      id: 'lembretes',
+      icon: <Bell />,
+      title: 'Lembretes',
+      summary: remindersOn ? 'Ligados' : 'Desligados',
+      content: <LembretesSwitch initialOn={remindersOn} publicKey={process.env.VAPID_PUBLIC_KEY ?? ''} />,
     },
     {
       id: 'seguranca',

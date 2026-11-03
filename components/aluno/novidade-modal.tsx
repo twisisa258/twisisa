@@ -4,14 +4,18 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { Bookmark, Lightbulb, Sparkles } from 'lucide-react'
 import { MiniModal } from '@/components/aluno/mini-modal'
-import { fechar, foiFechado } from '@/lib/dispensar'
+import { fechar, foiFechado, reservarModalHoje } from '@/lib/dispensar'
 
 const ID = 'novidade:kit-v2'
 
 // Novidade que aparece uma só vez por aparelho. Para anunciar outra, muda o ID e o conteúdo.
 export function NovidadeModal() {
   const [aberto, setAberto] = useState(false)
-  useEffect(() => { if (!foiFechado(ID)) setAberto(true) }, [])
+  useEffect(() => {
+    // Espera um pouco: o modal de notificações (mais importante) tem prioridade e só um aparece por dia.
+    const atraso = window.setTimeout(() => { if (!foiFechado(ID) && reservarModalHoje()) setAberto(true) }, 2500)
+    return () => window.clearTimeout(atraso)
+  }, [])
   const close = useCallback(() => { fechar(ID); setAberto(false) }, [])
 
   return (

@@ -21,7 +21,7 @@ Estados: FEITO E TESTADO · FEITO, FALTA TESTE · FICTÍCIO (dados inventados) �
 | Página | Estado | Nota |
 |---|---|---|
 | `/sign-up`, `/sign-in` | FEITO, FALTA TESTE | Registo de 1 ecrã: e-mail, palavra-passe, caixa dos Termos (versão e data em `account_consents`). Validação em tempo real e repetida no servidor (`hooks.before` em `lib/auth.ts`). Botão Google desactivado até existirem `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`. Sessão de 30 dias; «Computador partilhado» na entrada (`rememberMe: false`, a confirmar em ensaio); depois de entrar volta ao sítio de origem (`?next=`). Limite de pedidos na base de dados (tabela `rateLimit`). |
-| `/aluno/bem-vindo` (onboarding) | FEITO, FALTA TESTE | 3 ecrãs: Sobre ti (nome, data de nascimento, Termos se faltarem), O que preparas (percurso, instituição, meta diária), Lembretes (e-mail com hora preferida, ou nada; telemóvel «Em breve»). Cada passo guarda-se ao avançar. Menor de 13 anos: conta apagada e ecrã de recusa. Menores de 18: ranking oculto por omissão. No fim abre uma Prática com o tamanho da meta diária (se houver questões). Critério nº 1: o ecrã 2 caber em 360x640 sem scroll (não testado em aparelho). |
+| `/aluno/bem-vindo` (onboarding) | FEITO, FALTA TESTE | Passos curtos, só botões: Sobre ti (nome, data DD/MM/AAAA, Termos), O que preparas (percurso e, na admissão, instituição), Curso (lista com procura; «Ainda não sei» leva ao teste vocacional no painel), Combinação de provas (só se o curso tiver mais de uma), Meta diária. No fim, um modal pergunta «Queres praticar agora?»: nunca abre um quiz sozinho. Os lembretes ficam ligados por defeito (e-mail). |
 | `/esqueci-a-senha`, `/redefinir-senha` | FEITO, FALTA TESTE | Depende do domínio no Resend (`docs/EMAIL.md`). |
 | `/aluno/percurso` | FEITO, FALTA TESTE | 10ª, 12ª ou admissão (com instituição). |
 | `/aluno` (painel) | FEITO, FALTA TESTE | Linha discreta «Hoje 4/10 · 3 dias seguidos» com dados reais de `study_days` (escritos pelo simulador, pela Biblioteca e pelo Jonas). Parabéns no aniversário (dia e mês, fuso de Maputo; 29/02 celebra a 28/02 nos anos não bissextos). |
@@ -31,7 +31,6 @@ Estados: FEITO E TESTADO · FEITO, FALTA TESTE · FICTÍCIO (dados inventados) �
 | `/aluno/ranking` | FEITO, FALTA TESTE | Real (pontos de `attempt_items`). `show_in_ranking` é verdadeiro por omissão. |
 | `/jonas` | FEITO, FALTA TESTE | Groq. Só travão de 25 mensagens por minuto; sem limites por plano. |
 | `/aluno/notificacoes` | FEITO, FALTA TESTE | Lembretes criados pelo cron (`lib/lembretes.ts`) e a mensagem de boas-vindas; mais recentes primeiro, com ação e «marcar tudo como lido». |
-| `/aluno/lembretes` | FEITO, FALTA TESTE | Ligar ou desligar o e-mail e escolher a hora (de Maputo). `/lembretes/cancelar?token=` desliga com um botão de confirmação (não ao abrir a ligação). |
 | `/aluno/estudar-depois` | FEITO, FALTA TESTE | Questões guardadas no Kit ou no resultado, por data; «Praticar este tema» inicia uma Prática. |
 | `/aluno/favoritos` | FEITO, FALTA TESTE | Lista real de `library_favorites` (só materiais aprovados). |
 | `/aluno/desafios` | FEITO, FALTA TESTE | Sequência, missões do dia e da semana, prontidão por curso e avisos, tudo calculado a partir das respostas do Simulador (`lib/desafios.ts`). Curso alvo escolhido no perfil ou no resultado do teste vocacional (`student_profiles.target_course_id`, migração 0026). |
@@ -67,10 +66,11 @@ Botão flutuante no quiz (`components/simulador/toolbox.tsx`, atalho `T`). No Mo
 | Reportar questão | sempre | `question_reports`; lido em `/admin/reportes`. |
 
 ## Lembretes
-- Hora escolhida no onboarding ou em `/aluno/lembretes` (`notification_prefs.study_hour`, padrão 18h de Maputo).
-- Cron de hora a hora (`vercel.json`; exige plano da Vercel com crons horários). Protegido por `CRON_SECRET`.
-- No máximo um lembrete por aluno e dia (`last_sent_on`, chave `lembrete:<dia>`). Meta cumprida e nada para rever: não envia nada (`chooseReminder`, testado).
-- Meta diária do aluno (`student_profiles.daily_goal`) já manda na sequência, nas missões e nos avisos.
+- Não há página de lembretes. Os lembretes vêm **ligados por defeito** (e-mail, criado no fim do onboarding: `saveGoal`). O push pede-se num **modal simples** no painel (`components/aluno/notificacoes-modal.tsx`, botão «Permitir notificações»), só se o navegador ainda não decidiu.
+- No **perfil**, secção «Lembretes», um interruptor liga ou desliga tudo (`LembretesSwitch` → `setReminders`; ao desligar apagam-se os aparelhos registados).
+- No máximo **uma janela por dia** por aparelho (`reservarModalHoje` em `lib/dispensar.ts`): notificações, depois instalar a app, depois novidade.
+- Hora do lembrete: `notification_prefs.study_hour` (padrão `DEFAULT_STUDY_HOUR`, hora de Maputo). `/lembretes/cancelar?token=` desliga com um botão de confirmação.
+- Cron (`/api/cron/lembretes`), regras em `lib/lembretes-shared.ts`; envia e-mail e push.
 
 ## Cores (`app/globals.css`)
 Marca (ação principal), sucesso, erro (só erros), aviso (atenção e tempo a acabar), ajuda (azul), assistente e revisão (índigo), conquista (dourado). Classes `.btn-primario/-secundario/-terciario/-perigo/-icone` e `.chip`. Pílula só para etiquetas.
@@ -87,7 +87,10 @@ Pontuação solta numa linha (ex.: um `.` sozinho) junta-se à linha anterior, t
 Cada bloco tem forma própria: destaque escuro «Hoje» (`hoje-hero.tsx`: anel da meta + continuar), faixa fina de aviso que se fecha (`aviso-faixa.tsx`, um por vez, «+N» abre janela pequena, volta no dia seguinte), fichas «Para hoje» (`plano-hoje.tsx`), três atalhos em grelha, cartão de orientação que se fecha (`fechavel.tsx`, volta ao fim de 14 dias) e uma janela de novidade única (`novidade-modal.tsx`, muda o ID em `ID` para anunciar outra). O «fechado» fica só no aparelho (`lib/dispensar.ts`, localStorage).
 
 ## Web push
-Ficheiros: `public/sw.js` (service worker), `lib/push.ts` (envio), `app/api/push` (registar/apagar aparelho) e `app/api/push/teste`, `components/aluno/push-toggle.tsx` (botão em `/aluno/lembretes`). O cron dos lembretes (`lib/lembretes.ts`) envia também por push a quem ligou. Variáveis: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` (opcional). Chaves: `npx web-push generate-vapid-keys`. No iPhone só funciona com a app instalada no ecrã principal. Com o plano Hobby da Vercel o cron corre uma vez por dia.
+Ficheiros: `public/sw.js` (service worker), `lib/push.ts` (envio), `lib/push-client.ts` (navegador: pedir permissão e registar), `app/api/push` (registar/apagar aparelho) e `app/api/push/teste` (diagnóstico; sem botão no ecrã). O cron envia a quem permitiu. Variáveis: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` (opcional). No iPhone só funciona com a app instalada no ecrã principal. Com o plano Hobby da Vercel o cron corre uma vez por dia.
+
+## Percurso, exames e calendário
+Especificação e estado das fases em `docs/EXAMES-E-PERCURSO.md`. Feito: modal «Praticar agora?», modal de instalar a app, curso e combinação de provas (onboarding e perfil), Simulador só com as disciplinas da combinação (botões), notificações em modal. Por fazer: exame com regras, calendário, UEM integrado, seletores do admin e da Biblioteca. Regra de ouro: nada de listas fixas no código; tudo na base de dados e no admin; sem `<select>`, `alert` ou `confirm` nativos.
 
 ## Pendentes, por prioridade
 P0 (antes de receber estudantes)

@@ -12,7 +12,8 @@ import { StudentFeatureShell } from '@/components/student-feature-shell'
 import { EmptyState } from '@/components/states/empty-state'
 import { SimHeader } from '@/components/simulador/sim-header'
 import { SimTabs } from '@/components/simulador/sim-tabs'
-import { SubjectSelect } from '@/components/simulador/subject-select'
+import { SubjectChoice } from '@/components/simulador/subject-choice'
+import { getStudentSubjectIds } from '@/lib/combinacoes'
 import { ModePicker } from '@/components/simulador/mode-picker'
 import { StartCard } from '@/components/simulador/start-actions'
 
@@ -44,7 +45,10 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
   const enabled = modules.flatMap((item) => (item.status === 'active' && MODE_BY_MODULE[item.key] ? [MODE_BY_MODULE[item.key]!] : []))
   const mode: AttemptMode = isAttemptMode(m) && enabled.includes(m) ? m : (enabled[0] ?? 'pratica')
 
-  const subjects = hub?.subjects ?? []
+  // Quem escolheu curso e combinação vê só as duas disciplinas das suas provas.
+  const allowed = await getStudentSubjectIds(scope.userId).catch(() => null)
+  const subjects = (hub?.subjects ?? []).filter((item) => !allowed || allowed.includes(item.id))
+  const total = subjects.reduce((sum, item) => sum + item.count, 0)
   const chosen = subjects.find((item) => item.id === d) ?? (subjects.length === 1 ? subjects[0] : null)
   const size = sessionSize(mode, prefs, ROUND_SIZE)
   const catalog = chosen && hub && mode !== 'revisao' ? await getVariants(scope, chosen.id) : null
@@ -62,7 +66,7 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
             <h2 className="text-base font-semibold">Não foi possível carregar</h2>
             <Link href="/aluno/simulador" className="mt-4 inline-flex h-11 items-center justify-center rounded-full bg-marca px-5 text-sm font-semibold text-white">Tentar de novo</Link>
           </div>
-        ) : hub.totalQuestions === 0 || enabled.length === 0 ? (
+        ) : total === 0 || enabled.length === 0 ? (
           <EmptyState title="O Simulador abre em breve" description="Enquanto isso, estuda com os materiais da Biblioteca." actionLabel="Ver a Biblioteca" actionHref="/biblioteca" />
         ) : (
           <>
@@ -76,7 +80,7 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
               </Link>
             )}
 
-            <SubjectSelect subjects={subjects} current={chosen?.id ?? null} mode={mode} />
+            <SubjectChoice subjects={subjects} current={chosen?.id ?? null} mode={mode} />
 
             {chosen && (
               <div key={`${chosen.id}-${mode}`} className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
