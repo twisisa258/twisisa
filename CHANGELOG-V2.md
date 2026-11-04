@@ -41,4 +41,5 @@ Web Push; datas de exame (fase H); repetição espaçada automática; «dia livr
 - Candidatos sem curso (ou combinação) não começam nenhuma prática: página `/aluno/escolher-curso`, guarda nas páginas do Simulador e em `startAttempt`, destaque no painel. Quem já tinha conta entra na regra sozinho. Combinação lida por SQL (as páginas não dependem da migração 0031 para abrir). Desafios usam as disciplinas da combinação.
 - Escolher curso passou a modal grande e fechável no painel (sem página própria); painel limpo enquanto falta o curso.
 - Motor de notificações push de 30 em 30 minutos com variedade (prazo do desafio, prática a meio, matéria nova, questões quentes, voltar, escolher curso), limites e silêncio configuráveis. Migração 0032, workflow `.github/workflows/push-cron.yml`, `docs/NOTIFICACOES-PUSH.md`.
+- Edital 2027 (UP-Maputo, UniLicungo, UniPúnguè, UniRovuma) carregado: migrações 0033 (regime à distância e vagas), 0034 (cursos, provas e disciplinas por instituição) e 0035 (lembretes ligados por defeito para quem já fez o onboarding). Editar um curso no admin passa a manter as vagas e a combinação que os alunos escolheram.
 

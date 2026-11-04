@@ -58,7 +58,7 @@ Ao escolher a disciplina, a página diz claramente se é **exame** ou **prática
 ## 4. Calendário de exames
 - O **edital** de cada instituição traz sempre as datas de início dos exames. O aluno vê um **calendário** com a data do exame **real** dele.
 - O aluno pode **criar agenda** de exames dentro da plataforma (os seus treinos e exames), com lembrete (liga aos lembretes e ao web push).
-- As datas oficiais são dados do admin, com a fonte (link do edital).
+- As datas oficiais são dados do admin, com a fonte (link do edital). As do edital 2027 (UP, UniLicungo, UniPúnguè, UniRovuma) já estão recolhidas em `docs/EDITAL-UP-2027.md`, prontas a lançar quando a tabela existir.
 
 ## 4.1 Lembretes e notificações (decidido)
 - Não há página de configurações de lembretes. Os lembretes vêm ligados por defeito; um modal simples pede a permissão de notificações e o perfil tem um interruptor para desligar.

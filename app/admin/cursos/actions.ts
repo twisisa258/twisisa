@@ -67,6 +67,7 @@ export async function saveCourse(formData: FormData): Promise<ActionResult> {
 
     const client = await pool.connect()
     let courseId = id
+    let kept: PreservedOptions = { vacancies: new Map(), students: new Map() }
     try {
       await client.query('BEGIN')
       const inst = await client.query('SELECT 1 FROM institutions WHERE id = $1', [institutionId])
@@ -84,14 +85,17 @@ export async function saveCourse(formData: FormData): Promise<ActionResult> {
         // Nunca perder opções em silêncio: o formulário só mostra MAX_OPTIONS.
         const current = await client.query('SELECT count(*)::int AS n FROM course_exam_options WHERE course_id = $1', [id])
         if (current.rows[0].n > MAX_OPTIONS) throw new AppError(`Este curso tem ${current.rows[0].n} opções de exame e o formulário só edita ${MAX_OPTIONS}.`)
+        kept = await captureOptionState(client, id)
         await client.query('DELETE FROM course_exam_options WHERE course_id = $1', [id])
       } else {
         courseId = `course-${randomUUID()}`
         await client.query('INSERT INTO courses (id, institution_id, name, unit, campus) VALUES ($1, $2, $3, $4, $5)', [courseId, institutionId, name, unit || null, campus || null])
       }
 
+      const created: { optionId: string; period: string; key: string }[] = []
       for (const [index, option] of options.entries()) {
         const optionId = `opt-${randomUUID()}`
+        const paperIds: string[] = []
         await client.query('INSERT INTO course_exam_options (id, course_id, period, sort_order) VALUES ($1, $2, $3, $4)', [optionId, courseId, option.period, index])
         for (const paper of option.papers) {
           // A prova (disciplina + variante) é da instituição; cria-se na primeira vez que é usada.
@@ -101,8 +105,12 @@ export async function saveCourse(formData: FormData): Promise<ActionResult> {
             [`paper-${randomUUID()}`, institutionId, paper.subjectId, paper.variant],
           )
           await client.query('INSERT INTO course_exam_option_papers (option_id, paper_id, weight) VALUES ($1, $2, $3)', [optionId, found.rows[0].id, paper.weight])
+          paperIds.push(found.rows[0].id)
         }
+        created.push({ optionId, period: option.period, key: [...paperIds].sort().join('|') })
       }
+      // Editar o curso refaz as opções; o que os alunos já escolheram e as vagas passam para a opção equivalente.
+      await restoreOptionState(client, courseId, kept, created)
       await client.query('COMMIT')
     } catch (error) {
       await client.query('ROLLBACK')
@@ -143,4 +151,49 @@ export async function deleteCourse(formData: FormData): Promise<ActionResult> {
     refresh()
     return 'Curso eliminado.'
   }, 'Não foi possível eliminar o curso. Tenta outra vez.')
+}
+
+type DbClient = Awaited<ReturnType<typeof pool.connect>>
+type PreservedOptions = { vacancies: Map<string, number>; students: Map<string, string[]> }
+
+// Guarda, antes de refazer as opções, as vagas e a combinação que cada aluno escolheu. Nunca impede a gravação do curso.
+async function captureOptionState(client: DbClient, courseId: string): Promise<PreservedOptions> {
+  const out: PreservedOptions = { vacancies: new Map(), students: new Map() }
+  try {
+    await client.query('SAVEPOINT preservar')
+    const rows = await client.query(
+      `SELECT o.period, o.vacancies, sp.user_id,
+              (SELECT string_agg(op.paper_id, '|' ORDER BY op.paper_id) FROM course_exam_option_papers op WHERE op.option_id = o.id) AS key
+       FROM course_exam_options o
+       LEFT JOIN student_profiles sp ON sp.target_option_id = o.id AND sp.target_course_id = o.course_id
+       WHERE o.course_id = $1`,
+      [courseId],
+    )
+    for (const row of rows.rows) {
+      if (row.vacancies !== null) out.vacancies.set(`${row.period}|${row.key}`, row.vacancies as number)
+      if (row.user_id) out.students.set(row.key as string, [...(out.students.get(row.key as string) ?? []), row.user_id as string])
+    }
+    await client.query('RELEASE SAVEPOINT preservar')
+  } catch (error) {
+    await client.query('ROLLBACK TO SAVEPOINT preservar').catch(() => undefined)
+    console.error('[ADMIN-CURSOS] não foi possível guardar as vagas e as escolhas dos alunos', error)
+  }
+  return out
+}
+
+async function restoreOptionState(client: DbClient, courseId: string | null, kept: PreservedOptions, created: { optionId: string; period: string; key: string }[]) {
+  if (!courseId || (kept.vacancies.size === 0 && kept.students.size === 0)) return
+  try {
+    await client.query('SAVEPOINT restaurar')
+    for (const item of created) {
+      const vacancies = kept.vacancies.get(`${item.period}|${item.key}`)
+      if (vacancies !== undefined) await client.query('UPDATE course_exam_options SET vacancies = $2 WHERE id = $1', [item.optionId, vacancies])
+      const users = kept.students.get(item.key)
+      if (users?.length) await client.query('UPDATE student_profiles SET target_option_id = $2 WHERE user_id = ANY($1::text[]) AND target_course_id = $3 AND target_option_id IS NULL', [users, item.optionId, courseId])
+    }
+    await client.query('RELEASE SAVEPOINT restaurar')
+  } catch (error) {
+    await client.query('ROLLBACK TO SAVEPOINT restaurar').catch(() => undefined)
+    console.error('[ADMIN-CURSOS] não foi possível repor as vagas e as escolhas dos alunos', error)
+  }
 }

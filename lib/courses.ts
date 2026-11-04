@@ -3,6 +3,7 @@ import { pool } from '@/lib/db'
 export const PERIODS = [
   { value: 'laboral', label: 'Laboral' },
   { value: 'pos_laboral', label: 'Pós-laboral' },
+  { value: 'ead', label: 'À distância' },
 ] as const
 export type Period = (typeof PERIODS)[number]['value']
 

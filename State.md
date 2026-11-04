@@ -92,6 +92,9 @@ Ficheiros: `public/sw.js` (service worker), `lib/push.ts` (envio), `lib/push-cli
 ## Percurso, exames e calendário
 Especificação, mapa do fluxo entre cursos e disciplinas e estado das fases em `docs/EXAMES-E-PERCURSO.md`. Feito: modal «Praticar agora?», modal de instalar a app, curso e combinação de provas (onboarding, perfil, `/aluno/escolher-curso`), bloqueio «sem curso não se começa nada» para candidatos, Simulador só com as disciplinas da combinação (botões), notificações em modal. Por fazer: exame com regras, calendário, UEM integrado, seletores do admin e da Biblioteca. Regra de ouro: nada de listas fixas no código; tudo na base de dados e no admin; sem `<select>`, `alert` ou `confirm` nativos.
 
+## Editais de admissão carregados
+Edital 2027 da UP-Maputo, UniLicungo, UniPúnguè e UniRovuma: 184 cursos, 248 opções, vagas e provas por curso (`database/migrations/0033` e `0034`). Datas, regras, confirmações em falta e mapa de provas: `docs/EDITAL-UP-2027.md`. Cursos por concurso documental não entram (não há exame). A UEM 2027 falta carregar.
+
 ## Pendentes, por prioridade
 P0 (antes de receber estudantes)
 1. Ensaio completo com 3 a 5 estudantes reais num telemóvel (conta, e-mail, percurso, simulado, ranking, Jonas, Biblioteca).
