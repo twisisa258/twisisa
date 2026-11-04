@@ -1,6 +1,7 @@
 import { pool } from '@/lib/db'
 import { getSimulatorHub, type StudentScope } from '@/lib/simulator'
-import { getCourse, getCourseSubjects } from '@/lib/target-course'
+import { getCourse } from '@/lib/target-course'
+import { getStudentCourseSubjects } from '@/lib/combinacoes'
 import {
   DAILY_GOAL,
   MIN_SAMPLE,
@@ -94,7 +95,7 @@ export async function getDesafios(input: { scope: StudentScope; targetCourseId: 
   const playable = new Map(hub.subjects.map((subject) => [subject.id, subject.name]))
   let base: { id: string; name: string; weight: number }[]
   if (validCourse) {
-    const weights = await getCourseSubjects(validCourse.id)
+    const weights = await getStudentCourseSubjects(input.scope.userId, validCourse.id)
     base = weights.filter((item) => playable.has(item.id))
   } else {
     base = hub.subjects.map((subject) => ({ id: subject.id, name: subject.name, weight: 1 }))

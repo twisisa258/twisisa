@@ -12,7 +12,7 @@ import { isUniqueViolation } from '@/lib/pg-errors'
 import { AVATAR_FOLDER, isProvince } from '@/lib/perfil'
 import { DEFAULT_STUDY_HOUR } from '@/lib/lembretes-shared'
 import { removeAllSubscriptions } from '@/lib/push'
-import { getCourseCombos } from '@/lib/combinacoes'
+import { getCourseCombos, setStudentOption } from '@/lib/combinacoes'
 import { resolveCombo } from '@/lib/combinacoes-pure'
 
 // Cada secção do perfil guarda-se sozinha: um erro numa não perde o que está nas outras.
@@ -108,8 +108,9 @@ export async function saveCandidate(formData: FormData): Promise<ActionResult> {
 
     await db
       .insert(studentProfiles)
-      .values({ userId: current.id, targetCourseId, targetCourse, targetOptionId, targetScore })
-      .onConflictDoUpdate({ target: studentProfiles.userId, set: { targetCourseId, targetCourse, targetOptionId, targetScore, updatedAt: new Date() } })
+      .values({ userId: current.id, targetCourseId, targetCourse, targetScore })
+      .onConflictDoUpdate({ target: studentProfiles.userId, set: { targetCourseId, targetCourse, targetScore, updatedAt: new Date() } })
+    await setStudentOption(current.id, targetOptionId)
 
     refresh()
     return 'Guardado.'

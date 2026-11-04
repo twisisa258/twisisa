@@ -23,6 +23,24 @@ Pedido do dono do produto em 2026-11-02. Este documento existe para nada se perd
 - No **Simulador só aparecem as duas disciplinas** da combinação do aluno, como dois botões grandes. Sem seletor de disciplina.
 - Esta etapa **não pode ser saltada** (ver pergunta aberta P1).
 
+## 2.1 Fluxo entre cursos e disciplinas (mapa e regras)
+**Regra:** quem se candidata (percurso Admissão, com instituição) **não começa nenhuma prática** enquanto não tiver **curso** e, se o curso aceitar mais de uma combinação de provas, **combinação**. Quem fez a conta antes da atualização entra nesta regra sozinho. Uma só combinação fica escolhida sem perguntar; instituição sem cursos na base não bloqueia; 10ª e 12ª classe não são afetadas.
+
+| Onde | O que acontece |
+|---|---|
+| Onboarding (conta nova) | Percurso → instituição → curso → combinação (se houver várias) → meta. «Ainda não sei o curso» deixa seguir, mas a escolha é pedida logo a seguir em `/aluno/escolher-curso` |
+| Modal «A que curso te candidatas?» (`components/aluno/curso-gate.tsx`) | Curso (lista com procura) e combinação, só botões. Se não souber o curso, link para o teste vocacional. Ao guardar segue para onde ia (`/aluno?curso=1&next=...`). A rota `/aluno/escolher-curso` só redireciona (links antigos) |
+| Painel `/aluno` | Sem curso, o painel fica limpo: um cartão simples «Escolhe o teu curso» e um **modal grande, que se pode fechar**, com a escolha (abre sozinho; tem prioridade sobre os outros modais) |
+| Simulador (páginas) | `requireSimulatorScope()` redireciona para `/aluno?curso=1&next=...`, que abre o modal |
+| Qualquer início de sessão | `startAttempt` (lib/simulator.ts) recusa com a mensagem «Escolhe primeiro o teu curso…»; vale para Prática, Modo rápido, Rever erros, «Praticar este tema» e primeira prática |
+| Desafios | Mesma guarda; as disciplinas e pesos vêm da combinação do aluno |
+| Teste vocacional | Fora da guarda (é por lá que se pode escolher). Escolher um curso do resultado resolve a combinação (uma só: automático; várias: leva a `/aluno/escolher-curso`) |
+| Perfil → Percurso | Curso e combinação por botões; guardar exige combinação se houver várias |
+| Mudar de percurso, instituição ou curso | A combinação antiga deixa de valer (só vale se pertencer ao curso atual); o aluno escolhe de novo |
+| Admin apaga ou refaz as opções de um curso | A combinação guardada desaparece (`ON DELETE SET NULL`); o aluno é perguntado outra vez, ou fica escolhida sozinha se sobrar uma |
+
+Código: `lib/combinacoes-pure.ts` (`decideGate`, testado), `lib/combinacoes.ts` (`getCourseGate`, `getStudentSubjectIds`, `getStudentCourseSubjects`). A coluna `student_profiles.target_option_id` (migração 0031) é lida por SQL e não pelo drizzle: se a migração faltar, as páginas abrem na mesma e o aviso fica nos registos do servidor.
+
 ## 3. Exame e prática
 Ao escolher a disciplina, a página diz claramente se é **exame** ou **prática**.
 
@@ -71,7 +89,7 @@ Ao escolher a disciplina, a página diz claramente se é **exame** ou **prática
 |---|---|---|
 | 1 | Modal «Praticar agora?» no fim do onboarding; modal de instalar a app; notificações em modal (sem página de lembretes) | FEITO (falta teste no telemóvel) |
 | 2 | Sem seletores nativos | PARCIAL: feito no onboarding, perfil e Simulador (botões e lista com procura). Falta: `jonas-chat`, filtros da Biblioteca e todo o admin (`SelectField`) |
-| 3 | Curso e combinação no perfil e no onboarding; simulador só com as duas disciplinas | FEITO (migração 0031; falta teste). Falta pedir o curso a quem já tinha conta de admissão sem curso, e aplicar o mesmo filtro aos modos Duelo e outros quando existirem |
+| 3 | Curso e combinação no perfil e no onboarding; simulador só com as duas disciplinas; bloqueio «sem curso não se começa nada» (secção 2.1) | FEITO (migração 0031; falta teste). Falta aplicar o mesmo filtro aos modos Duelo e outros quando existirem |
 | 4 | Exame: regras, aviso, sem pausa, sem ajuda, 2 tentativas, baralhar, UEM integrado | por fazer |
 | 5 | Resultado do exame: notificação e e-mail estratégico | por fazer |
 | 6 | Calendário de exames e agenda do aluno | por fazer |

@@ -40,3 +40,19 @@ export function resolveCombo(combos: Combo[], chosen: string | null): { optionId
   const found = chosen ? combos.find((combo) => combo.optionIds.includes(chosen)) : undefined
   return found ? { optionId: found.optionId, needsChoice: false } : { optionId: null, needsChoice: true }
 }
+
+export type Gate = { need: 'curso' | 'combinacao' | null; courseId: string | null; auto: string | null }
+
+/**
+ * Quem se candidata (admissão, com instituição) tem de ter curso, e combinação de provas quando o curso tem mais de uma,
+ * antes de começar qualquer prática. Uma só combinação fica escolhida sozinha (`auto`). Instituição sem cursos não bloqueia.
+ */
+export function decideGate(input: { track: string | null; institutionId: string | null; courseId: string | null; optionOk: boolean; institutionHasCourses: boolean; combos: Combo[] }): Gate {
+  const free: Gate = { need: null, courseId: null, auto: null }
+  if (input.track !== 'admissao' || !input.institutionId) return free
+  if (!input.courseId) return input.institutionHasCourses ? { need: 'curso', courseId: null, auto: null } : free
+  if (input.optionOk) return free
+  if (input.combos.length === 0) return free
+  if (input.combos.length === 1) return { need: null, courseId: input.courseId, auto: input.combos[0].optionId }
+  return { need: 'combinacao', courseId: input.courseId, auto: null }
+}

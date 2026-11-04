@@ -7,6 +7,8 @@ import { db } from '@/lib/db'
 import { studentProfiles } from '@/lib/db/schema'
 import { AppError, runAction, type ActionResult } from '@/lib/action-result'
 import { getCourse } from '@/lib/target-course'
+import { getCourseCombos, setStudentOption } from '@/lib/combinacoes'
+import { resolveCombo } from '@/lib/combinacoes-pure'
 
 // O aluno escolhe, entre os cursos sugeridos pelo teste, o curso a que se candidata.
 // Escolher um curso é preparar a admissão nessa instituição: o percurso passa a «Admissão» e a instituição é a do curso.
@@ -22,6 +24,9 @@ export async function chooseCourse(courseId: string): Promise<ActionResult> {
       .insert(studentProfiles)
       .values({ userId: session.user.id, ...set })
       .onConflictDoUpdate({ target: studentProfiles.userId, set })
+
+    // Uma só combinação fica escolhida sozinha; várias: o aluno escolhe a seguir (página «Escolhe o teu curso»).
+    await setStudentOption(session.user.id, resolveCombo(await getCourseCombos(course.id), null).optionId)
 
     for (const path of ['/aluno', '/aluno/perfil', '/aluno/desafios', '/aluno/simulador']) revalidatePath(path)
     return 'Curso escolhido.'

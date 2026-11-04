@@ -20,6 +20,12 @@ import { getDesafios } from '@/lib/desafios'
 import { buildAvisos } from '@/lib/avisos'
 import { AvisoFaixa } from '@/components/aluno/aviso-faixa'
 import { HojeHero } from '@/components/aluno/hoje-hero'
+import { CursoGate } from '@/components/aluno/curso-gate'
+import { safeNext } from '@/lib/identity'
+import { getCourseCombos, getCourseGate } from '@/lib/combinacoes'
+import { listInstitutionCourses } from '@/lib/target-course'
+import { getVisibleModules } from '@/lib/exam-modules'
+import { ORIENTACAO_HREF, ORIENTACAO_MODULE_KEY } from '@/lib/orientacao'
 import { Fechavel } from '@/components/aluno/fechavel'
 import { NovidadeModal } from '@/components/aluno/novidade-modal'
 import { InstalarApp } from '@/components/aluno/instalar-app'
@@ -77,7 +83,7 @@ function MaterialCard({ tone, items, emptyTitle, emptyText }: { tone: 'white' | 
 const tile = 'flex min-h-[92px] flex-col items-start justify-between rounded-2xl p-3 text-[14px] font-semibold no-underline'
 const sectionLabel = 'text-[11px] uppercase tracking-[0.12em] text-texto [font-family:inherit]'
 
-export default async function StudentPage() {
+export default async function StudentPage({ searchParams }: { searchParams: Promise<{ curso?: string; next?: string }> }) {
   const session = await requireStudent('/aluno')
 
   const [profile] = await db
@@ -92,6 +98,25 @@ export default async function StudentPage() {
   const staffRole = isAdmin ? ('admin' as const) : await getStaffRole(session.user).catch(() => null)
   const rawTrack = profile?.track
   const track: Track | null = isTrack(rawTrack) ? rawTrack : null
+  // Candidato sem curso (ou combinação) escolhido: só pode escolher; nada de prática antes.
+  const gate = track === 'admissao' ? await getCourseGate(session.user.id) : null
+  const params = await searchParams
+  const next = safeNext(params.next, '')
+  // Veio escolher o curso para seguir para outro sítio e já está tudo em ordem: segue.
+  if (params.curso && !gate?.need && next) redirect(next)
+  let gateCourses: { id: string; label: string; detail: string | null }[] = []
+  let gateCombos: { optionId: string; label: string }[] = []
+  let gateOrientacao: string | null = null
+  if (gate?.need && profile?.institutionId) {
+    try {
+      gateCourses = (await listInstitutionCourses(profile.institutionId)).map((course) => ({ id: course.id, label: course.name, detail: course.unit }))
+      if (gate.need === 'combinacao' && gate.courseId) gateCombos = (await getCourseCombos(gate.courseId)).map((combo) => ({ optionId: combo.optionId, label: combo.label }))
+      const modules = await getVisibleModules('admissao').catch(() => [])
+      if (modules.some((item) => item.key === ORIENTACAO_MODULE_KEY && item.status === 'active')) gateOrientacao = ORIENTACAO_HREF
+    } catch (error) {
+      console.error('[ALUNO] cursos para escolher', error)
+    }
+  }
   // Primeiro acesso: o aluno escolhe o percurso. A administração fica de fora para poder criar as instituições antes de escolher.
   if (!track && !profile?.otherLevel && !isAdmin) redirect('/aluno/percurso')
 
@@ -197,18 +222,24 @@ export default async function StudentPage() {
                 </Link>
               </div>
 
-              <AvisoFaixa items={avisos} />
+              <AvisoFaixa items={gate?.need ? [] : avisos} />
 
-              <HojeHero goal={desafios ? desafios.goal : null} answered={desafios ? desafios.todayAnswered : 0} resume={resume} />
+              {gate?.need ? (
+                <CursoGate courses={gateCourses} initialCourseId={gate.need === 'combinacao' ? gate.courseId : null} initialCombos={gateCombos} orientacaoHref={gateOrientacao} next={next || null} forcarAbrir={Boolean(params.curso)} />
+              ) : (
+                <>
+                  <HojeHero goal={desafios ? desafios.goal : null} answered={desafios ? desafios.todayAnswered : 0} resume={resume} />
+                  <ParaHoje items={plan} />
+                </>
+              )}
 
-              <ParaHoje items={plan} />
-
+              {!gate?.need && (
               <nav aria-label="Atalhos" className="grid grid-cols-3 gap-2.5">
                 <Link href="/biblioteca" className={cn(tile, 'border border-linha bg-white text-texto')}>
                   <span className="flex size-9 items-center justify-center rounded-xl bg-marca-suave text-marca"><Ic name="book" /></span>
                   Biblioteca
                 </Link>
-                <Link href="/aluno/simulador" className={cn(tile, 'bg-marca-suave text-marca')}>
+                <Link href={gate?.need ? '/aluno/escolher-curso?next=/aluno/simulador' : '/aluno/simulador'} className={cn(tile, 'bg-marca-suave text-marca')}>
                   <span className="flex size-9 items-center justify-center rounded-xl bg-white/70"><Ic name="test" /></span>
                   Simulador
                 </Link>
@@ -217,8 +248,10 @@ export default async function StudentPage() {
                   Jonas
                 </Link>
               </nav>
+              )}
             </div>
 
+            {!gate?.need && (
             <div className="flex min-w-0 flex-col gap-[16px]">
               {inicio?.ok && inicio.value.practice && (
                 <>
@@ -236,6 +269,7 @@ export default async function StudentPage() {
               </section>
               )}
             </div>
+            )}
           </div>
         </div>
       </div>

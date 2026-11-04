@@ -12,14 +12,14 @@ import { getOnboardingState } from '@/lib/onboarding'
 import { isTrack } from '@/lib/percurso'
 import { getVisibleModules } from '@/lib/exam-modules'
 import { startAttempt } from '@/lib/simulator'
-import { getCourseCombos } from '@/lib/combinacoes'
+import { getCourseCombos, getCourseGate, setStudentOption } from '@/lib/combinacoes'
 import { resolveCombo } from '@/lib/combinacoes-pure'
 import { listInstitutionCourses } from '@/lib/target-course'
 
 // Onboarding (dois a cinco ecrãs, conforme o percurso). Cada passo guarda-se no servidor ao avançar: se o estudante fechar a aplicação, retoma onde parou.
 // As acções devolvem o resultado em vez de lançar (em produção o Next.js esconde as mensagens de erro lançadas).
 
-export type StepResult = { ok: true } | { ok: false; message: string; underAge?: boolean }
+export type StepResult = { ok: true; gated?: boolean } | { ok: false; message: string; underAge?: boolean }
 
 async function step(fallback: string, task: (user: { id: string; email: string }) => Promise<StepResult | void>): Promise<StepResult> {
   try {
@@ -90,10 +90,10 @@ export async function saveTrack(input: { track: string; institutionId: string | 
       `INSERT INTO student_profiles (user_id, track, institution_id) VALUES ($1, $2, $3)
        ON CONFLICT (user_id) DO UPDATE SET track = $2, institution_id = $3, updated_at = now(),
          target_course_id = CASE WHEN $4 THEN student_profiles.target_course_id ELSE NULL END,
-         target_course = CASE WHEN $4 THEN student_profiles.target_course ELSE NULL END,
-         target_option_id = CASE WHEN $4 THEN student_profiles.target_option_id ELSE NULL END`,
+         target_course = CASE WHEN $4 THEN student_profiles.target_course ELSE NULL END`,
       [user.id, input.track, institutionId, keepCourse],
     )
+    if (!keepCourse) await setStudentOption(user.id, null)
     revalidatePath('/aluno')
   })
 }
@@ -132,7 +132,8 @@ export async function saveCourse(input: { courseId: string | null; optionId: str
     const state = await getOnboardingState(user.id)
     if (state.track !== 'admissao' || !state.institutionId) throw new AppError('Escolhe primeiro a instituição.')
     if (!input?.courseId) {
-      await pool.query(`UPDATE student_profiles SET target_course_id = NULL, target_course = NULL, target_option_id = NULL, updated_at = now() WHERE user_id = $1`, [user.id])
+      await pool.query(`UPDATE student_profiles SET target_course_id = NULL, target_course = NULL, updated_at = now() WHERE user_id = $1`, [user.id])
+      await setStudentOption(user.id, null)
       revalidatePath('/aluno')
       return
     }
@@ -140,10 +141,8 @@ export async function saveCourse(input: { courseId: string | null; optionId: str
     if (!course.rows[0]) throw new AppError('Escolhe um curso da lista da tua instituição.')
     const resolved = resolveCombo(await getCourseCombos(input.courseId), typeof input.optionId === 'string' ? input.optionId : null)
     if (resolved.needsChoice) throw new AppError('Escolhe a tua combinação de provas.')
-    await pool.query(
-      `UPDATE student_profiles SET target_course_id = $2, target_course = $3, target_option_id = $4, updated_at = now() WHERE user_id = $1`,
-      [user.id, input.courseId, course.rows[0].name, resolved.optionId],
-    )
+    await pool.query(`UPDATE student_profiles SET target_course_id = $2, target_course = $3, updated_at = now() WHERE user_id = $1`, [user.id, input.courseId, course.rows[0].name])
+    await setStudentOption(user.id, resolved.optionId)
     revalidatePath('/aluno')
     revalidatePath('/aluno/perfil')
   })
@@ -179,6 +178,8 @@ export async function saveGoal(input: { dailyGoal: number }): Promise<StepResult
 
     revalidatePath('/aluno')
     revalidatePath('/aluno/notificacoes')
+    // Sem curso (ou combinação) escolhido não se começa nada: o cliente leva-o a escolher.
+    return { ok: true, gated: (await getCourseGate(user.id)).need !== null }
   })
 }
 

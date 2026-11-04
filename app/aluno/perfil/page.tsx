@@ -11,7 +11,8 @@ import { PROVINCES, profileSteps } from '@/lib/perfil'
 import { getSubscription, isSubscriptionActive } from '@/lib/subscription'
 import { getRanking } from '@/lib/ranking'
 import { ORIENTACAO_HREF } from '@/lib/orientacao'
-import { getCourseSubjects, listInstitutionCourses } from '@/lib/target-course'
+import { listInstitutionCourses } from '@/lib/target-course'
+import { getStudentCourseSubjects, getStudentOptionId } from '@/lib/combinacoes'
 import { formatPoints } from '@/lib/simulator-shared'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
 import { EscolhaBotoes } from '@/components/ui/escolha-botoes'
@@ -46,7 +47,8 @@ export default async function PerfilPage() {
   // Admissão: cursos da instituição e disciplinas das provas do curso escolhido (se falhar, o resto da página segue).
   const isAdmissionTrack = current?.track === 'admissao' && !!current.institutionId
   const institutionCourses = isAdmissionTrack ? await listInstitutionCourses(current.institutionId!).catch(() => []) : []
-  const courseSubjects = current?.targetCourseId ? await getCourseSubjects(current.targetCourseId).catch(() => []) : []
+  const courseSubjects = current?.targetCourseId ? await getStudentCourseSubjects(session.user.id, current.targetCourseId).catch(() => []) : []
+  const optionId = current?.targetCourseId ? await getStudentOptionId(session.user.id).catch(() => null) : null
 
   const prefs = (await pool.query(`SELECT email_enabled, push_enabled FROM notification_prefs WHERE user_id = $1`, [session.user.id]).catch(() => ({ rows: [] }))).rows[0]
   const remindersOn = prefs ? prefs.email_enabled === true || prefs.push_enabled === true : false
@@ -145,14 +147,14 @@ export default async function PerfilPage() {
               ) : (
                 <SectionForm sectionId="percurso" action={saveCandidate}>
                   <Field label="Curso alvo" custom>
-                    <CursoCombinacao courses={institutionCourses.map((course) => ({ id: course.id, label: course.name, detail: course.unit }))} defaultCourseId={current?.targetCourseId ?? null} defaultOptionId={current?.targetOptionId ?? null} />
+                    <CursoCombinacao courses={institutionCourses.map((course) => ({ id: course.id, label: course.name, detail: course.unit }))} defaultCourseId={current?.targetCourseId ?? null} defaultOptionId={optionId} />
                   </Field>
                   <Field label="Meta de nota" hint="Escala de 0 a 20." custom>
                     <EscolhaBotoes name="targetScore" rotulo="Meta de nota" defaultValue={String(current?.targetScore ?? 12)} options={[10, 12, 14, 16, 18, 20].map((score) => ({ value: String(score), label: String(score) }))} />
                   </Field>
                 </SectionForm>
               )}
-              {courseSubjects.length > 0 && <p className="text-xs text-texto-2">Provas do curso: {courseSubjects.map((subject) => subject.name).join(', ')}.</p>}
+              {courseSubjects.length > 0 && <p className="text-xs text-texto-2">{optionId ? 'As tuas provas' : 'Provas do curso'}: {courseSubjects.map((subject) => subject.name).join(', ')}.</p>}
               <p className="text-sm text-texto-2">Não sabes o curso? <Link href={ORIENTACAO_HREF} className="font-semibold text-marca hover:underline">Faz o teste vocacional</Link> e escolhe entre 5 sugestões.</p>
             </div>
           )}

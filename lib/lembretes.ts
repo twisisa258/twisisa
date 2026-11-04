@@ -6,7 +6,6 @@ import { DEFAULT_STUDY_HOUR, chooseReminder } from '@/lib/lembretes-shared'
 import { getDesafios } from '@/lib/desafios'
 import { isTrack } from '@/lib/percurso'
 import { markCounts } from '@/lib/kit'
-import { pushToUser } from '@/lib/push'
 
 // Lembretes de estudo: no máximo um por aluno e por dia, na hora que o aluno escolheu (hora de Maputo).
 // Regras puras em `chooseReminder` (testadas); o resto liga a base de dados, as notificações na app e o e-mail.
@@ -23,7 +22,7 @@ export async function queueReminders(limit = 200): Promise<{ checked: number; qu
        FROM notification_prefs p
        JOIN "user" u ON u.id = p.user_id
        JOIN student_profiles sp ON sp.user_id = p.user_id AND sp.onboarded_at IS NOT NULL
-       WHERE ((p.email_enabled AND coalesce((p.categories->>'study')::boolean, false)) OR EXISTS (SELECT 1 FROM push_subscriptions s WHERE s.user_id = p.user_id))
+       WHERE p.email_enabled AND coalesce((p.categories->>'study')::boolean, false)
          AND coalesce(p.study_hour, $1) <= extract(hour FROM (now() AT TIME ZONE 'Africa/Maputo'))::int
          AND p.last_sent_on IS DISTINCT FROM (now() AT TIME ZONE 'Africa/Maputo')::date
        ORDER BY p.user_id LIMIT $2`,
@@ -50,8 +49,6 @@ export async function queueReminders(limit = 200): Promise<{ checked: number; qu
         const mail = reminderEmail({ name: row.name, title: reminder.title, text: reminder.text, cta: reminder.cta, href: reminder.href, unsubscribeUrl: `${siteBaseUrl()}/lembretes/cancelar?token=${encodeURIComponent(row.token)}` })
         await pool.query(`INSERT INTO notification_outbox (id, user_id, subject, body, href, dedupe_key) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (user_id, dedupe_key) DO NOTHING`, [randomUUID(), row.user_id, mail.subject, JSON.stringify({ html: mail.html, text: mail.text }), reminder.href, dedupe])
       }
-      // Push no telemóvel (se o aluno ligou). Falhar aqui nunca impede o resto.
-      await pushToUser(row.user_id, { title: reminder.title, body: reminder.text, url: reminder.href }).catch((error) => console.error('[LEMBRETES] push', row.user_id, error))
       queued++
     } catch (error) {
       console.error('[LEMBRETES] aluno', row.user_id, error)

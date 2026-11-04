@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Configurações do Simulador | Twisisa' }
 
 export default async function SimuladorSettingsPage() {
-  const [{ firstName }, prefs] = await Promise.all([requireSimulatorScope(), getSimPrefs()])
+  const [{ firstName }, prefs] = await Promise.all([requireSimulatorScope({ gate: false }), getSimPrefs()])
   return (
     <StudentFeatureShell firstName={firstName} eyebrow="Simulador" title="Configurações" hideTitle hideBackLink>
       <div className="max-w-[640px] space-y-6">

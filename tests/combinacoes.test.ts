@@ -34,3 +34,17 @@ test('duas combinações diferentes obrigam a perguntar', () => {
 test('sem opções não há combinação', () => {
   assert.deepEqual(resolveCombo(uniqueCombos([]), null), { optionId: null, needsChoice: false })
 })
+
+test('bloqueio: admissão sem curso não começa nada; com uma combinação segue; com duas pergunta', async () => {
+  const { decideGate } = await import('../lib/combinacoes-pure')
+  const um = uniqueCombos([{ optionId: 'o1', sortOrder: 0, papers: [mat1, fis1] }])
+  const dois = uniqueCombos([{ optionId: 'o1', sortOrder: 0, papers: [mat1, fis1] }, { optionId: 'o2', sortOrder: 1, papers: [mat2, por2] }])
+  const base = { track: 'admissao', institutionId: 'uem', courseId: null as string | null, optionOk: false, institutionHasCourses: true, combos: [] as typeof um }
+  assert.equal(decideGate(base).need, 'curso')
+  assert.equal(decideGate({ ...base, institutionHasCourses: false }).need, null)
+  assert.equal(decideGate({ ...base, track: '12', institutionId: null }).need, null)
+  assert.deepEqual(decideGate({ ...base, courseId: 'c1', combos: um }), { need: null, courseId: 'c1', auto: 'o1' })
+  assert.equal(decideGate({ ...base, courseId: 'c1', combos: dois }).need, 'combinacao')
+  assert.equal(decideGate({ ...base, courseId: 'c1', combos: dois, optionOk: true }).need, null)
+  assert.equal(decideGate({ ...base, courseId: 'c1', combos: [] }).need, null)
+})

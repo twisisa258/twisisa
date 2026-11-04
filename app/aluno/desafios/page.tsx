@@ -13,7 +13,7 @@ export const metadata = { title: 'Desafios | Twisisa', description: 'Sequência,
 export const dynamic = 'force-dynamic'
 
 export default async function DesafiosPage() {
-  const { scope, firstName } = await requireSimulatorScope()
+  const { scope, firstName } = await requireSimulatorScope({ next: '/aluno/desafios' })
   const [profile] = await db.select({ targetCourseId: studentProfiles.targetCourseId, dailyGoal: studentProfiles.dailyGoal }).from(studentProfiles).where(eq(studentProfiles.userId, scope.userId)).limit(1)
 
   let data: DesafiosSnapshot | null = null

@@ -18,7 +18,7 @@ const card = 'rounded-2xl bg-gradient-to-br from-white to-[#f4f6f1] shadow-[0_1p
 const joinLabels = (list: string[]) => (list.length <= 1 ? (list[0] ?? '') : `${list.slice(0, -1).join(', ')} e ${list[list.length - 1]}`)
 
 export default async function ResultadoPage() {
-  const { scope, firstName } = await requireSimulatorScope()
+  const { scope, firstName } = await requireSimulatorScope({ gate: false })
   const modules = await getVisibleModules(scope.track)
   const entry = modules.find((item) => item.key === ORIENTACAO_MODULE_KEY)
   if (!entry || entry.status !== 'active') redirect('/aluno')

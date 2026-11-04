@@ -23,7 +23,7 @@ export function ChooseCourseButton({ courseId, chosen }: { courseId: string; cho
     try {
       const result = await chooseCourse(courseId)
       if (result.ok) {
-        router.push('/aluno/desafios')
+        router.push('/aluno?curso=1&next=/aluno/desafios')
         return
       }
       feedback.error(result.message)

@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { getStudentSubjectIds } from '@/lib/combinacoes'
+import { getCourseGate, getStudentSubjectIds } from '@/lib/combinacoes'
 import { AppError } from '@/lib/action-result'
 import { pool } from '@/lib/db'
 import type { Track } from '@/lib/percurso'
@@ -172,6 +172,8 @@ type PoolRow = { id: string; exam_year: number | null; topic_id: string | null; 
  *  • as questões ficam marcadas como vistas no momento em que a sessão é criada.
  */
 export async function startAttempt(scope: StudentScope, mode: AttemptMode, subjectId: string | null, variant: string | null = null, topicId: string | null = null, options: { size?: number; quickSeconds?: number } = {}) {
+  // Candidatos sem curso (ou combinação) escolhido não começam nada.
+  if (scope.track === 'admissao' && (await getCourseGate(scope.userId)).need) throw new AppError('Escolhe primeiro o teu curso para começares a praticar.')
   const recent = await pool.query(`SELECT count(*)::int AS n FROM attempts WHERE user_id = $1 AND started_at > now() - interval '1 hour'`, [scope.userId])
   if (recent.rows[0].n >= 30) throw new AppError('Começaste muitas sessões seguidas. Espera um pouco e tenta de novo.')
 

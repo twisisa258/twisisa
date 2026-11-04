@@ -38,4 +38,7 @@ Web Push; datas de exame (fase H); repetição espaçada automática; «dia livr
 - Onboarding já não abre um quiz sozinho: modal «Praticar agora?». Modal próprio para instalar a app. Especificação de exames e percurso em `docs/EXAMES-E-PERCURSO.md`.
 - Sem página de lembretes: modal «Permitir notificações» e interruptor no perfil; lembretes ligados por defeito. Onboarding sem o passo de lembretes.
 - Onboarding por botões (data com máscara, instituição e curso em listas com procura), com curso e combinação de provas. Perfil com curso e combinação. Simulador só com as disciplinas da combinação, em botões. Migração 0031.
+- Candidatos sem curso (ou combinação) não começam nenhuma prática: página `/aluno/escolher-curso`, guarda nas páginas do Simulador e em `startAttempt`, destaque no painel. Quem já tinha conta entra na regra sozinho. Combinação lida por SQL (as páginas não dependem da migração 0031 para abrir). Desafios usam as disciplinas da combinação.
+- Escolher curso passou a modal grande e fechável no painel (sem página própria); painel limpo enquanto falta o curso.
+- Motor de notificações push de 30 em 30 minutos com variedade (prazo do desafio, prática a meio, matéria nova, questões quentes, voltar, escolher curso), limites e silêncio configuráveis. Migração 0032, workflow `.github/workflows/push-cron.yml`, `docs/NOTIFICACOES-PUSH.md`.
 

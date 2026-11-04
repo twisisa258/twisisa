@@ -12,7 +12,7 @@ export const metadata = { title: 'Descobre o teu curso | Twisisa' }
 
 // Entrada do teste: com um teste a meio, abre-o onde ficou; com resultado, vai ao resultado; senão, apresenta-o e deixa começar.
 export default async function DescobrirCursoPage() {
-  const { scope, firstName } = await requireSimulatorScope()
+  const { scope, firstName } = await requireSimulatorScope({ gate: false })
   const modules = await getVisibleModules(scope.track)
   const entry = modules.find((item) => item.key === ORIENTACAO_MODULE_KEY)
   if (!entry || entry.status !== 'active') redirect('/aluno')

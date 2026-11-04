@@ -161,8 +161,12 @@ export function OnboardingFlow({
     const result = await run(() => saveGoal({ dailyGoal: goal }))
     if (!result) return
     // Nunca entra num quiz sozinho: pergunta primeiro se quer praticar agora.
-    if (result.ok) return setPronto(true)
-    feedback.error(result.message)
+    if (!result.ok) return feedback.error(result.message)
+    if (result.gated) {
+      router.replace('/aluno/escolher-curso')
+      return router.refresh()
+    }
+    setPronto(true)
   }
 
   function irParaPainel() {
@@ -273,7 +277,7 @@ export function OnboardingFlow({
           </div>
           <div className="mt-auto grid gap-2 pt-5">
             {courses.length > 0 && botao('Continuar', () => submitCourse(false), Boolean(courseId))}
-            <button type="button" onClick={() => submitCourse(true)} disabled={pending} className={secondary}>{courses.length > 0 ? 'Ainda não sei o curso' : 'Continuar'}</button>
+            <button type="button" onClick={() => submitCourse(true)} disabled={pending} className={secondary}>{courses.length > 0 ? 'Ainda não sei o curso (escolho já a seguir)' : 'Continuar'}</button>
           </div>
         </section>
       )}
