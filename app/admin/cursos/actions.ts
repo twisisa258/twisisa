@@ -153,7 +153,7 @@ export async function deleteCourse(formData: FormData): Promise<ActionResult> {
   }, 'Não foi possível eliminar o curso. Tenta outra vez.')
 }
 
-type DbClient = Awaited<ReturnType<typeof pool.connect>>
+type DbClient = import('pg').PoolClient
 type PreservedOptions = { vacancies: Map<string, number>; students: Map<string, string[]> }
 
 // Guarda, antes de refazer as opções, as vagas e a combinação que cada aluno escolheu. Nunca impede a gravação do curso.
