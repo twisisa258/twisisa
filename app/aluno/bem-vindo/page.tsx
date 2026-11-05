@@ -30,7 +30,7 @@ export default async function BemVindoPage() {
       initialTrack={state.track}
       initialInstitutionId={state.institutionId}
       initialGoal={state.dailyGoal}
-      institutions={institutions.map((item) => ({ id: item.id, shortName: item.shortName, name: item.name, soon: item.contentCount === 0 }))}
+      institutions={institutions.map((item) => ({ id: item.id, shortName: item.shortName, name: item.name, soon: item.contentCount === 0 && item.questionCount === 0 }))}
     />
   )
 }

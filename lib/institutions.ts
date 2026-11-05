@@ -25,6 +25,8 @@ export type InstitutionRow = {
   sortOrder: number
   showWhenEmpty: boolean
   contentCount: number
+  courseCount: number
+  questionCount: number
   studentCount: number
 }
 
@@ -34,6 +36,8 @@ export async function listInstitutions(): Promise<InstitutionRow[]> {
   const result = await pool.query(`
     SELECT i.id, i.short_name, i.name, i.kind, i.description, i.logo_url, i.city, i.province, i.active, i.sort_order, i.show_when_empty,
       (SELECT count(*)::int FROM academic_materials m WHERE m.status = 'approved' AND lower(m.institution_name) = lower(i.short_name)) AS content_count,
+      (SELECT count(*)::int FROM courses c WHERE c.institution_id = i.id AND c.active) AS course_count,
+      (SELECT count(*)::int FROM questions q WHERE q.institution_id = i.id AND q.status = 'publicada') AS question_count,
       (SELECT count(*)::int FROM student_profiles p WHERE p.institution_id = i.id) AS student_count
     FROM institutions i
     ORDER BY i.sort_order, i.short_name
@@ -51,13 +55,15 @@ export async function listInstitutions(): Promise<InstitutionRow[]> {
     sortOrder: row.sort_order,
     showWhenEmpty: row.show_when_empty,
     contentCount: row.content_count,
+    courseCount: row.course_count,
+    questionCount: row.question_count,
     studentCount: row.student_count,
   }))
 }
 
-// Regra do produto: o aluno só vê instituições activas com conteúdo publicado, ou marcadas como visíveis mesmo vazias ("Em breve").
-export function isVisibleToStudents(institution: Pick<InstitutionRow, 'active' | 'contentCount' | 'showWhenEmpty'>) {
-  return institution.active && (institution.contentCount > 0 || institution.showWhenEmpty)
+// Regra do produto: o aluno vê instituições activas com materiais publicados, com cursos (para escolher o curso) ou marcadas como visíveis mesmo vazias.
+export function isVisibleToStudents(institution: Pick<InstitutionRow, 'active' | 'contentCount' | 'courseCount' | 'showWhenEmpty'>) {
+  return institution.active && (institution.contentCount > 0 || institution.courseCount > 0 || institution.showWhenEmpty)
 }
 
 export async function listStudentInstitutions() {

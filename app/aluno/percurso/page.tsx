@@ -26,7 +26,7 @@ export default async function PercursoPage() {
         initialTrack={isTrack(savedTrack) ? savedTrack : null}
         initialOtherLevel={profile?.otherLevel ?? null}
         initialInstitutionId={profile?.institutionId ?? null}
-        institutions={institutions.map((item) => ({ id: item.id, shortName: item.shortName, name: item.name, description: item.description, logoUrl: item.logoUrl, soon: item.contentCount === 0 }))}
+        institutions={institutions.map((item) => ({ id: item.id, shortName: item.shortName, name: item.name, description: item.description, logoUrl: item.logoUrl, soon: item.contentCount === 0 && item.questionCount === 0 }))}
       />
     </StudentFeatureShell>
   )

@@ -19,7 +19,7 @@ const input = 'mt-1 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 py-2
 // Estado curto na linha; a explicação completa fica no título (hover/toque longo).
 function visibility(item: InstitutionRow) {
   if (!item.active) return { label: 'Oculta', tone: 'bg-[#f1f1ee] text-[#6b716c]', hint: 'Oculta: não aparece aos alunos.' }
-  if (item.contentCount > 0) return { label: 'Visível', tone: 'bg-[#e6f0e9] text-marca', hint: 'Visível aos alunos.' }
+  if (item.contentCount > 0 || item.courseCount > 0) return { label: 'Visível', tone: 'bg-[#e6f0e9] text-marca', hint: 'Visível aos alunos (tem materiais ou cursos).' }
   if (item.showWhenEmpty) return { label: 'Em breve', tone: 'bg-[#f4eddb] text-aviso-texto', hint: 'Visível aos alunos com o aviso «Em breve».' }
   return { label: 'Sem conteúdo', tone: 'bg-[#f4eddb] text-aviso-texto', hint: 'Sem conteúdo: não aparece aos alunos. Edita e marca «Mostrar mesmo sem conteúdo».' }
 }
@@ -112,7 +112,7 @@ export default async function AdminInstituicoesPage({ searchParams }: { searchPa
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium leading-5">{item.shortName}<span className="font-normal text-texto-2"> · {item.name}</span></p>
-                    <p className="mt-0.5 truncate text-xs text-texto-2">{kindLabel(item.kind)} · {item.contentCount} {item.contentCount === 1 ? 'conteúdo' : 'conteúdos'} · {item.studentCount} {item.studentCount === 1 ? 'aluno' : 'alunos'}</p>
+                    <p className="mt-0.5 truncate text-xs text-texto-2">{kindLabel(item.kind)} · {item.courseCount} {item.courseCount === 1 ? 'curso' : 'cursos'} · {item.questionCount} {item.questionCount === 1 ? 'questão' : 'questões'} · {item.contentCount} {item.contentCount === 1 ? 'material' : 'materiais'} · {item.studentCount} {item.studentCount === 1 ? 'aluno' : 'alunos'}</p>
                   </div>
                   <span title={state.hint} className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${state.tone}`}>{state.label}</span>
                   <RowMenu

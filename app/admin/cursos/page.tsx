@@ -91,15 +91,41 @@ function CourseForm({ editing, institutions, subjects, courses }: { editing: Cou
   )
 }
 
-function ViewSwitch({ view, q }: { view: 'cursos' | 'provas'; q: string }) {
-  const href = (target: string) => `/admin/cursos${target === 'provas' ? '?vista=provas' : ''}${q ? `${target === 'provas' ? '&' : '?'}q=${encodeURIComponent(q)}` : ''}`
+// Endereço da lista com o filtro de instituição, a vista e a pesquisa.
+function listHref(params: { inst: string; vista?: string; q?: string; editar?: string }) {
+  const search = new URLSearchParams()
+  if (params.editar) search.set('editar', params.editar)
+  search.set('inst', params.inst)
+  if (params.vista === 'provas') search.set('vista', 'provas')
+  if (params.q) search.set('q', params.q)
+  return `/admin/cursos?${search.toString()}`
+}
+
+function InstitutionTabs({ tabs, current, view, q }: { tabs: { id: string; label: string; count: number }[]; current: string; view: string; q: string }) {
+  return (
+    <nav aria-label="Instituição" className="-mx-1 flex shrink-0 gap-1.5 overflow-x-auto px-1 pb-1">
+      {tabs.map((tab) => {
+        const active = tab.id === current
+        return (
+          <Link key={tab.id} href={listHref({ inst: tab.id, vista: view, q })} aria-current={active ? 'page' : undefined} className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm transition-colors ${active ? 'border-marca bg-marca font-semibold text-white' : 'border-[#dfe3d9] bg-white text-[#526057] hover:bg-[#f3f4ef]'}`}>
+            {tab.label}
+            <span className={`text-xs tabular-nums ${active ? 'text-white/80' : 'text-texto-2'}`}>{tab.count}</span>
+          </Link>
+        )
+      })}
+    </nav>
+  )
+}
+
+function ViewSwitch({ view, q, inst }: { view: 'cursos' | 'provas'; q: string; inst: string }) {
+  const href = (target: string) => listHref({ inst, vista: target, q })
   const item = (target: 'cursos' | 'provas', label: string) => (
     <Link href={href(target)} aria-current={view === target ? 'page' : undefined} className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${view === target ? 'bg-marca font-semibold text-white' : 'text-[#526057] hover:bg-white'}`}>{label}</Link>
   )
   return <div className="flex shrink-0 gap-1 self-start rounded-full border border-[#dfe3d9] bg-[#f3f4ef] p-1">{item('cursos', 'Por curso')}{item('provas', 'Por provas')}</div>
 }
 
-export default async function AdminCursosPage({ searchParams }: { searchParams: Promise<{ editar?: string; q?: string; vista?: string }> }) {
+export default async function AdminCursosPage({ searchParams }: { searchParams: Promise<{ editar?: string; q?: string; vista?: string; inst?: string }> }) {
   const admin = await getAdminUser()
   if (!admin) redirect('/admin/questoes')
   const params = await searchParams
@@ -115,11 +141,19 @@ export default async function AdminCursosPage({ searchParams }: { searchParams: 
     console.error('[ADMIN CURSOS]', error)
   }
 
+  // Uma instituição de cada vez (a primeira, por defeito); «Todas» junta tudo.
+  const counts = new Map<string, number>()
+  for (const course of courses ?? []) counts.set(course.institutionId, (counts.get(course.institutionId) ?? 0) + 1)
+  const withCourses = institutions.filter((item) => counts.has(item.id))
+  const tabs = [...withCourses.map((item) => ({ id: item.id, label: item.shortName, count: counts.get(item.id) ?? 0 })), { id: 'todas', label: 'Todas', count: courses?.length ?? 0 }]
+  const inst = params.inst === 'todas' || withCourses.some((item) => item.id === params.inst) ? (params.inst as string) : (withCourses[0]?.id ?? 'todas')
+  const scoped = inst === 'todas' ? (courses ?? []) : (courses ?? []).filter((item) => item.institutionId === inst)
+
   const editing = courses?.find((item) => item.id === params.editar) ?? null
   const term = normalizeSearch(q)
-  const visible = courses?.filter((item) => !term || normalizeSearch(`${item.name} ${item.unit ?? ''} ${item.institutionShortName}`).includes(term)) ?? []
+  const visible = scoped.filter((item) => !term || normalizeSearch(`${item.name} ${item.unit ?? ''} ${item.institutionShortName}`).includes(term))
   const groups = groupByCombo(visible)
-  const countLabel = courses ? (q ? `${visible.length} ${visible.length === 1 ? 'resultado' : 'resultados'}` : view === 'provas' ? `${groups.length} combinações de provas` : `${courses.length} ${courses.length === 1 ? 'curso' : 'cursos'}`) : undefined
+  const countLabel = courses ? (q ? `${visible.length} ${visible.length === 1 ? 'resultado' : 'resultados'}` : view === 'provas' ? `${groups.length} combinações de provas` : `${scoped.length} ${scoped.length === 1 ? 'curso' : 'cursos'}`) : undefined
 
   return (
     <AdminPage>
@@ -134,12 +168,13 @@ export default async function AdminCursosPage({ searchParams }: { searchParams: 
         }
       />
       {editing && (
-        <RouteModal title={`Editar ${editing.name}`} closeHref="/admin/cursos">
+        <RouteModal title={`Editar ${editing.name}`} closeHref={listHref({ inst, vista: view, q })}>
           <CourseForm editing={editing} institutions={institutions} subjects={subjects} courses={courses ?? []} />
         </RouteModal>
       )}
-      <ViewSwitch view={view} q={q} />
-      <AdminSearchBar q={q} placeholder="Pesquisar curso ou faculdade" countLabel={countLabel} hidden={view === 'provas' ? { vista: 'provas' } : undefined} />
+      <InstitutionTabs tabs={tabs} current={inst} view={view} q={q} />
+      <ViewSwitch view={view} q={q} inst={inst} />
+      <AdminSearchBar q={q} placeholder="Pesquisar curso ou faculdade" countLabel={countLabel} hidden={view === 'provas' ? { vista: 'provas', inst } : { inst }} />
 
       <AdminListPanel>
         {courses === null ? (
@@ -147,7 +182,7 @@ export default async function AdminCursosPage({ searchParams }: { searchParams: 
         ) : courses.length === 0 ? (
           <div className="m-4"><EmptyState title="Ainda sem cursos" description="Usa o botão Adicionar para criar o primeiro." /></div>
         ) : visible.length === 0 ? (
-          <div className="m-4"><EmptyState title="Sem resultados" description={`Nenhum curso corresponde a “${q}”.`} actionLabel="Limpar pesquisa" actionHref="/admin/cursos" /></div>
+          <div className="m-4"><EmptyState title="Sem resultados" description={`Nenhum curso corresponde a “${q}”.`} actionLabel="Limpar pesquisa" actionHref={listHref({ inst, vista: view })} /></div>
         ) : view === 'provas' ? (
           <ul className="min-h-0 flex-1 divide-y divide-[#edf0e9] overflow-y-auto px-4 sm:px-5">
             {groups.map((group) => (
@@ -155,7 +190,7 @@ export default async function AdminCursosPage({ searchParams }: { searchParams: 
                 <p className="text-sm font-semibold leading-5">{group.key} <span className="font-normal text-texto-2">· {group.courses.length} {group.courses.length === 1 ? 'curso' : 'cursos'}</span></p>
                 <p className="mt-1 text-xs leading-5 text-[#526057]">
                   {group.courses.map((c, index) => (
-                    <span key={c.id}>{index > 0 && ', '}<Link href={`/admin/cursos?editar=${c.id}`} className="hover:text-marca hover:underline">{c.name}</Link>{c.periods.length === 1 && c.periods[0] === 'pos_laboral' ? ' (pós-laboral)' : ''}</span>
+                    <span key={c.id}>{index > 0 && ', '}<Link href={listHref({ inst, vista: view, q, editar: c.id })} className="hover:text-marca hover:underline">{c.name}</Link>{c.periods.length === 1 && c.periods[0] === 'pos_laboral' ? ' (pós-laboral)' : ''}</span>
                   ))}
                 </p>
               </li>
@@ -176,7 +211,7 @@ export default async function AdminCursosPage({ searchParams }: { searchParams: 
                 <RowMenu
                   label={`Acções de ${item.name}`}
                   items={[
-                    { label: 'Editar', icon: <Pencil size={16} />, href: `/admin/cursos?editar=${item.id}` },
+                    { label: 'Editar', icon: <Pencil size={16} />, href: listHref({ inst, vista: view, q, editar: item.id }) },
                     item.active
                       ? { label: 'Arquivar', icon: <Archive size={16} />, action: setCourseActive, fields: { id: item.id, active: 'false' }, confirm: 'Arquivar' }
                       : { label: 'Activar', icon: <ArchiveRestore size={16} />, action: setCourseActive, fields: { id: item.id, active: 'true' } },
