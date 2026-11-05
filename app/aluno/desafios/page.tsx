@@ -4,7 +4,7 @@ import { studentProfiles } from '@/lib/db/schema'
 import { buildAvisos } from '@/lib/avisos'
 import { getDesafios, type DesafiosSnapshot } from '@/lib/desafios'
 import { requireSimulatorScope } from '@/lib/simulator-scope'
-import { CalendarRange, Sun, Target } from 'lucide-react'
+import { CalendarRange, Flame, Sun } from 'lucide-react'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
 import { Avisos } from '@/components/aluno/avisos'
 import { MissionList, ReadinessCard, Regras, StreakCard } from '@/components/aluno/desafios/parts'
@@ -29,7 +29,7 @@ export default async function DesafiosPage() {
   const daysToSunday = data ? 6 - data.weekday : 0
 
   return (
-    <StudentFeatureShell firstName={firstName} eyebrow="Desafios" title="Desafios" description="Missões diárias e semanais, e a tua prontidão." icon={Target} tone="conquista" hideBackLink>
+    <StudentFeatureShell firstName={firstName} eyebrow="Desafios" title="Desafios" description="Missões diárias e semanais, e a tua prontidão." icon={Flame} tone="conquista" hideBackLink>
       <div className="mx-auto flex max-w-2xl flex-col gap-5">
         {!data ? (
           <ErrorState title="Não foi possível carregar os desafios" description="Tenta outra vez daqui a pouco." />

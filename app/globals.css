@@ -234,6 +234,7 @@ body {
 .tom-conquista { --tom: var(--conquista); --tom-suave: #fffaea; --tom-texto: var(--conquista-texto); --tom-linha: #f3e1a6; }
 .tom-ajuda { --tom: var(--ajuda); --tom-suave: var(--ajuda-suave); --tom-texto: #1e40af; --tom-linha: #c7d8fb; }
 .tom-assistente { --tom: var(--assistente); --tom-suave: var(--assistente-suave); --tom-texto: #3730a3; --tom-linha: #d4d8fb; }
+.tom-neutro { --tom: #6b716c; --tom-suave: #f1f3ed; --tom-texto: #4d5851; --tom-linha: #dde1d6; }
 .tom-aviso { --tom: var(--aviso); --tom-suave: var(--aviso-suave); --tom-texto: var(--aviso-texto); --tom-linha: #f6d9ad; }
 
 @layer components {

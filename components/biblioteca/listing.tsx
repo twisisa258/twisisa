@@ -3,7 +3,7 @@ import { SearchX, FolderOpen } from 'lucide-react'
 import { getCategoryCounts, getFacets, getSavedIds, listMaterials } from '@/lib/library'
 import { withParams, type ListParams } from '@/lib/library-shared'
 import { LibraryProvider } from '@/components/biblioteca/library-provider'
-import { MaterialCard } from '@/components/biblioteca/material-card'
+import { MaterialGrid } from '@/components/biblioteca/material-grid'
 import { LibrarySearch } from '@/components/biblioteca/library-search'
 import { ListingFilters } from '@/components/biblioteca/listing-filters'
 import { ChipRow, type Chip } from '@/components/biblioteca/chip-row'
@@ -92,13 +92,7 @@ export async function Listing({ userId, basePath, category, params }: { userId: 
       ) : (
         <LibraryProvider savedIds={savedIds}>
           <p className="text-xs text-texto-2">{data.total === 1 ? '1 material' : `${data.total} materiais`}</p>
-          <ul className="grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-            {data.items.map((item) => (
-              <li key={item.id} className="min-w-0">
-                <MaterialCard item={item} />
-              </li>
-            ))}
-          </ul>
+          <MaterialGrid items={data.items} byYear={filters.category === 'exames'} showCategory={!filters.category} />
           <div className="pt-2">
             <Pagination page={data.page} pages={data.pages} hrefFor={(page) => hrefFor({ pagina: page })} />
           </div>

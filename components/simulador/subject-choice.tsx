@@ -1,21 +1,21 @@
 import Link from 'next/link'
+import { cn } from '@/lib/utils'
+import { iconeDaDisciplina } from '@/components/simulador/subject-icon'
+import type { Tom } from '@/components/simulador/modos'
 
-// Disciplinas como botões (duas lado a lado; mais, em coluna). Sem seletor.
-export function SubjectChoice({ subjects, current, mode }: { subjects: { id: string; name: string }[]; current: string | null; mode?: string }) {
+// Disciplinas como cartões (ícone, nome, quantas questões). O modo já foi escolhido antes: a cor segue o modo.
+export function SubjectChoice({ subjects, mode, tom }: { subjects: { id: string; name: string; count: number }[]; mode: string; tom: Tom }) {
   return (
-    <div role="group" aria-label="Disciplina" className={`grid gap-2.5 ${subjects.length === 2 ? 'grid-cols-2' : ''}`}>
+    <div role="group" aria-label="Disciplina" className={cn('grid gap-3', subjects.length > 1 && 'grid-cols-2')}>
       {subjects.map((item) => {
-        const active = item.id === current
+        const Icon = iconeDaDisciplina(item.name)
         return (
-          <Link
-            key={item.id}
-            href={`/aluno/simulador?d=${encodeURIComponent(item.id)}${mode ? `&m=${mode}` : ''}`}
-            replace
-            scroll={false}
-            aria-current={active ? 'true' : undefined}
-            className={`flex min-h-[64px] items-center justify-center rounded-2xl px-4 text-center text-[16px] font-semibold no-underline transition ${active ? 'bg-marca text-white' : 'bg-white text-texto shadow-[0_1px_3px_rgba(20,50,40,0.10)] active:scale-[0.99]'}`}
-          >
-            {item.name}
+          <Link key={item.id} href={`/aluno/simulador?m=${mode}&d=${encodeURIComponent(item.id)}`} className={cn('sf sf-toque flex min-h-[116px] flex-col justify-between p-4 no-underline', `tom-${tom}`)}>
+            <span className="ic-tom"><Icon size={20} aria-hidden="true" /></span>
+            <span className="mt-4 block">
+              <span className="block text-[16px] font-semibold leading-5 tracking-[-0.01em] text-texto">{item.name}</span>
+              <span className="mt-0.5 block text-[12px] leading-4 text-texto-2">{item.count} {item.count === 1 ? 'questão' : 'questões'}</span>
+            </span>
           </Link>
         )
       })}

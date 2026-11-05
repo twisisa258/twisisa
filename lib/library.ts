@@ -254,6 +254,7 @@ export async function getHub() {
     failed,
     popular: popular.value,
     total: counts.value.reduce((sum, item) => sum + item.count, 0),
+    categories: counts.value,
     sections: MAIN_SECTIONS.map((section, index): HubSection => ({ slug: section.slug, title: section.title, items: sections[index].value })),
   }
 }

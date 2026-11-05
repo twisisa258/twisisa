@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="space-y-4 rounded-2xl bg-white p-5 shadow-[0_1px_3px_rgba(20,50,40,0.08)]">
+    <section className="sf space-y-4 p-5">
       <h2 className="text-[15px] font-semibold">{title}</h2>
       {children}
     </section>

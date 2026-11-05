@@ -20,6 +20,8 @@ import { getDesafios } from '@/lib/desafios'
 import { buildAvisos } from '@/lib/avisos'
 import { AvisoFaixa } from '@/components/aluno/aviso-faixa'
 import { Anuncios } from '@/components/anuncios/anuncios'
+import { TreinarAgora } from '@/components/aluno/treinar-agora'
+import { MODE_META, ATTEMPT_MODES } from '@/lib/simulator-shared'
 import { getAnunciosAtivos } from '@/lib/anuncios'
 import { HojeHero } from '@/components/aluno/hoje-hero'
 import { CursoGate } from '@/components/aluno/curso-gate'
@@ -165,6 +167,9 @@ export default async function StudentPage({ searchParams }: { searchParams: Prom
     console.error('[ALUNO] anúncios', error)
     return []
   })
+  // Modos do Simulador ligados ao percurso: o painel oferece-os como atalho para começar a estudar.
+  const modulos = track ? await getVisibleModules(track).catch(() => []) : []
+  const modos = ATTEMPT_MODES.filter((modo) => modulos.some((item) => item.key === MODE_META[modo].moduleKey && item.status === 'active'))
   const marks = await markCounts(session.user.id).catch(() => null)
   // Plano de hoje: só com dados reais. Sem os desafios (falha ou sem percurso) o cartão não aparece.
   const plan = desafios
@@ -238,6 +243,7 @@ export default async function StudentPage({ searchParams }: { searchParams: Prom
                 <>
                   <HojeHero goal={desafios ? desafios.goal : null} answered={desafios ? desafios.todayAnswered : 0} resume={resume} />
                   <ParaHoje items={plan} />
+                  <TreinarAgora modes={modos} errorCount={inicio?.ok && inicio.value.practice ? inicio.value.practice.errorCount : 0} />
                 </>
               )}
 

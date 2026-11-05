@@ -41,28 +41,28 @@ export function ListingFilters({
   if (subjects.length === 0 && years.length === 0 && !hasFilter) return null
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <div key={`d-${subject}`} className="min-w-[150px] flex-1 sm:max-w-[240px]">
+    <div className="grid grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap">
+      <div key={`d-${subject}`} className="min-w-0 sm:min-w-[150px] sm:max-w-[240px] sm:flex-1">
         <SelectField
           name="disciplina"
           label="Disciplina"
           placeholder="Disciplina"
           defaultValue={subject}
           triggerClassName={trigger}
-          options={[{ value: '', label: 'Todas as disciplinas' }, ...subjects.map((item) => ({ value: item.value, label: `${item.label} (${item.count})` }))]}
+          options={[{ value: '', label: 'Disciplinas' }, ...subjects.map((item) => ({ value: item.value, label: `${item.label} (${item.count})` }))]}
           onValueChange={(value) => {
             if (value !== subject) go({ disciplina: value, ano: '' })
           }}
         />
       </div>
-      <div key={`a-${year}-${subject}`} className="min-w-[110px] flex-1 sm:max-w-[160px]">
+      <div key={`a-${year}-${subject}`} className="min-w-0 sm:min-w-[110px] sm:max-w-[160px] sm:flex-1">
         <SelectField
           name="ano"
           label="Ano"
           placeholder="Ano"
           defaultValue={year}
           triggerClassName={trigger}
-          options={[{ value: '', label: 'Todos os anos' }, ...years.map((item) => ({ value: item.value, label: `${item.label} (${item.count})` }))]}
+          options={[{ value: '', label: 'Anos' }, ...years.map((item) => ({ value: item.value, label: `${item.label} (${item.count})` }))]}
           onValueChange={(value) => {
             if (value !== year) go({ ano: value })
           }}
@@ -72,7 +72,7 @@ export function ListingFilters({
         <button
           type="button"
           onClick={() => router.push(withParams(basePath, { q, categoria }))}
-          className="inline-flex h-11 items-center gap-1.5 rounded-xl px-3 text-xs font-semibold text-marca hover:bg-[#eaf1ec]"
+          className="col-span-2 inline-flex h-11 items-center justify-center gap-1.5 rounded-xl px-3 text-xs font-semibold text-marca hover:bg-[#eaf1ec] sm:col-span-1"
         >
           <X size={14} /> Limpar
         </button>

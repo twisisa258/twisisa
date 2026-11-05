@@ -83,7 +83,6 @@ export default async function RankingPage({ searchParams }: { searchParams: Prom
   const me = data?.me ?? null
   const rows = data?.rows ?? []
   const fora = me && me.position > TOP
-  const comPodio = rows.length >= 3
   const lider = rows[0]?.points ?? 0
   const reinicio = reinicioDaSemana(Date.now())
 
@@ -165,10 +164,10 @@ export default async function RankingPage({ searchParams }: { searchParams: Prom
               />
             ) : (
               <>
-                {comPodio && <Podio rows={rows.slice(0, 3)} />}
-                {(comPodio ? rows.length > 3 : true) && (
+                <Podio rows={rows.slice(0, 3)} />
+                {(rows.length > 3 || Boolean(fora)) && (
                   <ol className="sf divide-y divide-linha overflow-hidden">
-                    {rows.slice(comPodio ? 3 : 0).map((row) => <Row key={row.userId} row={row} lider={lider} />)}
+                    {rows.slice(3).map((row) => <Row key={row.userId} row={row} lider={lider} />)}
                     {fora && me && (
                       <>
                         <li aria-hidden="true" className="py-1 text-center text-xs text-texto-2">···</li>

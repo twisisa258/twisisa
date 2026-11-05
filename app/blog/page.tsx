@@ -11,7 +11,7 @@ export default async function BlogPage() {
 
   const firstName = session.user.name.split(' ')[0]
   return (
-    <StudentFeatureShell firstName={firstName} eyebrow="Conteúdos para avançar" title="Blog e novidades." description="Guias de estudo, dicas para exames e novidades úteis para estudantes moçambicanos.">
+    <StudentFeatureShell firstName={firstName} eyebrow="Conteúdos para avançar" title="Blog e novidades" description="Guias de estudo, dicas para exames e novidades úteis para estudantes moçambicanos.">
       <EditorialFeed />
     </StudentFeatureShell>
   )

@@ -91,3 +91,14 @@ export function normalizeTerm(value: string) {
   const term = value.replace(/\s+/g, ' ').trim().toLocaleLowerCase('pt-PT').slice(0, 80)
   return term.length >= 2 ? term : ''
 }
+
+/** Agrupa materiais seguidos do mesmo ano (a lista já vem ordenada por ano). Materiais sem ano ficam no fim. */
+export function groupByYear<T extends { year: number | null }>(items: T[]): { year: number | null; items: T[] }[] {
+  const groups: { year: number | null; items: T[] }[] = []
+  for (const item of items) {
+    const last = groups.find((group) => group.year === item.year)
+    if (last) last.items.push(item)
+    else groups.push({ year: item.year, items: [item] })
+  }
+  return groups.sort((a, b) => (a.year === null ? 1 : b.year === null ? -1 : b.year - a.year))
+}

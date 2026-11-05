@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { BookOpen, ExternalLink, Bookmark } from 'lucide-react'
+import { BookOpen, ExternalLink, Library } from 'lucide-react'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
 import { pool } from '@/lib/db'
 import { relativeTime } from '@/lib/relative-time'
@@ -29,7 +29,7 @@ export default async function FavoritosPage() {
     return null
   })
   return (
-    <StudentFeatureShell firstName={session.user.name.split(' ')[0]} eyebrow="A minha biblioteca" title="Materiais guardados." description="Os materiais que guardaste na Biblioteca." icon={Bookmark} tone="ajuda">
+    <StudentFeatureShell firstName={session.user.name.split(' ')[0]} eyebrow="A minha biblioteca" title="Materiais guardados" description="Os materiais que guardaste na Biblioteca." icon={Library} tone="ajuda">
       {items === null ? (
         <div className="rounded-2xl border border-linha bg-white p-6"><p className="text-[15px] font-medium">Não foi possível carregar os teus materiais</p><p className="mt-1 text-sm text-texto-2">Tenta outra vez daqui a pouco.</p></div>
       ) : items.length === 0 ? (
