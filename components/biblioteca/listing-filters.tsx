@@ -8,7 +8,7 @@ import { withParams } from '@/lib/library-shared'
 type Facet = { value: string; label: string; count: number }
 
 const trigger =
-  'h-11 rounded-xl bg-white px-3 text-sm text-texto shadow-[0_1px_2px_rgba(20,50,40,0.05),0_8px_20px_-14px_rgba(20,50,40,0.25)] outline-none focus-visible:ring-2 focus-visible:ring-marca/25'
+  'h-11 rounded-xl border border-linha bg-white px-3 text-sm text-texto outline-none focus-visible:ring-2 focus-visible:ring-marca/25'
 
 // Disciplina e Ano, em funil: mudar a disciplina limpa o ano. A instituição são botões (ver `ChipRow`).
 // A página recarrega com o novo endereço, por isso só vem da base de dados o que é preciso.

@@ -49,7 +49,7 @@ function Group({ label, items, onNavigate }: { label: string; items: readonly It
               aria-current={active ? 'page' : undefined}
               className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
                 active
-                  ? 'bg-gradient-to-br from-[#2a6a57] to-marca font-medium text-white shadow-[0_6px_16px_-8px_rgba(29,77,65,0.7)]'
+                  ? 'bg-marca font-medium text-white'
                   : 'text-texto-2 hover:bg-white hover:text-marca'
               }`}
             >

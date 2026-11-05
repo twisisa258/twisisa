@@ -76,18 +76,18 @@ export async function Listing({ userId, basePath, category, params }: { userId: 
       )}
 
       {!data ? (
-        <EmptyState title="Não foi possível carregar" description="Tenta outra vez dentro de instantes." actionLabel="Voltar à Biblioteca" actionHref="/biblioteca" icon={FolderOpen} />
+        <EmptyState tone="ajuda" title="Não foi possível carregar" description="Tenta outra vez dentro de instantes." actionLabel="Voltar à Biblioteca" actionHref="/biblioteca" icon={FolderOpen} />
       ) : data.total === 0 ? (
         anyFilter ? (
-          <div className="rounded-3xl bg-white px-5 py-10 text-center shadow-[0_1px_2px_rgba(20,50,40,0.04),0_10px_26px_-14px_rgba(20,50,40,0.18)]">
-            <SearchX size={26} className="mx-auto text-texto-2" />
-            <p className="mt-3 text-sm font-semibold text-[#202923]">Nenhum resultado</p>
-            <Link href={basePath} className="mt-4 inline-flex h-10 items-center rounded-full bg-gradient-to-br from-[#2a6a57] to-marca px-5 text-sm font-semibold text-white">
+          <div className="sf tom-ajuda px-5 py-10 text-center">
+            <span className="ic-tom ic-tom-lg mx-auto"><SearchX size={24} aria-hidden="true" /></span>
+            <p className="mt-4 text-[16px] font-semibold text-texto">Nenhum resultado</p><p className="mx-auto mt-1 max-w-[30ch] text-[14px] leading-6 text-texto-2">Tenta outra palavra ou tira um filtro.</p>
+            <Link href={basePath} className="btn btn-primario mt-5">
               Limpar pesquisa
             </Link>
           </div>
         ) : (
-          <EmptyState title="Ainda sem materiais aqui" actionLabel="Voltar à Biblioteca" actionHref="/biblioteca" icon={FolderOpen} />
+          <EmptyState tone="ajuda" title="Ainda sem materiais aqui" description="Quando houver materiais nesta secção, aparecem aqui." actionLabel="Voltar à Biblioteca" actionHref="/biblioteca" icon={FolderOpen} />
         )
       ) : (
         <LibraryProvider savedIds={savedIds}>

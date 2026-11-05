@@ -20,7 +20,7 @@ export function ListaEscolha({ itens, valor, onChange, rotulo, procuraDepois = 8
       {itens.length > procuraDepois && (
         <div className="relative">
           <Search size={16} aria-hidden className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9aa29c]" />
-          <input type="search" value={texto} onChange={(event) => setTexto(event.target.value)} placeholder="Procurar" aria-label={`Procurar: ${rotulo}`} className="h-11 w-full rounded-xl border border-[#dfe3d9] bg-white pl-10 pr-3.5 text-sm outline-none transition-colors placeholder:text-[#9aa29c] focus:border-marca focus:ring-2 focus:ring-marca/10" />
+          <input type="search" value={texto} onChange={(event) => setTexto(event.target.value)} placeholder="Procurar" aria-label={`Procurar: ${rotulo}`} className="h-11 w-full rounded-xl border border-[#dfe3d9] bg-white pl-10 pr-3.5 text-sm outline-none transition-colors placeholder:text-[#6f7871] focus:border-marca focus:ring-2 focus:ring-marca/10" />
         </div>
       )}
       <div role="radiogroup" aria-label={rotulo} className={`flex flex-col gap-2 ${itens.length > procuraDepois ? 'max-h-[44dvh] overflow-y-auto pr-0.5' : ''}`}>

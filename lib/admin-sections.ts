@@ -1,4 +1,4 @@
-import { BookOpen, BookOpenCheck, Copy, Flag, GraduationCap, Landmark, Layers, LayoutDashboard, LayoutGrid, ListTree, Sparkles, Tags, Users, type LucideIcon } from 'lucide-react'
+import { BookOpen, BookOpenCheck, Copy, Flag, GraduationCap, Landmark, Layers, LayoutDashboard, LayoutGrid, ListTree, Megaphone, Sparkles, Tags, Users, type LucideIcon } from 'lucide-react'
 
 export type AdminSection = {
   href: string
@@ -41,6 +41,12 @@ export const adminSections: AdminSection[] = [
     label: 'Disciplinas',
     description: 'Disciplinas por classe (10ª, 12ª) e por instituição.',
     icon: Layers,
+  },
+  {
+    href: '/admin/anuncios',
+    label: 'Anúncios',
+    description: 'Cartões de novidades, eventos e avisos que os alunos veem no painel.',
+    icon: Megaphone,
   },
   {
     href: '/admin/reportes',

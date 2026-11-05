@@ -104,7 +104,7 @@ export function LibrarySearch({ scope, initialQuery = '', placeholder = 'Pesquis
           event.preventDefault()
           run(value)
         }}
-        className="flex h-12 items-center gap-3 rounded-2xl bg-white px-3.5 shadow-[0_1px_2px_rgba(20,50,40,0.05),0_10px_26px_-14px_rgba(20,50,40,0.22)] focus-within:ring-2 focus-within:ring-marca/25"
+        className="flex h-12 items-center gap-3 rounded-2xl border border-linha bg-white px-3.5 transition-colors focus-within:border-[color:var(--ajuda)] focus-within:ring-4 focus-within:ring-[color:var(--ajuda)]/10"
       >
         <Search size={18} className="shrink-0 text-[#5f6a63]" aria-hidden="true" />
         <input
@@ -125,7 +125,7 @@ export function LibrarySearch({ scope, initialQuery = '', placeholder = 'Pesquis
           autoComplete="off"
           enterKeyHint="search"
           maxLength={80}
-          className="h-full min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-[#929b94]"
+          className="h-full min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-[#6f7871]"
         />
         {value && (
           <button
@@ -146,7 +146,7 @@ export function LibrarySearch({ scope, initialQuery = '', placeholder = 'Pesquis
         <ul
           id={listId}
           role="listbox"
-          className="absolute inset-x-0 top-[calc(100%+8px)] max-h-[min(60vh,420px)] overflow-y-auto rounded-2xl bg-white p-1.5 shadow-[0_18px_44px_-12px_rgba(20,50,40,0.32)]"
+          className="absolute inset-x-0 top-[calc(100%+8px)] max-h-[min(60vh,420px)] overflow-y-auto sf sf-flutua p-1.5"
         >
           {rows.map((row, index) => {
             const previous = rows[index - 1]

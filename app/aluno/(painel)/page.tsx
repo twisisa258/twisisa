@@ -19,6 +19,8 @@ import { getInicioAluno, type ResumeItem } from '@/lib/aluno-inicio'
 import { getDesafios } from '@/lib/desafios'
 import { buildAvisos } from '@/lib/avisos'
 import { AvisoFaixa } from '@/components/aluno/aviso-faixa'
+import { Anuncios } from '@/components/anuncios/anuncios'
+import { getAnunciosAtivos } from '@/lib/anuncios'
 import { HojeHero } from '@/components/aluno/hoje-hero'
 import { CursoGate } from '@/components/aluno/curso-gate'
 import { safeNext } from '@/lib/identity'
@@ -158,6 +160,11 @@ export default async function StudentPage({ searchParams }: { searchParams: Prom
   const resume: ResumeItem | null =
     (inicio?.ok ? inicio.value.resume : null) ?? (last ? { kind: 'material', title: last.title, at: last.at, href: fileHref(last.id) } : null)
   const desafios = await desafiosPromise
+  // Anúncios da equipa: se a consulta falhar (ou a tabela ainda não existir), a página segue sem eles.
+  const anuncios = await getAnunciosAtivos(track).catch((error: unknown) => {
+    console.error('[ALUNO] anúncios', error)
+    return []
+  })
   const marks = await markCounts(session.user.id).catch(() => null)
   // Plano de hoje: só com dados reais. Sem os desafios (falha ou sem percurso) o cartão não aparece.
   const plan = desafios
@@ -223,6 +230,7 @@ export default async function StudentPage({ searchParams }: { searchParams: Prom
               </div>
 
               <AvisoFaixa items={gate?.need ? [] : avisos} />
+              {!gate?.need && <Anuncios items={anuncios} />}
 
               {gate?.need ? (
                 <CursoGate courses={gateCourses} initialCourseId={gate.need === 'combinacao' ? gate.courseId : null} initialCombos={gateCombos} orientacaoHref={gateOrientacao} next={next || null} forcarAbrir={Boolean(params.curso)} />

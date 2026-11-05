@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { BookOpen, ChevronRight } from 'lucide-react'
+import { BookOpen, ChevronRight, Library } from 'lucide-react'
 import { getHub, getSavedIds } from '@/lib/library'
 import { withParams } from '@/lib/library-shared'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
@@ -33,22 +33,29 @@ export default async function BibliotecaPage({ searchParams }: { searchParams: P
     <StudentFeatureShell firstName={firstName} eyebrow="Biblioteca" title="Biblioteca" hideTitle hideBackLink>
       <UrlFeedback />
       <div className="space-y-8">
+        <header className="tom-ajuda flex items-center gap-3.5">
+          <span className="ic-tom ic-tom-lg"><Library size={24} aria-hidden="true" /></span>
+          <div className="min-w-0">
+            <h1 className="text-[28px] font-semibold leading-tight tracking-[-0.045em] sm:text-4xl">Biblioteca</h1>
+            {hub.total > 0 && <p className="text-[14px] leading-5 text-texto-2">{hub.total === 1 ? '1 material' : `${hub.total} materiais`} para estudar</p>}
+          </div>
+        </header>
 
         <LibrarySearch />
 
         {hub.failed && hub.total === 0 ? (
-          <EmptyState title="Não foi possível carregar a biblioteca" description="Tenta outra vez dentro de instantes." icon={BookOpen} />
+          <EmptyState tone="ajuda" title="Não foi possível carregar a biblioteca" description="Tenta outra vez dentro de instantes." icon={BookOpen} />
         ) : hub.total === 0 ? (
-          <EmptyState title="A biblioteca ainda não tem materiais" icon={BookOpen} />
+          <EmptyState tone="ajuda" title="A biblioteca ainda não tem materiais" description="Quando houver exames e apontamentos, aparecem aqui." icon={BookOpen} />
         ) : (
           <LibraryProvider savedIds={savedIds}>
-            {hub.popular.length > 0 && <SectionRow title="Mais populares" items={hub.popular} />}
+            {hub.popular.length > 0 && <SectionRow title="Mais populares" slug="populares" items={hub.popular} />}
             {sections.map((section) => (
-              <SectionRow key={section.slug} title={section.title} href={`/biblioteca/${section.slug}`} items={section.items} />
+              <SectionRow key={section.slug} title={section.title} slug={section.slug} href={`/biblioteca/${section.slug}`} items={section.items} />
             ))}
             <Link
               href="/biblioteca/explorar"
-              className="flex h-12 items-center justify-center gap-1 rounded-2xl bg-gradient-to-br from-[#eaf1ec] to-[#d6e6dc] text-sm font-semibold text-marca"
+              className="btn btn-tom tom-ajuda btn-grande w-full"
             >
               Explorar mais
               <ChevronRight size={16} />

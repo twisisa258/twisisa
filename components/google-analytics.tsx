@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import Script from 'next/script'
 import { usePathname } from 'next/navigation'
 import { GA_ID } from '@/lib/analytics'
+import { CHAVE_COOKIES } from '@/lib/cookies-consent'
 
 // Áreas que nunca entram nas estatísticas (equipa interna).
 const PRIVATE_PREFIXES = ['/admin']
@@ -30,7 +31,8 @@ window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 window.gtag = gtag;
 if (location.pathname === '/admin' || location.pathname.indexOf('/admin/') === 0) { window['ga-disable-' + ${id}] = true; }
-gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'granted' });
+var escolha = null; try { escolha = localStorage.getItem(${JSON.stringify(CHAVE_COOKIES)}) } catch (e) {}
+gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: escolha === 'aceite' ? 'granted' : 'denied' });
 gtag('js', new Date());
 gtag('config', ${id});
 `

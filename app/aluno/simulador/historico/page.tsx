@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, RotateCcw, Target, Timer } from 'lucide-react'
+import { ArrowLeft, ArrowRight, RotateCcw, Target, Timer, History } from 'lucide-react'
 import { getHistory } from '@/lib/simulator'
 import { MODE_META, formatGrade, percent, type AttemptMode } from '@/lib/simulator-shared'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
@@ -22,7 +22,7 @@ export default async function HistoricoPage() {
   const totals = history?.entries.reduce((acc, e) => ({ correct: acc.correct + e.correct, total: acc.total + e.total }), { correct: 0, total: 0 })
 
   return (
-    <StudentFeatureShell firstName={session.user.name.split(' ')[0]} eyebrow="Simulador" title="Histórico" hideBackLink>
+    <StudentFeatureShell firstName={session.user.name.split(' ')[0]} eyebrow="Simulador" title="Histórico" icon={History} hideBackLink>
       <div className="max-w-2xl space-y-5">
         <Link href="/aluno/simulador" className="inline-flex items-center gap-2 text-xs font-semibold text-texto-2 hover:text-marca"><ArrowLeft size={14} aria-hidden />Voltar ao Simulador</Link>
 

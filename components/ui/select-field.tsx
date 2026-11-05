@@ -149,7 +149,7 @@ export function SelectField({
         onKeyDown={onTriggerKeyDown}
         className={`flex w-full items-center justify-between gap-2 text-left ${triggerClassName}`}
       >
-        <span className={`min-w-0 flex-1 truncate ${selected ? '' : 'text-[#929b94]'}`}>
+        <span className={`min-w-0 flex-1 truncate ${selected ? '' : 'text-[#6f7871]'}`}>
           {selected ? selected.label : placeholder}
         </span>
         <svg
@@ -184,7 +184,7 @@ export function SelectField({
           aria-label={label}
           aria-activedescendant={`${id}-option-${active}`}
           onKeyDown={onListKeyDown}
-          className={`absolute inset-x-0 z-30 max-h-64 overflow-auto rounded-xl border border-[#dfe3d9] bg-white p-1 text-texto shadow-[0_12px_32px_rgba(35,54,44,0.14)] outline-none ${dropUp ? 'bottom-full mb-1' : 'top-full mt-1'}`}
+          className={`absolute inset-x-0 z-30 max-h-64 overflow-auto rounded-xl border border-[#dfe3d9] bg-white p-1 text-texto shadow-[0_8px_24px_-8px_rgba(35,54,44,0.2)] outline-none ${dropUp ? 'bottom-full mb-1' : 'top-full mt-1'}`}
         >
           {options.map((option, index) => {
             const isSelected = option.value === value

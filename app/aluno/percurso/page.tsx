@@ -1,3 +1,4 @@
+import { Route } from 'lucide-react'
 import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { studentProfiles } from '@/lib/db/schema'
@@ -21,7 +22,7 @@ export default async function PercursoPage() {
   const savedTrack = profile?.track
 
   return (
-    <StudentFeatureShell firstName={firstName} eyebrow="Percurso" title="O teu percurso" hideBackLink>
+    <StudentFeatureShell firstName={firstName} eyebrow="Percurso" title="O teu percurso" icon={Route} hideBackLink>
       <PercursoPicker
         initialTrack={isTrack(savedTrack) ? savedTrack : null}
         initialOtherLevel={profile?.otherLevel ?? null}

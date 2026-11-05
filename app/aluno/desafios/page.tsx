@@ -4,6 +4,7 @@ import { studentProfiles } from '@/lib/db/schema'
 import { buildAvisos } from '@/lib/avisos'
 import { getDesafios, type DesafiosSnapshot } from '@/lib/desafios'
 import { requireSimulatorScope } from '@/lib/simulator-scope'
+import { CalendarRange, Sun, Target } from 'lucide-react'
 import { StudentFeatureShell } from '@/components/student-feature-shell'
 import { Avisos } from '@/components/aluno/avisos'
 import { MissionList, ReadinessCard, Regras, StreakCard } from '@/components/aluno/desafios/parts'
@@ -28,7 +29,7 @@ export default async function DesafiosPage() {
   const daysToSunday = data ? 6 - data.weekday : 0
 
   return (
-    <StudentFeatureShell firstName={firstName} eyebrow="Desafios" title="Desafios" hideBackLink>
+    <StudentFeatureShell firstName={firstName} eyebrow="Desafios" title="Desafios" description="Missões diárias e semanais, e a tua prontidão." icon={Target} tone="conquista" hideBackLink>
       <div className="mx-auto flex max-w-2xl flex-col gap-5">
         {!data ? (
           <ErrorState title="Não foi possível carregar os desafios" description="Tenta outra vez daqui a pouco." />
@@ -36,8 +37,8 @@ export default async function DesafiosPage() {
           <>
             <StreakCard s={data} />
             <Avisos items={avisos} />
-            <MissionList title="Hoje" hint={`acaba às 24:00`} missions={data.daily} />
-            <MissionList title="Esta semana" hint={daysToSunday === 0 ? 'acaba hoje' : `acaba em ${daysToSunday} ${daysToSunday === 1 ? 'dia' : 'dias'}`} missions={data.weekly} />
+            <MissionList title="Hoje" hint="acaba às 24:00" missions={data.daily} icon={Sun} tone="marca" />
+            <MissionList title="Esta semana" hint={daysToSunday === 0 ? 'acaba hoje' : `acaba em ${daysToSunday} ${daysToSunday === 1 ? 'dia' : 'dias'}`} missions={data.weekly} icon={CalendarRange} tone="conquista" />
             <ReadinessCard s={data} />
             <Regras admission={data.admission} goal={data.goal} />
           </>

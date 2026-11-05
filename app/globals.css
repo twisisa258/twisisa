@@ -204,7 +204,7 @@ body {
    Ação = cantos suaves (14 px). Pílula fica só para etiquetas e estados (.chip).
    Primário: um por ecrã. Secundário: tonal. Terciário: só texto. Perigo: contorno vermelho. */
 @layer components {
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 14px; font-size: 15px; font-weight: 600; line-height: 1; text-decoration: none; cursor: pointer; transition: transform 0.08s ease, background-color 0.15s ease; -webkit-user-select: none; user-select: none; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 18px; border-radius: 14px; font-size: 15px; font-weight: 600; line-height: 1.2; text-align: center; text-wrap: balance; text-decoration: none; cursor: pointer; transition: transform 0.08s ease, background-color 0.15s ease; -webkit-user-select: none; user-select: none; }
   .btn:active:not(:disabled) { transform: translateY(1px); }
   .btn:disabled, .btn[aria-disabled='true'] { cursor: default; opacity: 0.45; }
   .btn-grande { min-height: 52px; font-size: 16px; }
@@ -213,15 +213,77 @@ body {
   .btn-primario:active:not(:disabled) { border-bottom-width: 2px; }
   .btn-secundario { background: var(--marca-suave); color: var(--marca); }
   .btn-secundario:hover:not(:disabled) { background: #d6e6dc; }
-  .btn-terciario { min-height: 40px; padding: 0 10px; background: transparent; color: var(--marca); }
+  .btn-terciario { min-height: 40px; padding: 8px 10px; background: transparent; color: var(--marca); }
   .btn-terciario:hover:not(:disabled) { text-decoration: underline; }
   .btn-perigo { background: #fff; color: var(--erro); box-shadow: inset 0 0 0 1.5px var(--erro); }
   .btn-perigo:hover:not(:disabled) { background: var(--erro-suave); }
-  .btn-icone { width: 44px; padding: 0; border-radius: 12px; background: transparent; color: var(--texto-2); }
+  .btn-icone { width: 44px; padding: 0; flex: none; border-radius: 12px; background: transparent; color: var(--texto-2); }
   .btn-icone:hover:not(:disabled) { background: #eaede4; }
   .chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 500; }
   .kit-fab { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; background: var(--ajuda); color: #fff; }
   .kit-fab:active { transform: scale(0.96); }
+}
+
+/* ═════════════ Camada viva (v3) ═════════════
+   Regras: a estrutura vem de linhas finas (1px), não de sombras. Cada área tem UM tom (--tom) usado em fundos suaves.
+   Cor cheia só na ação principal. Movimento só onde responde a um gesto, ou numa única ação por ecrã (aura). */
+@property --aura-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+
+/* Tom da área: marca (estudar), conquista (pontos, ranking, sequência), ajuda (biblioteca), assistente (Jonas), aviso (atenção). */
+.tom-marca { --tom: var(--marca); --tom-suave: var(--marca-suave); --tom-texto: var(--marca); --tom-linha: #cfe0d5; }
+.tom-conquista { --tom: var(--conquista); --tom-suave: #fffaea; --tom-texto: var(--conquista-texto); --tom-linha: #f3e1a6; }
+.tom-ajuda { --tom: var(--ajuda); --tom-suave: var(--ajuda-suave); --tom-texto: #1e40af; --tom-linha: #c7d8fb; }
+.tom-assistente { --tom: var(--assistente); --tom-suave: var(--assistente-suave); --tom-texto: #3730a3; --tom-linha: #d4d8fb; }
+.tom-aviso { --tom: var(--aviso); --tom-suave: var(--aviso-suave); --tom-texto: var(--aviso-texto); --tom-linha: #f6d9ad; }
+
+@layer components {
+  /* Aura: um anel de cor a rodar à volta da ação principal. Usar em UMA ação por ecrã. */
+  .btn-aura { position: relative; isolation: isolate; border: 0; background: transparent; color: #fff; filter: drop-shadow(0 4px 10px rgba(29, 77, 65, 0.18)); }
+  .btn-aura::before { content: ''; position: absolute; inset: -2px; z-index: -2; border-radius: 16px; background: conic-gradient(from var(--aura-angle), #1d4d41 0deg, #4fae8f 80deg, #d99a06 150deg, #6d63e0 225deg, #4fae8f 300deg, #1d4d41 360deg); animation: aura-giro 5s linear infinite; }
+  .btn-aura::after { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: 14px; background: var(--marca); transition: background-color 0.15s ease; }
+  .btn-aura:hover:not(:disabled)::after { background: var(--marca-escura); }
+  .btn-aura:hover:not(:disabled)::before, .btn-aura:focus-visible::before { animation-duration: 1.6s; }
+  .btn-aura:active:not(:disabled) { transform: translateY(1px) scale(0.99); }
+  .btn-aura:disabled::before { animation: none; opacity: 0.4; }
+  @keyframes aura-giro { to { --aura-angle: 360deg; } }
+
+  /* Botão tonal com a cor da área (ex.: «Ver mais» azul na Biblioteca). */
+  .btn-tom { background: var(--tom-suave, var(--marca-suave)); color: var(--tom-texto, var(--marca)); box-shadow: inset 0 0 0 1px var(--tom-linha, #cfe0d5); }
+  .btn-tom:hover:not(:disabled) { filter: brightness(0.97); }
+
+  /* Superfícies: três níveis. Linha fina por omissão; sombra só em elementos que flutuam. */
+  .sf { background: #fff; border: 1px solid var(--linha); border-radius: 18px; }
+  .sf-tom { background: var(--tom-suave, var(--marca-suave)); border: 1px solid var(--tom-linha, #cfe0d5); border-radius: 18px; }
+  .sf-noite { position: relative; isolation: isolate; overflow: hidden; border-radius: 20px; color: #fff; background: radial-gradient(120% 90% at 100% 0%, rgba(79, 174, 143, 0.30), transparent 55%), linear-gradient(160deg, #20594a 0%, #12362d 100%); }
+  .sf-noite::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background-image: radial-gradient(rgba(255, 255, 255, 0.13) 1px, transparent 1px); background-size: 16px 16px; -webkit-mask-image: linear-gradient(to bottom left, #000, transparent 72%); mask-image: linear-gradient(to bottom left, #000, transparent 72%); }
+  .sf-flutua { box-shadow: 0 1px 2px rgba(20, 50, 40, 0.06), 0 12px 32px -16px rgba(20, 50, 40, 0.28); }
+  .sf-toque { transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.08s ease; }
+  .sf-toque:hover { border-color: var(--tom, var(--marca)); }
+  .sf-toque:active { transform: scale(0.988); }
+
+  /* Ícone num quadrado com a cor da área. */
+  .ic-tom { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 12px; background: var(--tom-suave, var(--marca-suave)); color: var(--tom-texto, var(--marca)); box-shadow: inset 0 0 0 1px var(--tom-linha, #cfe0d5); }
+  .ic-tom-sm { width: 32px; height: 32px; border-radius: 10px; }
+  .ic-tom-lg { width: 52px; height: 52px; border-radius: 16px; }
+
+  /* Seletor segmentado: partes iguais, o texto nunca parte. */
+  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 2px; padding: 3px; border-radius: 14px; background: #e8ebe3; }
+  .seg > * { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 0 12px; border-radius: 11px; font-size: 14px; font-weight: 600; white-space: nowrap; color: var(--texto-2); text-decoration: none; transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease; }
+  .seg > *:hover { color: var(--marca); }
+  .seg > [aria-current='page'], .seg > [aria-pressed='true'] { background: #fff; color: var(--marca); box-shadow: 0 1px 2px rgba(20, 50, 40, 0.12); }
+
+  /* Número tabular: pontos e posições alinham-se em coluna. */
+  .num { font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+}
+
+/* O único momento de movimento do Ranking: os pilares do pódio crescem uma vez. */
+@keyframes pilar-sobe { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.pilar { transform-origin: bottom; animation: pilar-sobe 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: var(--atraso, 0s); }
+@keyframes cartao-entra { from { opacity: 0; transform: translateY(16px) scale(0.98); } to { opacity: 1; transform: none; } }
+.cartao-entra { animation: cartao-entra 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .btn-aura::before { animation: none; }
+  .pilar, .cartao-entra { animation: none; }
 }
 
 /* Global route loader */

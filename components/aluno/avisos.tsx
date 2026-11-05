@@ -5,10 +5,10 @@ import type { Aviso, AvisoIcon, AvisoTone } from '@/lib/avisos'
 export const ICONS: Record<AvisoIcon, LucideIcon> = { flame: Flame, clock: Clock, target: Target, book: BookOpen, alert: AlertTriangle, check: Check, calendar: CalendarDays }
 
 export const TONES: Record<AvisoTone, { card: string; icon: string; cta: string }> = {
-  urgent: { card: 'bg-gradient-to-br from-[#fff4ee] to-[#fde5da]', icon: 'bg-aviso text-white', cta: 'text-[#9a3412]' },
-  warning: { card: 'bg-gradient-to-br from-[#fffaec] to-[#f8edca]', icon: 'bg-aviso text-white', cta: 'text-[#8a5a12]' },
-  info: { card: 'bg-gradient-to-br from-white to-[#f4f6f1]', icon: 'bg-[#eaf1ec] text-marca', cta: 'text-marca' },
-  success: { card: 'bg-gradient-to-br from-[#eef6f0] to-[#dcebe0]', icon: 'bg-marca text-white', cta: 'text-marca' },
+  urgent: { card: 'border border-[#f3c9b4] bg-[#fff4ee]', icon: 'bg-aviso text-white', cta: 'text-[#9a3412]' },
+  warning: { card: 'border border-[#f6d9ad] bg-aviso-suave', icon: 'bg-aviso text-white', cta: 'text-[#8a5a12]' },
+  info: { card: 'border border-linha bg-white', icon: 'bg-marca-suave text-marca', cta: 'text-marca' },
+  success: { card: 'border border-[#cfe0d5] bg-marca-suave', icon: 'bg-marca text-white', cta: 'text-marca' },
 }
 
 // Avisos e lembretes do aluno (calculados em lib/avisos.ts). Cada cartão é uma ligação para a ação.
@@ -24,12 +24,12 @@ export function Avisos({ items }: { items: Aviso[] }) {
             key={aviso.id}
             href={aviso.href}
             role={aviso.tone === 'urgent' ? 'alert' : undefined}
-            className={`flex items-center gap-3 rounded-[18px] p-3.5 text-texto no-underline shadow-[0_1px_2px_rgba(20,50,40,0.04),0_10px_26px_-14px_rgba(20,50,40,0.18)] ${tone.card}`}
+            className={`flex items-center gap-3 sf-toque rounded-[18px] p-3.5 text-texto no-underline ${tone.card}`}
           >
             <span className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${tone.icon}`}><Icon size={18} aria-hidden="true" /></span>
             <span className="min-w-0 flex-1">
               <span className="block text-sm font-semibold leading-5">{aviso.title}</span>
-              <span className="mt-0.5 block text-xs leading-[18px] text-[#5b645d]">{aviso.text}</span>
+              <span className="mt-0.5 block text-xs leading-[18px] text-texto-2">{aviso.text}</span>
             </span>
             <span className={`flex shrink-0 items-center gap-1 text-xs font-semibold ${tone.cta}`}>
               <span className="hidden sm:inline">{aviso.cta}</span>
