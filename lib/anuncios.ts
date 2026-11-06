@@ -63,3 +63,16 @@ export type AnuncioInput = { title: string; body: string; tone: string; featured
 export function newAnuncioId() {
   return randomUUID()
 }
+
+// [twisisa-ux] anúncio único para a página de detalhe. Só se estiver ativo e dentro das datas.
+export async function getAnuncioAtivo(id: string): Promise<Anuncio | null> {
+  const result = await pool.query(
+    `SELECT id, title, body, tone, featured, cta_label, cta_href
+     FROM announcements
+     WHERE id = $1 AND active AND starts_at <= now() AND (ends_at IS NULL OR ends_at > now())
+     LIMIT 1`,
+    [id],
+  )
+  const row = result.rows[0] as Linha | undefined
+  return row ? toAnuncio(row) : null
+}

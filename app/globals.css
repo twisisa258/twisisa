@@ -477,3 +477,15 @@ form[aria-busy="true"] button[type="submit"]::before {
 @media (prefers-reduced-motion: reduce) {
   form[aria-busy="true"] button[type="submit"]::before { animation-duration: 2s; }
 }
+
+/* [twisisa-ux] variantes de botão. O btn-aura deixa de girar: fica sólido, com sombra suave. */
+.btn-aura { position: relative; border: 0; background: var(--marca); color: #fff; box-shadow: 0 6px 16px -8px rgba(29, 77, 65, 0.55); filter: none; isolation: auto; }
+.btn-aura::before, .btn-aura::after { content: none; display: none; }
+.btn-aura:hover:not(:disabled) { background: var(--marca-escura); }
+.btn-aura:active:not(:disabled) { transform: translateY(1px); }
+.btn-contorno { background: #fff; color: var(--marca); box-shadow: inset 0 0 0 1.5px var(--marca); }
+.btn-contorno:hover:not(:disabled) { background: var(--marca-suave); }
+.btn-escuro { background: var(--texto, #202321); color: #fff; }
+.btn-escuro:hover:not(:disabled) { filter: brightness(1.15); }
+.btn-destaque { background: var(--conquista, #d99a06); color: #fff; }
+.btn-destaque:hover:not(:disabled) { filter: brightness(0.94); }
