@@ -1,4 +1,4 @@
-import { BookOpen, BookOpenCheck, Copy, Flag, GraduationCap, Landmark, Layers, LayoutDashboard, LayoutGrid, ListTree, Megaphone, Sparkles, Tags, Users, type LucideIcon } from 'lucide-react'
+import { BookOpen, BookOpenCheck, Copy, FileSearch, Flag, ListOrdered, GraduationCap, Landmark, Layers, LayoutDashboard, LayoutGrid, ListTree, Megaphone, Sparkles, Tags, Users, type LucideIcon } from 'lucide-react'
 
 export type AdminSection = {
   href: string
@@ -47,6 +47,18 @@ export const adminSections: AdminSection[] = [
     label: 'Anúncios',
     description: 'Cartões de novidades, eventos e avisos que os alunos veem no painel.',
     icon: Megaphone,
+  },
+  {
+    href: '/admin/importar',
+    label: 'Importar exames',
+    description: 'O Jonas lê os exames da Biblioteca e propõe as questões como rascunho.',
+    icon: FileSearch,
+  },
+  {
+    href: '/admin/temas-principais',
+    label: 'Temas principais',
+    description: 'Os 10 temas principais de cada disciplina, por instituição, para o Google e o PDF de estudo.',
+    icon: ListOrdered,
   },
   {
     href: '/admin/reportes',

@@ -43,3 +43,7 @@ Web Push; datas de exame (fase H); repetição espaçada automática; «dia livr
 - Motor de notificações push de 30 em 30 minutos com variedade (prazo do desafio, prática a meio, matéria nova, questões quentes, voltar, escolher curso), limites e silêncio configuráveis. Migração 0032, workflow `.github/workflows/push-cron.yml`, `docs/NOTIFICACOES-PUSH.md`.
 - Edital 2027 (UP-Maputo, UniLicungo, UniPúnguè, UniRovuma) carregado: migrações 0033 (regime à distância e vagas), 0034 (cursos, provas e disciplinas por instituição) e 0035 (lembretes ligados por defeito para quem já fez o onboarding). Editar um curso no admin passa a manter as vagas e a combinação que os alunos escolheram.
 
+
+- Área «Importar exames»: o Jonas lê os PDFs da Biblioteca, 10 questões de cada vez, com LaTeX, opções separadas e resposta verificada por segunda resolução; tudo como rascunho para rever.
+- Páginas públicas `/exames` com SEO e sitemap: temas principais, exames anteriores legíveis sem conta, descarregar exige conta; PDF dos temas. Admin «Temas principais» com geração pelo Jonas.
+\n

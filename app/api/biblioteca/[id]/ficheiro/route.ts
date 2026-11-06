@@ -30,7 +30,18 @@ function fail(request: Request, code: string, message: string, status: number, d
 // GET /api/biblioteca/<id>/ficheiro?baixar=1   -> descarrega o documento e regista o download
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) return fail(request, 'sessao', 'Inicia sessão para aceder ao material.', 401)
+  if (!session?.user) {
+    // Quem toca em «Descarregar» sem conta vai criá-la e volta à página onde estava.
+    if (request.headers.get('sec-fetch-mode') === 'navigate') {
+      let next = '/biblioteca'
+      try {
+        const referer = new URL(request.headers.get('referer') ?? '')
+        if (referer.origin === new URL(request.url).origin && !referer.pathname.startsWith('/api/')) next = referer.pathname
+      } catch {}
+      return Response.redirect(new URL(`/sign-up?next=${encodeURIComponent(next)}`, request.url), 303)
+    }
+    return fail(request, 'sessao', 'Inicia sessão para aceder ao material.', 401)
+  }
 
   const { id } = await params
   const download = new URL(request.url).searchParams.get('baixar') === '1'
