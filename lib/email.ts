@@ -180,3 +180,17 @@ export function reminderEmail(input: { name: string; title: string; text: string
   const text = `Olá, ${input.name.trim().split(/\s+/)[0] || 'estudante'}.\n\n${input.text}\n\n${input.cta}: ${url}\n\nPara deixares de receber estes lembretes: ${input.unsubscribeUrl}`
   return { subject: input.title, html, text }
 }
+
+// [twisisa-notif] e-mail de aviso importante (boas-vindas, conta, avisos da equipa). Sem desligar: é uma mensagem sobre a conta.
+export function avisoEmail(input: { name: string; title: string; text: string; cta: string; href: string }) {
+  const url = `${siteBaseUrl()}${input.href.startsWith('/') ? input.href : '/aluno/notificacoes'}`
+  const html = layout({
+    title: escapeHtml(input.title),
+    preheader: escapeHtml(input.text),
+    body: p(`Olá, ${firstName(input.name)}.`) + p(escapeHtml(input.text)),
+    button: { label: input.cta, href: url },
+    reason: 'Recebes este aviso porque tens uma conta no Twisisa.',
+  })
+  const text = `Olá, ${input.name.trim().split(/\s+/)[0] || 'estudante'}.\n\n${input.text}\n\n${input.cta}: ${url}`
+  return { subject: input.title, html, text }
+}

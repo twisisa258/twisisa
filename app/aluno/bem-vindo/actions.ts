@@ -1,9 +1,10 @@
 'use server'
 
+import { notificarAluno } from '@/lib/notificar'
 import { DEFAULT_STUDY_HOUR } from '@/lib/lembretes-shared'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
-import { randomBytes, randomUUID } from 'node:crypto'
+import { randomBytes } from 'node:crypto'
 import { auth } from '@/lib/auth'
 import { pool } from '@/lib/db'
 import { AppError } from '@/lib/action-result'
@@ -166,15 +167,16 @@ export async function saveGoal(input: { dailyGoal: number }): Promise<StepResult
       [user.id, JSON.stringify({ study: true, summary: true, promo: false }), randomBytes(24).toString('hex'), DEFAULT_STUDY_HOUR],
     )
 
-    // Boas-vindas na plataforma, uma só vez.
+    // Boas-vindas na plataforma, uma só vez. Também vai por e-mail e push (ver lib/notificar.ts).
     const firstName = state.name.split(' ')[0] || 'estudante'
-    await pool
-      .query(
-        `INSERT INTO notifications (id, user_id, title, body, kind)
-         SELECT $1, $2, $3, $4, 'boas-vindas' WHERE NOT EXISTS (SELECT 1 FROM notifications WHERE user_id = $2 AND kind = 'boas-vindas')`,
-        [randomUUID(), user.id, `Boas-vindas, ${firstName}`, 'Responde a algumas questões hoje e começa a tua sequência de dias de estudo.'],
-      )
-      .catch((error) => console.error('[ONBOARDING] notificação de boas-vindas', error))
+    await notificarAluno({
+      userId: user.id,
+      kind: 'boas-vindas',
+      title: `Boas-vindas, ${firstName}`,
+      body: 'Responde a algumas questões hoje e começa a tua sequência de dias de estudo.',
+      dedupeKey: 'boas-vindas',
+      unica: true,
+    }).catch((error) => console.error('[ONBOARDING] notificação de boas-vindas', error))
 
     revalidatePath('/aluno')
     revalidatePath('/aluno/notificacoes')
