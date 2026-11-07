@@ -2,14 +2,25 @@ import type { Metadata } from 'next'
 
 export const SITE_NAME = 'Twisisa'
 export const SITE_LOCALE = 'pt_MZ'
-export const SITE_TITLE = 'Twisisa — Percebe a matéria. Não decores.'
-export const SITE_DESCRIPTION =
-  'Plataforma de estudos para estudantes moçambicanos: compreende a lógica de cada matéria, pratica com simulados, tira dúvidas com o Jonas e encontra materiais na biblioteca.'
 
-// Ordem: NEXT_PUBLIC_SITE_URL (explícito) > https://twisisa.site
+export const SITE_TITLE =
+  'Exames Nacionais e de Admissão em Moçambique | Twisisa'
+
+export const SITE_DESCRIPTION =
+  'Estuda para os exames nacionais e exames de admissão em Moçambique. Encontra exames da 10.ª e 12.ª classe, simulados, resoluções, materiais de estudo e apoio para compreender cada matéria.'
+
+// NEXT_PUBLIC_SITE_URL > domínio oficial
 function resolveSiteUrl() {
   const explicit = process.env.NEXT_PUBLIC_SITE_URL?.trim()
-  if (explicit) return (/^https?:\/\//.test(explicit) ? explicit : `https://${explicit}`).replace(/\/+$/, '')
+
+  if (explicit) {
+    return (
+      /^https?:\/\//.test(explicit)
+        ? explicit
+        : `https://${explicit}`
+    ).replace(/\/+$/, '')
+  }
+
   return 'https://twisisa.site'
 }
 
@@ -19,7 +30,7 @@ export const OG_IMAGE = {
   url: '/og/twisisa-og.png',
   width: 1200,
   height: 630,
-  alt: 'Twisisa — Percebe a matéria. Não decores.',
+  alt: 'Twisisa | Plataforma de estudos e preparação para exames em Moçambique.',
 }
 
 type PageSeo = {
@@ -29,26 +40,55 @@ type PageSeo = {
   index?: boolean
 }
 
-// Metadados completos de uma página: canonical, Open Graph e Twitter Card.
-// Páginas com index:false só levam título, descrição e noindex.
-export function pageMetadata({ title, description, path, index = true }: PageSeo): Metadata {
+export function pageMetadata({
+  title,
+  description,
+  path,
+  index = true,
+}: PageSeo): Metadata {
   if (!index) {
-    return { title, description, robots: { index: false, follow: true } }
+    return {
+      title,
+      description,
+      robots: {
+        index: false,
+        follow: true,
+      },
+    }
   }
+
+  const canonical = `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`
+
   return {
     title,
     description,
-    alternates: { canonical: path },
-    robots: { index: true, follow: true },
+
+    alternates: {
+      canonical,
+    },
+
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
+
     openGraph: {
       type: 'website',
       locale: SITE_LOCALE,
       siteName: SITE_NAME,
-      url: path,
+      url: canonical,
       title,
       description,
       images: [OG_IMAGE],
     },
+
     twitter: {
       card: 'summary_large_image',
       title,
@@ -57,7 +97,6 @@ export function pageMetadata({ title, description, path, index = true }: PageSeo
     },
   }
 }
-
 // Dados estruturados do site (Organization + WebSite), injectados no layout raiz.
 export const siteJsonLd = {
   '@context': 'https://schema.org',
