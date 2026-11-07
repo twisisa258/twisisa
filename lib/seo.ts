@@ -7,7 +7,7 @@ export const SITE_TITLE =
   'Exames Nacionais e de Admissão em Moçambique | Twisisa'
 
 export const SITE_DESCRIPTION =
-  'Estuda para os exames nacionais e exames de admissão em Moçambique. Encontra exames da 10.ª e 12.ª classe, simulados, resoluções, materiais de estudo e apoio para compreender cada matéria.'
+  'O Twisisa é a plataforma de aprendizagem para estudantes moçambicanos que querem compreender as matérias, esclarecer dúvidas e preparar-se melhor para os testes e exames. Aprende, pratica e evolui gratuitamente!'
 
 // NEXT_PUBLIC_SITE_URL > domínio oficial
 function resolveSiteUrl() {
