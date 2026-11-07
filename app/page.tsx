@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { headers } from 'next/headers'
 import { auth } from '@/lib/auth'
 import HomePage from '@/components/home-page'
+import { listLatest } from '@/lib/blog'
+import { BLOG_TRACK_LABEL } from '@/lib/blog-pure'
 import { SITE_DESCRIPTION, SITE_TITLE, pageMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = {
@@ -12,5 +14,8 @@ export const metadata: Metadata = {
 export default async function Page() {
   // A página inicial mostra «Painel» a quem já iniciou sessão. Se a verificação falhar, mostra-se como a um visitante.
   const session = await auth.api.getSession({ headers: await headers() }).catch(() => null)
-  return <HomePage signedIn={Boolean(session?.user)} />
+  // Últimos artigos reais do blog; se a leitura falhar ou não houver artigos, a secção não aparece.
+  const latest = await listLatest(3)
+  const posts = latest.map((post) => ({ slug: post.slug, category: post.subjectName ?? (post.track ? BLOG_TRACK_LABEL[post.track] : 'Artigo'), title: post.title, description: post.excerpt }))
+  return <HomePage signedIn={Boolean(session?.user)} posts={posts} />
 }

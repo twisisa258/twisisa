@@ -4,7 +4,8 @@ import { PLANO } from '@/lib/plano'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { articles } from '@/lib/blog'
+// Artigos reais do blog (últimos publicados), enviados por app/page.tsx. Sem artigos, a secção do blog não aparece.
+export type HomePost = { slug: string; category: string; title: string; description: string }
 
 // Separadores "Por dentro": conteúdo real da plataforma (Biblioteca, Simulador, Jonas, Blog).
 const tabs = [
@@ -32,7 +33,7 @@ const tabs = [
 
 const words = ['regra', 'fórmula', 'passo 1', 'exceção', 'passo 2', 'definição', 'truque', 'data']
 
-function Visual({ k }: { k: string }) {
+function Visual({ k, posts }: { k: string; posts: HomePost[] }) {
   if (k === 'Biblioteca') return <>{['Livros', 'Exames', 'Guias de estudos'].map((n) => <div className="tw-row" key={n}><b />{n}<small>Ver · Baixar</small></div>)}</>
   if (k === 'Simulador') return <>
     <div className="tw-ring"><span>30s</span></div>
@@ -42,10 +43,10 @@ function Visual({ k }: { k: string }) {
     <div className="tw-bub tw-me">Porque dividimos os dois lados?</div>
     <div className="tw-bub tw-jo">Para manter a balança equilibrada: o que fazes de um lado, fazes do outro.</div>
     <div className="tw-bub tw-me">Agora percebi!</div></>
-  return <>{articles.slice(0, 3).map((a) => <div className="tw-row" key={a.slug}><b />{a.title}</div>)}</>
+  return <>{posts.slice(0, 3).map((a) => <div className="tw-row" key={a.slug}><b />{a.title}</div>)}</>
 }
 
-export default function Page({ signedIn = false }: { signedIn?: boolean }) {
+export default function Page({ signedIn = false, posts = [] }: { signedIn?: boolean; posts?: HomePost[] }) {
   const [menu, setMenu] = useState(false)
   const [tab, setTab] = useState(0)
   const [divided, setDivided] = useState(false)
@@ -117,12 +118,12 @@ export default function Page({ signedIn = false }: { signedIn?: boolean }) {
         </div>
       </div></section>
 
-      {/* BLOG: artigos reais */}
-      <section className="tw-sec" style={{ paddingTop: 0 }}><div className="tw-w">
+      {/* BLOG: artigos reais da base de dados; sem artigos publicados a secção não aparece */}
+      {posts.length > 0 && <section className="tw-sec" style={{ paddingTop: 0 }}><div className="tw-w">
         <span className="tw-tag tw-rv">Blog</span>
         <h2 className="tw-h2 tw-rv">Ler 3 minutos ajuda.</h2>
-        <div className="tw-art">{articles.map((a, n) => <Link href={`/blog/${a.slug}`} key={a.slug} className="tw-rv" style={{ ['--d' as string]: `${n * 0.1}s` }}><small>{a.category}</small><h3>{a.title}</h3><p>{a.description}</p></Link>)}</div>
-      </div></section>
+        <div className="tw-art">{posts.map((a, n) => <Link href={`/blog/${a.slug}`} key={a.slug} className="tw-rv" style={{ ['--d' as string]: `${n * 0.1}s` }}><small>{a.category}</small><h3>{a.title}</h3><p>{a.description}</p></Link>)}</div>
+      </div></section>}
 
       {/* PLANO */}
       <section className="tw-sec" style={{ paddingTop: 0 }}><div className="tw-w">

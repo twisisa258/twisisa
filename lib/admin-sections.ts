@@ -1,4 +1,4 @@
-import { BookOpen, BookOpenCheck, Copy, FileSearch, Flag, ListOrdered, GraduationCap, Landmark, Layers, LayoutDashboard, LayoutGrid, ListTree, Megaphone, Sparkles, Tags, Users, type LucideIcon } from 'lucide-react'
+import { BookOpen, BookOpenCheck, Copy, FileSearch, Flag, ListOrdered, GraduationCap, Landmark, Layers, LayoutDashboard, LayoutGrid, ListTree, Megaphone, PenLine, Sparkles, Tags, Users, type LucideIcon } from 'lucide-react'
 
 export type AdminSection = {
   href: string
@@ -47,6 +47,12 @@ export const adminSections: AdminSection[] = [
     label: 'Anúncios',
     description: 'Cartões de novidades, eventos e avisos que os alunos veem no painel.',
     icon: Megaphone,
+  },
+  {
+    href: '/admin/blog',
+    label: 'Blog',
+    description: 'Escreve e publica guias, explicações por tema e dicas de exame.',
+    icon: PenLine,
   },
   {
     href: '/admin/importar',

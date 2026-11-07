@@ -11,5 +11,26 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
   const session = await auth.api.getSession({ headers: await headers() })
   if (session?.user) redirect(safeNext(next))
 
-  return <main className="flex min-h-screen items-center justify-center bg-fundo px-5 py-6 text-texto sm:py-12"><div className="w-full max-w-[420px]"><Brand /><div className="mt-5 rounded-[28px] border border-[#e0e2d9] bg-white p-5 shadow-[0_24px_60px_rgba(35,54,44,0.08)] sm:mt-8 sm:p-8"><h1 className="text-2xl font-medium tracking-[-0.06em] sm:text-3xl">Entrar</h1><div className="mt-5 sm:mt-8"><AuthForm mode="sign-in" googleEnabled={googleEnabled} next={next} /></div><p className="mt-4 text-center text-sm text-texto-2 sm:mt-6">Ainda não tens conta? <Link href="/sign-up" className="font-semibold text-marca">Criar conta</Link></p></div></div></main>
+  return (
+    <main className="flex min-h-screen flex-col bg-fundo px-6 text-texto">
+      <header className="pt-8 sm:pt-12">
+        <Brand />
+      </header>
+
+      <section className="mx-auto flex w-full max-w-[360px] flex-1 flex-col justify-center py-12">
+        <h1 className="text-3xl font-medium tracking-[-0.05em] sm:text-4xl">Entrar</h1>
+
+        <div className="mt-8">
+          <AuthForm mode="sign-in" googleEnabled={googleEnabled} next={next} />
+        </div>
+
+        <p className="mt-8 text-center text-sm text-texto-2">
+          Ainda não tens conta?{' '}
+          <Link href="/sign-up" className="font-semibold text-marca">
+            Criar conta
+          </Link>
+        </p>
+      </section>
+    </main>
+  )
 }

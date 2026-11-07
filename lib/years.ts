@@ -1,6 +1,6 @@
 // Anos disponíveis ao criar exames, materiais, etc. Lista fixa (não se gere no admin):
 // de 2020 até 2026, ou até ao ano corrente se for posterior. Do mais recente para o mais antigo.
-export const FIRST_EXAM_YEAR = 2020
+export const FIRST_EXAM_YEAR = 2013
 const MIN_LAST_YEAR = 2026
 
 export function examYears(now: Date = new Date()): number[] {

@@ -36,10 +36,10 @@ Estados: FEITO E TESTADO · FEITO, FALTA TESTE · FICTÍCIO (dados inventados) �
 | `/aluno/desafios` | FEITO, FALTA TESTE | Sequência, missões do dia e da semana, prontidão por curso e avisos, tudo calculado a partir das respostas do Simulador (`lib/desafios.ts`). Curso alvo escolhido no perfil ou no resultado do teste vocacional (`student_profiles.target_course_id`, migração 0026). |
 | `/aluno/descobrir-curso` | NÃO VERIFICADO | |
 | `/planos` | FEITO | Mostra 197 MT/mês (`lib/plano.ts`). Sem Stripe. O pagamento por meios locais ainda não existe; nada na plataforma é reservado a quem paga. |
-| `/blog` | FEITO | 5 artigos em `lib/blog.ts`. |
+| `/blog` | FEITO, FALTA TESTE | Artigos reais da base de dados (`blog_posts`, migração 0039), escritos em `/admin/blog`. Listagem em `/blog`, artigo em `/blog/[slug]`, pré-visualização em `/blog/pre-visualizar/[id]`, RSS em `/blog/feed.xml`. Sem artigos publicados mostra o estado vazio. |
 
 ## Administração (`/admin`)
-Instituições, Disciplinas, Temas, Classificação (categorias e níveis), Módulos, Materiais, Banco de questões, Variantes, Cursos, Equipa, Jonas (modelo). Todas FEITO, FALTA TESTE no telemóvel.
+Instituições, Disciplinas, Temas, Classificação (categorias e níveis), Módulos, Materiais, Banco de questões, Variantes, Cursos, Equipa, Jonas (modelo), Blog (artigos). Todas FEITO, FALTA TESTE no telemóvel.
 - Formulários usam `FeedbackForm`: durante o envio os campos ficam desactivados e o botão de envio mostra um indicador (CSS em `app/globals.css`, marcador `Estado de processamento`).
 - Acções em linha usam `RowMenu` (já tem estado de processamento).
 - O botão de confirmação do diálogo em `components/admin/question-bulk-form.tsx` desactiva-se durante o processamento, mas não mostra indicador: por fazer.

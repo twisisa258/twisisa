@@ -458,3 +458,9 @@ export async function getHistory(userId: string) {
     open: open.rows.map((row) => ({ id: row.id as string, mode: row.mode as AttemptMode })),
   }
 }
+
+/** Tema ativo de uma disciplina (para o Simulador abrir já filtrado, p. ex. a partir de um artigo do blog). */
+export async function getActiveTopic(topicId: string, subjectId: string): Promise<{ id: string; name: string } | null> {
+  const row = (await pool.query(`SELECT id, name FROM topics WHERE id = $1 AND subject_id = $2 AND active`, [topicId.slice(0, 120), subjectId])).rows[0]
+  return row ? { id: row.id as string, name: row.name as string } : null
+}

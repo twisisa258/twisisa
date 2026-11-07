@@ -3,7 +3,7 @@ import { ClipboardCheck, History } from 'lucide-react'
 import { getVisibleModules, type ModuleKey } from '@/lib/exam-modules'
 import { listStudentInstitutions } from '@/lib/institutions'
 import { trackLabel } from '@/lib/percurso'
-import { getSimulatorHub, getVariants } from '@/lib/simulator'
+import { getActiveTopic, getSimulatorHub, getVariants } from '@/lib/simulator'
 import { requireSimulatorScope } from '@/lib/simulator-scope'
 import { getSimPrefs } from '@/lib/simulator-prefs-server'
 import { sessionSize } from '@/lib/simulator-prefs'
@@ -27,9 +27,9 @@ export const metadata = { title: 'Simulador | Twisisa', description: 'Escolhe o 
 const MODE_BY_MODULE: Partial<Record<ModuleKey, AttemptMode>> = { pratica: 'pratica', 'modo-rapido': 'rapido', 'revisar-erros': 'revisao' }
 const count = (n: number) => `${n} ${n === 1 ? 'questão' : 'questões'}`
 
-export default async function SimuladorPage({ searchParams }: { searchParams: Promise<{ d?: string; m?: string }> }) {
+export default async function SimuladorPage({ searchParams }: { searchParams: Promise<{ d?: string; m?: string; t?: string }> }) {
   const { scope, firstName } = await requireSimulatorScope()
-  const { d, m } = await searchParams
+  const { d, m, t } = await searchParams
   const { track, institutionId } = scope
   const prefs = await getSimPrefs()
 
@@ -59,6 +59,8 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
   const size = mode ? sessionSize(mode, prefs, ROUND_SIZE) : ROUND_SIZE
   const catalog = mode && chosen && hub && mode !== 'revisao' ? await getVariants(scope, chosen.id) : null
   const named = catalog?.variants ?? []
+  // ?t= abre a prática já filtrada pelo tema (ligação «Praticar este tema» dos artigos do blog).
+  const topic = t && chosen && mode && mode !== 'revisao' ? await getActiveTopic(t, chosen.id).catch(() => null) : null
   const open = hub?.open.find((item) => enabled.includes(item.mode))
 
   const ui = mode ? MODO_UI[mode] : null
@@ -132,11 +134,11 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
                 <StartCard mode="revisao" subjectId={chosen.id} title={hub.errorCount > 0 ? 'Rever erros' : 'Sem erros para rever'} caption={hub.errorCount > 0 ? count(Math.min(size, hub.errorCount)) : undefined} disabled={hub.errorCount === 0} />
               ) : named.length > 0 ? (
                 <>
-                  {named.length > 1 && <StartCard mode={mode} subjectId={chosen.id} title="Todas as provas" caption={count(Math.min(size, catalog?.total ?? 0))} />}
-                  {named.map((item) => <StartCard key={item.name} mode={mode} subjectId={chosen.id} variant={item.name} title={item.name} caption={count(Math.min(size, item.count))} />)}
+                  {named.length > 1 && <StartCard mode={mode} subjectId={chosen.id} topicId={topic?.id ?? null} title="Todas as provas" caption={topic ? `Tema: ${topic.name}` : count(Math.min(size, catalog?.total ?? 0))} />}
+                  {named.map((item) => <StartCard key={item.name} mode={mode} subjectId={chosen.id} topicId={topic?.id ?? null} variant={item.name} title={item.name} caption={topic ? `Tema: ${topic.name}` : count(Math.min(size, item.count))} />)}
                 </>
               ) : (
-                <StartCard mode={mode} subjectId={chosen.id} title="Começar" caption={count(Math.min(size, catalog?.total ?? 0))} disabled={(catalog?.total ?? 0) === 0} />
+                <StartCard mode={mode} subjectId={chosen.id} topicId={topic?.id ?? null} title="Começar" caption={topic ? `Tema: ${topic.name}` : count(Math.min(size, catalog?.total ?? 0))} disabled={(catalog?.total ?? 0) === 0} />
               )}
             </section>
           </>

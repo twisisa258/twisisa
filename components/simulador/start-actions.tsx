@@ -10,10 +10,10 @@ import { MODO_UI } from '@/components/simulador/modos'
 import { cn } from '@/lib/utils'
 import type { AttemptMode } from '@/lib/simulator-shared'
 
-type Props = { mode: AttemptMode; subjectId: string; variant?: string | null; title: string; caption?: string; secondary?: boolean; disabled?: boolean }
+type Props = { mode: AttemptMode; subjectId: string; variant?: string | null; topicId?: string | null; title: string; caption?: string; secondary?: boolean; disabled?: boolean }
 
 // Último passo: começar. Cada cartão arranca uma sessão; a cor é a do modo escolhido.
-export function StartCard({ mode, subjectId, variant = null, title, caption, secondary = false, disabled = false }: Props) {
+export function StartCard({ mode, subjectId, variant = null, topicId = null, title, caption, secondary = false, disabled = false }: Props) {
   const router = useRouter()
   const feedback = useFeedback()
   const [pending, startTransition] = useTransition()
@@ -24,7 +24,7 @@ export function StartCard({ mode, subjectId, variant = null, title, caption, sec
     if (busy || disabled) return
     startTransition(async () => {
       try {
-        const result = await startSession({ mode, subjectId, variant })
+        const result = await startSession({ mode, subjectId, variant, topicId })
         if (!result.ok) return feedback.error(result.message)
         setStarted(true)
         router.push(`/aluno/simulador/sessao/${result.data.id}`)

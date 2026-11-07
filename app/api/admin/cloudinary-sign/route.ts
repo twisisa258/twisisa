@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic'
 const FOLDERS: Record<string, string> = {
   materiais: 'estuda-mz/materiais',
   logotipos: 'estuda-mz/logotipos',
+  blog: 'estuda-mz/blog',
 }
 
 // Devolve parâmetros assinados para o browser enviar o ficheiro directamente ao Cloudinary.
