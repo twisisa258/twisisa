@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth'
 import HomePage from '@/components/home-page'
 import { listLatest } from '@/lib/blog'
 import { listPublicInstitutions } from '@/lib/exames'
+import { countPublishedQuestions } from '@/lib/home-stats'
 import { BLOG_TRACK_LABEL } from '@/lib/blog-pure'
 import { SITE_DESCRIPTION, SITE_TITLE, pageMetadata } from '@/lib/seo'
 
@@ -19,6 +20,7 @@ export default async function Page() {
   const latest = await listLatest(3)
   // Universidades com exames públicos: ligações da página inicial para /exames/<universidade>.
   const institutions = (await listPublicInstitutions().catch(() => [])).map((item) => ({ slug: item.slug, shortName: item.shortName, name: item.name, exams: item.exams }))
+  const questoes = await countPublishedQuestions()
   const posts = latest.map((post) => ({ slug: post.slug, category: post.subjectName ?? (post.track ? BLOG_TRACK_LABEL[post.track] : 'Artigo'), title: post.title, description: post.excerpt }))
-  return <HomePage signedIn={Boolean(session?.user)} posts={posts} institutions={institutions} />
+  return <HomePage signedIn={Boolean(session?.user)} posts={posts} institutions={institutions} stats={{ questoes }} />
 }
