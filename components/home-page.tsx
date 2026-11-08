@@ -6,10 +6,12 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 // Artigos reais do blog (últimos publicados), enviados por app/page.tsx. Sem artigos, a secção do blog não aparece.
 export type HomePost = { slug: string; category: string; title: string; description: string }
+// Universidades com exames públicos (enviadas por app/page.tsx): ligações diretas a /exames/<universidade>.
+export type HomeInstitution = { slug: string; shortName: string; name: string; exams: number }
 
 const words = ['regra', 'fórmula', 'passo 1', 'exceção', 'passo 2', 'definição', 'truque', 'data']
 
-export default function Page({ signedIn = false, posts = [] }: { signedIn?: boolean; posts?: HomePost[] }) {
+export default function Page({ signedIn = false, posts = [], institutions = [] }: { signedIn?: boolean; posts?: HomePost[]; institutions?: HomeInstitution[] }) {
   const [menu, setMenu] = useState(false)
   const cta = signedIn ? '/aluno' : '/sign-up'
 
@@ -82,6 +84,12 @@ export default function Page({ signedIn = false, posts = [] }: { signedIn?: bool
             <div className="tw-chips"><Link href="/aluno/simulador">Revisar erros</Link><Link href="/aluno/simulador/historico">Histórico</Link></div></div>
         </div>
       </div></section>
+
+      {/* EXAMES: uma ligação por universidade com conteúdo; sem nenhuma a secção não aparece */}
+      {institutions.length > 0 && <section className="tw-sec" style={{ paddingTop: 0 }}><div className="tw-w">
+        <h2 className="tw-h2 tw-rv">Exames por universidade</h2>
+        <div className="tw-chips tw-rv" style={{ justifyContent: 'center', marginTop: 28 }}>{institutions.map((i) => <Link key={i.slug} href={`/exames/${i.slug}`}>{i.shortName}</Link>)}</div>
+      </div></section>}
 
       {/* BLOG: artigos reais da base de dados; sem artigos publicados a secção não aparece */}
       {posts.length > 0 && <section className="tw-sec" style={{ paddingTop: 0 }}><div className="tw-w">
