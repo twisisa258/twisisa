@@ -16,3 +16,10 @@ node_modules
 .sim-backup-*
 .vercel
 *.zip
+#skills
+.agents/
+.claude/
+.continue/
+.grok/
+aplicar.sh
+skills-lock.json

@@ -2,18 +2,12 @@
 const nextConfig = {
   async redirects() {
     return [
-      // A Biblioteca passou a chamar-se «Exames» e é pública: /exames é a entrada (e o que o Google indexa).
-      // NUNCA redirecionar /exames para outro sítio: era isto que escondia as páginas públicas.
-      { source: '/biblioteca', destination: '/exames', permanent: true },
-      { source: '/biblioteca/exames', destination: '/exames', permanent: true },
-      { source: '/biblioteca/pesquisa', destination: '/exames/pesquisa', permanent: true },
-      { source: '/biblioteca/explorar', destination: '/exames', permanent: true },
-      { source: '/biblioteca/partilhar', destination: '/exames', permanent: true },
       // O Simulador substitui a página de simulados (que tinha um simulado de demonstração).
       { source: '/aluno/simulados', destination: '/aluno/simulador', permanent: true },
       // A Comunidade e os Convites de estudante eram fictícios e foram retirados.
       { source: '/comunidade', destination: '/aluno', permanent: true },
       { source: '/aluno/convites', destination: '/aluno', permanent: true },
+      { source: '/biblioteca/partilhar', destination: '/biblioteca', permanent: true },
     ]
   },
   typescript: {
