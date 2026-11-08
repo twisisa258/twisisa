@@ -140,7 +140,7 @@ export async function finishUpload(): Promise<void> {
   try {
     await requireAdmin()
     revalidatePath('/admin/materiais')
-    revalidatePath('/biblioteca')
+    revalidatePath('/exames', 'layout')
   } catch {
     // Sem permissão: não há nada a revalidar.
   }
@@ -176,7 +176,7 @@ export async function deleteAcademicMaterial(formData: FormData): Promise<Action
     if (!fileRemoved) console.error('[ADMIN MATERIAIS] Ficheiro não removido do Cloudinary:', removed.rows[0].file_url)
 
     revalidatePath('/admin/materiais')
-    revalidatePath('/biblioteca')
+    revalidatePath('/exames', 'layout')
     return fileRemoved
       ? 'Material eliminado.'
       : 'Material eliminado da biblioteca, mas o ficheiro não foi removido do Cloudinary. Apaga-o no painel do Cloudinary.'

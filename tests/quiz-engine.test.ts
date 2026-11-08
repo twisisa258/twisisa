@@ -62,6 +62,23 @@ test('nota de 0 a 20 pesada', () => {
   assert.equal(gradeOutOf20([{ weight: 3, correct: false }]), 0)
 })
 
+test('nota = 20 × pontos ganhos ÷ pontos possíveis (as dicas descontam à nota)', () => {
+  // Duas questões de peso 4: uma certa sem dicas (4 pontos), outra certa com 2 dicas (50 % = 2 pontos). 6 de 8 → 15.
+  assert.equal(
+    gradeOutOf20([
+      { weight: 4, correct: true, points: 4 },
+      { weight: 4, correct: true, points: 2 }
+    ]),
+    15
+  )
+  // Errar continua a valer zero, mesmo que haja pontos gravados por engano.
+  assert.equal(gradeOutOf20([{ weight: 4, correct: false, points: 4 }]), 0)
+  // Dados antigos: pontos maiores que o peso nunca dão mais de 20.
+  assert.equal(gradeOutOf20([{ weight: 1, correct: true, points: 3 }]), 20)
+  // Sem pontos gravados, conta o peso inteiro (comportamento anterior).
+  assert.equal(gradeOutOf20([{ weight: 2, correct: true }, { weight: 2, correct: false }]), 10)
+})
+
 test('escolha: novas primeiro, sem duplicados, tamanho certo', () => {
   const pool = [
     ...Array.from({ length: 30 }, (_, i) =>

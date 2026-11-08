@@ -29,14 +29,14 @@ export default async function FavoritosPage() {
     return null
   })
   return (
-    <StudentFeatureShell firstName={session.user.name.split(' ')[0]} eyebrow="A minha biblioteca" title="Materiais guardados" description="Os materiais que guardaste na Biblioteca." icon={Library} tone="ajuda">
+    <StudentFeatureShell firstName={session.user.name.split(' ')[0]} eyebrow="Guardado" title="Materiais guardados" description="Os materiais que guardaste." icon={Library} tone="ajuda">
       {items === null ? (
         <div className="rounded-2xl border border-linha bg-white p-6"><p className="text-[15px] font-medium">Não foi possível carregar os teus materiais</p><p className="mt-1 text-sm text-texto-2">Tenta outra vez daqui a pouco.</p></div>
       ) : items.length === 0 ? (
         <div className="rounded-2xl border border-linha bg-white p-6">
           <p className="text-[15px] font-medium">Ainda não guardaste nenhum material</p>
-          <p className="mt-1 text-sm text-texto-2">Na Biblioteca, toca em guardar num material e ele aparece aqui.</p>
-          <Link href="/biblioteca" className="btn btn-primario mt-4">Abrir a Biblioteca</Link>
+          <p className="mt-1 text-sm text-texto-2">Nos exames e materiais, toca em guardar e ele aparece aqui.</p>
+          <Link href="/exames" className="btn btn-primario mt-4">Ver os exames</Link>
         </div>
       ) : (
         <ul className="space-y-2">

@@ -75,7 +75,7 @@ export default async function SimuladorPage({ searchParams }: { searchParams: Pr
         {failed || !hub ? (
           <ErrorState title="Não foi possível carregar o Simulador" description="Verifica a ligação e tenta de novo." />
         ) : total === 0 || enabled.length === 0 ? (
-          <EmptyState icon={ClipboardCheck} title="O Simulador abre em breve" description="Enquanto isso, estuda com os materiais da Biblioteca." actionLabel="Ver a Biblioteca" actionHref="/biblioteca" />
+          <EmptyState icon={ClipboardCheck} title="O Simulador abre em breve" description="Enquanto isso, lê os exames de anos anteriores." actionLabel="Ver os exames" actionHref="/exames" />
         ) : !mode || !ui || !modeMeta ? (
           <>
             {open && (

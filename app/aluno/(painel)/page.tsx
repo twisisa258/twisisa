@@ -251,9 +251,9 @@ export default async function StudentPage({ searchParams }: { searchParams: Prom
 
               {!gate?.need && (
               <nav aria-label="Atalhos" className="grid grid-cols-3 gap-2.5">
-                <Link href="/biblioteca" className={cn(tile, 'border border-linha bg-white text-texto')}>
+                <Link href="/exames" className={cn(tile, 'border border-linha bg-white text-texto')}>
                   <span className="flex size-9 items-center justify-center rounded-xl bg-marca-suave text-marca"><Ic name="book" /></span>
-                  Biblioteca
+                  Exames
                 </Link>
                 <Link href={gate?.need ? '/aluno/escolher-curso?next=/aluno/simulador' : '/aluno/simulador'} className={cn(tile, 'bg-marca-suave text-marca')}>
                   <span className="flex size-9 items-center justify-center rounded-xl bg-white/70"><Ic name="test" /></span>

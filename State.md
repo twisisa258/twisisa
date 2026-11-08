@@ -1,6 +1,6 @@
 # State.md — Twisisa
 
-Última actualização: 30/10/2026.
+Última actualização: 08/11/2026.
 Este ficheiro é o único documento vivo do estado do projecto. O registo detalhado dos 171 itens anteriores (até 27/10/2026) está no histórico do git: `git log -p -- State.md`.
 
 ## Como usar
@@ -26,7 +26,8 @@ Estados: FEITO E TESTADO · FEITO, FALTA TESTE · FICTÍCIO (dados inventados) �
 | `/aluno/percurso` | FEITO, FALTA TESTE | 10ª, 12ª ou admissão (com instituição). |
 | `/aluno` (painel) | FEITO, FALTA TESTE | Linha discreta «Hoje 4/10 · 3 dias seguidos» com dados reais de `study_days` (escritos pelo simulador, pela Biblioteca e pelo Jonas). Parabéns no aniversário (dia e mês, fuso de Maputo; 29/02 celebra a 28/02 nos anos não bissextos). |
 | `/aluno/simulador` (+ sessão, histórico, configurações) | FEITO, FALTA TESTE | Servidor avalia respostas, valida o dono da tentativa, fecha o tempo do modo rápido, limita inícios por hora. Testes de unidade só do motor (`tests/quiz-engine.test.ts`). Precisa de questões publicadas. |
-| `/biblioteca` (+ categoria, explorar, pesquisa) | FEITO, FALTA TESTE | Entrega de PDF pelo Cloudinary por confirmar (Definições, Segurança, "Allow delivery of PDF and ZIP files"). |
+| `/exames` (antiga Biblioteca) | FEITO, FALTA TESTE | Pública, sem login. Hub, pesquisa, universidade, disciplina, ano e exame (`docs/EXAMES-PUBLICOS-E-JONAS.md`). `/biblioteca`, `/biblioteca/exames`, `/explorar` e `/pesquisa` redirecionam para `/exames`; ficam só `/biblioteca/livros` e `/guias` (com conta), ligados a partir de `/exames`. Entrega de PDF pelo Cloudinary por confirmar. |
+| `/simulado` | FEITO, FALTA TESTE | Página pública do Simulador (modos, regra de pontos e nota, FAQ). |
 | `/aluno/perfil` | FEITO, FALTA TESTE | Foto no Cloudinary com upload assinado. |
 | `/aluno/ranking` | FEITO, FALTA TESTE | Real (pontos de `attempt_items`). `show_in_ranking` é verdadeiro por omissão. |
 | `/jonas` | FEITO, FALTA TESTE | Groq. Só travão de 25 mensagens por minuto; sem limites por plano. |
@@ -94,6 +95,15 @@ Especificação, mapa do fluxo entre cursos e disciplinas e estado das fases em 
 
 ## Editais de admissão carregados
 Edital 2027 da UP-Maputo, UniLicungo, UniPúnguè e UniRovuma: 184 cursos, 248 opções, vagas e provas por curso (`database/migrations/0033` e `0034`). Datas, regras, confirmações em falta e mapa de provas: `docs/EDITAL-UP-2027.md`. Cursos por concurso documental não entram (não há exame). A UEM 2027 falta carregar.
+
+## Correções de 08/11/2026 (SEO, nomes, pontuação)
+- **Causa de as páginas públicas nunca serem vistas:** `next.config.mjs` tinha `/exames → /biblioteca` (permanente), que exige login. Removido. Se o navegador guardou o redirecionamento antigo, testar num separador privado.
+- Biblioteca passou a «Exames» (menu, painel, avisos, página inicial). Cabeçalho e rodapé públicos comuns (`components/site/site-frame.tsx`) ligam exames, simulado, blog e as universidades em todas as páginas públicas.
+- Blog: moldura partilhada, páginas indexáveis `/blog/disciplina/<slug>` e `/blog/etiqueta/<tag>`, ligações para os exames, sitemap com tudo.
+- SEO dos exames: FAQ com dados estruturados, páginas por ano (`/exames/<uni>/ano/<ano>`), ligações internas, sitemap em poucas consultas, instituição reconhecida pelo nome curto ou completo.
+- Movimento ao fazer scroll: `components/ui/reveal.tsx` + classes `.rv`, `.rv-hero`, `.ex-card` em `globals.css`.
+- Pontos e nota: ver `docs/PONTUACAO.md` (nota = 20 × pontos ganhos ÷ possíveis; dicas descontam aos dois).
+- Por fazer: questões de exemplo públicas (testar sem conta), páginas por curso, `getHub` e `components/biblioteca/{category-tiles,section-row}.tsx` sem uso (remover), testar tudo num telemóvel.
 
 ## Exames públicos, temas e importação com o Jonas
 Páginas públicas `/exames` (Google), temas principais (`/admin/temas-principais`), importação de exames com o Jonas (`/admin/importar`): `docs/EXAMES-PUBLICOS-E-JONAS.md`. Depende de `unpdf` e `pdf-lib`. Migrações 0037 e 0038.

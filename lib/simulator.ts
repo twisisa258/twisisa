@@ -422,7 +422,7 @@ export async function getResult(userId: string, attemptId: string) {
     grouped.set(item.subject, entry)
   }
   const end = attempt.finished_at ? new Date(attempt.finished_at).getTime() : Date.now()
-  const weights = (await pool.query(`SELECT weight::float8 AS weight, coalesce(is_correct, false) AS correct FROM attempt_items WHERE attempt_id = $1`, [attemptId])).rows as { weight: number; correct: boolean }[]
+  const weights = (await pool.query(`SELECT weight::float8 AS weight, points::float8 AS points, coalesce(is_correct, false) AS correct FROM attempt_items WHERE attempt_id = $1`, [attemptId])).rows as { weight: number; points: number; correct: boolean }[]
   return {
     id: attempt.id,
     mode: attempt.mode,
@@ -432,6 +432,7 @@ export async function getResult(userId: string, attemptId: string) {
     topicId: attempt.topic_id,
     grade: gradeOutOf20(weights),
     points: Math.round(items.reduce((sum, item) => sum + (item.feedback?.points ?? 0), 0) * 10) / 10,
+    pointsPossible: Math.round(weights.reduce((sum, item) => sum + item.weight, 0) * 10) / 10,
     total: attempt.total,
     correct: attempt.correct,
     timedOut: attempt.status === 'expirada',
@@ -446,7 +447,7 @@ export async function getHistory(userId: string) {
   const [rows, open] = await Promise.all([
     pool.query(
       `SELECT a.id, a.mode, a.total, a.correct, a.finished_at, s.name AS subject, a.variant,
-         (SELECT CASE WHEN sum(i.weight) > 0 THEN round((20 * coalesce(sum(i.weight) FILTER (WHERE i.is_correct), 0) / sum(i.weight))::numeric, 1) END FROM attempt_items i WHERE i.attempt_id = a.id)::float8 AS grade
+         (SELECT CASE WHEN sum(i.weight) > 0 THEN round((20 * coalesce(sum(LEAST(i.points, i.weight)) FILTER (WHERE i.is_correct), 0) / sum(i.weight))::numeric, 1) END FROM attempt_items i WHERE i.attempt_id = a.id)::float8 AS grade
        FROM attempts a LEFT JOIN library_subjects s ON s.id = a.subject_id
        WHERE a.user_id = $1 AND a.status IN ('concluida','expirada') ORDER BY a.finished_at DESC LIMIT 60`,
       [userId],

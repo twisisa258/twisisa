@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { pool } from '@/lib/db'
 import { AppError } from '@/lib/action-result'
 import { askAi } from '@/lib/kit-ai'
-import { examHeading, parseKeyTopics, slugify } from '@/lib/exames-pure'
+import { examHeading, isYear, likePattern, parseKeyTopics, searchTokens, slugify } from '@/lib/exames-pure'
 
 // Páginas públicas de exames (para o Google) e temas principais (só servidor).
 // Tudo vem da base de dados: instituições, disciplinas, exames da Biblioteca e temas publicados no admin.
@@ -16,7 +16,7 @@ export async function listPublicInstitutions(): Promise<PublicInstitution[]> {
   const result = await pool.query(
     `SELECT i.id, i.short_name, i.name,
        (SELECT count(*)::int FROM key_topics k WHERE k.institution_id = i.id AND k.status = 'publicado') AS topics,
-       (SELECT count(*)::int ${EXAMS_FROM} AND lower(m.institution_name) = lower(i.short_name)) AS exams,
+       (SELECT count(*)::int ${EXAMS_FROM} AND lower(m.institution_name) IN (lower(i.short_name), lower(i.name))) AS exams,
        (SELECT count(*)::int FROM courses co WHERE co.institution_id = i.id AND co.active) AS courses
      FROM institutions i WHERE i.active ORDER BY i.short_name`,
   )
@@ -35,9 +35,9 @@ export async function listPublicSubjects(institution: PublicInstitution): Promis
   const result = await pool.query(
     `SELECT s.id, s.slug, s.name,
        (SELECT count(*)::int FROM key_topics k WHERE k.institution_id = $1 AND k.subject_id = s.id AND k.status = 'publicado') AS topics,
-       (SELECT count(*)::int ${EXAMS_FROM} AND m.subject_id = s.id AND lower(m.institution_name) = lower($2)) AS exams
+       (SELECT count(*)::int ${EXAMS_FROM} AND m.subject_id = s.id AND lower(m.institution_name) IN (lower($2), lower($3))) AS exams
      FROM library_subjects s WHERE s.active ORDER BY s.name`,
-    [institution.id, institution.shortName],
+    [institution.id, institution.shortName, institution.name],
   )
   return result.rows.filter((row) => row.topics > 0 || row.exams > 0).map((row) => ({ id: row.id, slug: row.slug, name: row.name, topics: row.topics, exams: row.exams }))
 }
@@ -52,8 +52,8 @@ export async function getSubjectPage(institutionSlug: string, subjectSlug: strin
   const topics = (await pool.query(`SELECT position, title, summary, tips FROM key_topics WHERE institution_id = $1 AND subject_id = $2 AND status = 'publicado' ORDER BY position`, [institution.id, subject.id])).rows as { position: number; title: string; summary: string; tips: string | null }[]
   const exams = (
     await pool.query(
-      `SELECT m.id, m.title, m.academic_year ${EXAMS_FROM} AND m.subject_id = $1 AND lower(m.institution_name) = lower($2) ORDER BY m.academic_year DESC NULLS LAST, m.title`,
-      [subject.id, institution.shortName],
+      `SELECT m.id, m.title, m.academic_year ${EXAMS_FROM} AND m.subject_id = $1 AND lower(m.institution_name) IN (lower($2), lower($3)) ORDER BY m.academic_year DESC NULLS LAST, m.title`,
+      [subject.id, institution.shortName, institution.name],
     )
   ).rows.map((row) => ({ id: row.id as string, title: row.title as string, year: (row.academic_year as number | null) ?? null, heading: examHeading({ subject: subject.name, institution: institution.shortName, year: row.academic_year, title: row.title }) })) as ExamEntry[]
   if (topics.length === 0 && exams.length === 0) return null
@@ -78,7 +78,8 @@ export async function getPublicExam(id: string) {
     )
   ).rows[0]
   if (!row || !row.institution_name || !row.subject_name) return null
-  const institution = (await listPublicInstitutions()).find((item) => item.shortName.toLowerCase() === String(row.institution_name).toLowerCase())
+  const wanted = String(row.institution_name).toLowerCase()
+  const institution = (await listPublicInstitutions()).find((item) => item.shortName.toLowerCase() === wanted || item.name.toLowerCase() === wanted)
   if (!institution) return null
   return {
     id: row.id as string,
@@ -86,21 +87,121 @@ export async function getPublicExam(id: string) {
     description: (row.description as string) ?? '',
     year: (row.academic_year as number | null) ?? null,
     institution,
-    subject: { name: row.subject_name as string, slug: row.subject_slug as string },
+    subject: { id: row.subject_id as string, name: row.subject_name as string, slug: row.subject_slug as string },
     heading: examHeading({ subject: row.subject_name, institution: institution.shortName, year: row.academic_year, title: row.title }),
     updatedAt: (row.updated_at as Date) ?? null,
   }
 }
 
-/** Todas as páginas públicas, para o sitemap. */
+// ---------------------------------------------------------------- listas de exames (hub, pesquisa, anos, sitemap)
+
+export type ExamListItem = { id: string; title: string; year: number | null; heading: string; institutionSlug: string; institutionShort: string; subjectSlug: string; subjectName: string; updatedAt: Date | null }
+
+type ExamFilter = { institutionId?: string; subjectId?: string; year?: number; q?: string; limit?: number; offset?: number }
+
+/** Exames aprovados (PDF, categoria «Exames») ligados a uma instituição e a uma disciplina ativas. Uma só consulta. */
+export async function findExams(filter: ExamFilter = {}): Promise<{ items: ExamListItem[]; total: number }> {
+  const where = [`m.status = 'approved'`, `c.slug = 'exames'`, `m.mime_type = 'application/pdf'`, `s.active`]
+  const params: unknown[] = []
+  const add = (sql: string, value: unknown) => {
+    params.push(value)
+    where.push(sql.replace('$n', `$${params.length}`))
+  }
+  if (filter.institutionId) add('i.id = $n', filter.institutionId)
+  if (filter.subjectId) add('m.subject_id = $n', filter.subjectId)
+  if (filter.year) add('m.academic_year = $n', filter.year)
+  for (const token of searchTokens(filter.q ?? '')) {
+    params.push(likePattern(token))
+    const n = `$${params.length}`
+    const yearClause = isYear(token) ? ` OR m.academic_year = ${Number(token)}` : ''
+    where.push(`(m.title ILIKE ${n} OR s.name ILIKE ${n} OR i.short_name ILIKE ${n} OR i.name ILIKE ${n}${yearClause})`)
+  }
+  const from = `FROM academic_materials m
+    JOIN library_categories c ON c.id = m.category_id
+    JOIN library_subjects s ON s.id = m.subject_id
+    JOIN institutions i ON i.active AND lower(m.institution_name) IN (lower(i.short_name), lower(i.name))
+    WHERE ${where.join(' AND ')}`
+  const limit = Math.min(Math.max(filter.limit ?? 24, 1), 5000)
+  const offset = Math.max(filter.offset ?? 0, 0)
+  const [rows, count] = await Promise.all([
+    pool.query(
+      `SELECT m.id, m.title, m.academic_year, m.updated_at, s.name AS subject_name, s.slug AS subject_slug, i.short_name
+       ${from} ORDER BY m.academic_year DESC NULLS LAST, m.published_at DESC NULLS LAST, m.title LIMIT ${limit} OFFSET ${offset}`,
+      params,
+    ),
+    pool.query(`SELECT count(*)::int AS n ${from}`, params),
+  ])
+  return {
+    total: (count.rows[0]?.n as number) ?? 0,
+    items: rows.rows.map((row) => ({
+      id: row.id as string,
+      title: row.title as string,
+      year: (row.academic_year as number | null) ?? null,
+      heading: examHeading({ subject: row.subject_name, institution: row.short_name, year: row.academic_year, title: row.title }),
+      institutionSlug: slugify(row.short_name as string),
+      institutionShort: row.short_name as string,
+      subjectSlug: row.subject_slug as string,
+      subjectName: row.subject_name as string,
+      updatedAt: (row.updated_at as Date) ?? null,
+    })),
+  }
+}
+
+/** Anos com exames numa instituição (mais recente primeiro), com o número de exames de cada um. */
+export async function listExamYears(institutionId: string): Promise<{ year: number; count: number }[]> {
+  const result = await pool.query(
+    `SELECT m.academic_year AS year, count(*)::int AS n
+     FROM academic_materials m
+     JOIN library_categories c ON c.id = m.category_id
+     JOIN library_subjects s ON s.id = m.subject_id AND s.active
+     JOIN institutions i ON i.id = $1 AND lower(m.institution_name) IN (lower(i.short_name), lower(i.name))
+     WHERE m.status = 'approved' AND c.slug = 'exames' AND m.mime_type = 'application/pdf' AND m.academic_year IS NOT NULL
+     GROUP BY m.academic_year ORDER BY m.academic_year DESC`,
+    [institutionId],
+  )
+  return result.rows.map((row) => ({ year: row.year as number, count: row.n as number }))
+}
+
+/** Página «Exames da UEM de 2023»: só existe se houver pelo menos um exame nesse ano. */
+export async function getYearPage(institutionSlug: string, year: number) {
+  if (!Number.isInteger(year) || year < 1990 || year > 2100) return null
+  const institution = await getPublicInstitution(institutionSlug)
+  if (!institution) return null
+  const { items } = await findExams({ institutionId: institution.id, year, limit: 200 })
+  if (items.length === 0) return null
+  const years = await listExamYears(institution.id)
+  return { institution, year, exams: items, years }
+}
+
+/** Categorias da Biblioteca antiga que não são exames (livros, guias), só as que têm materiais aprovados. */
+export async function listOtherCategories(): Promise<{ slug: string; name: string; total: number }[]> {
+  const result = await pool.query(
+    `SELECT c.slug, c.name, count(*)::int AS total
+     FROM academic_materials m JOIN library_categories c ON c.id = m.category_id
+     WHERE m.status = 'approved' AND c.active AND c.slug <> 'exames'
+     GROUP BY c.slug, c.name, c.sort_order ORDER BY c.sort_order, c.name`,
+  )
+  return result.rows.map((row) => ({ slug: row.slug as string, name: row.name as string, total: row.total as number }))
+}
+
+/** Todas as páginas públicas, para o sitemap (poucas consultas, sem uma por disciplina). */
 export async function listExamSitemapPaths(): Promise<{ path: string; lastModified?: Date }[]> {
   const out: { path: string; lastModified?: Date }[] = [{ path: '/exames' }]
-  for (const institution of await listPublicInstitutions()) {
+  const institutions = await listPublicInstitutions()
+  const { items: exams } = await findExams({ limit: 5000 })
+  const yearsSeen = new Set<string>()
+  for (const institution of institutions) {
     out.push({ path: `/exames/${institution.slug}` })
-    for (const subject of await listPublicSubjects(institution)) {
-      out.push({ path: `/exames/${institution.slug}/${subject.slug}` })
-      const page = await getSubjectPage(institution.slug, subject.slug)
-      for (const exam of page?.exams ?? []) out.push({ path: `/exames/${institution.slug}/${subject.slug}/${exam.id}` })
+    for (const subject of await listPublicSubjects(institution)) out.push({ path: `/exames/${institution.slug}/${subject.slug}` })
+  }
+  for (const exam of exams) {
+    out.push({ path: `/exames/${exam.institutionSlug}/${exam.subjectSlug}/${exam.id}`, lastModified: exam.updatedAt ?? undefined })
+    if (exam.year) {
+      const key = `${exam.institutionSlug}/${exam.year}`
+      if (!yearsSeen.has(key)) {
+        yearsSeen.add(key)
+        out.push({ path: `/exames/${exam.institutionSlug}/ano/${exam.year}` })
+      }
     }
   }
   return out

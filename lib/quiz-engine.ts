@@ -3,7 +3,7 @@
 // Regras (ver SIMULADOR.md, secção «Lógica única»):
 //  • Cada questão tem um peso de 2 a 4 (dificuldade da questão + dificuldade da variante). Pontos = peso, só se acertar.
 //  • O que já foi mostrado perde peso (fator de repetição) e perde prioridade na escolha.
-//  • A nota é de 0 a 20 e pesa as questões: 20 × (peso das certas ÷ peso de todas).
+//  • A nota é de 0 a 20: 20 × (pontos ganhos ÷ pontos possíveis). As dicas pedidas descontam pontos tanto aos pontos como à nota.
 //  • A escolha dá prioridade ao que o aluno nunca viu; o que errou pode voltar (limitado); o que acertou só volta no fim.
 //  • O baralhamento das opções usa aleatoriedade criptográfica e evita padrões (mesma letra certa várias vezes seguidas,
 //    ordem igual à escrita pelo admin).
@@ -36,12 +36,17 @@ export function itemWeight(questionDifficulty: string | null | undefined, varian
   return Math.max(0.1, round1(questionWeight(questionDifficulty, variantDifficulty) * repeatFactor(timesShown)))
 }
 
-/** Nota de 0 a 20 com uma casa decimal. Em branco conta como errada. Sem pesos, cai para a proporção simples. */
-export function gradeOutOf20(items: { weight: number; correct: boolean }[]): number {
+/**
+ * Nota de 0 a 20 com uma casa decimal: 20 × (pontos ganhos ÷ pontos possíveis). Pontos e nota são a mesma medida em duas escalas.
+ * `points` é o que a questão realmente valeu (peso menos o desconto das dicas); sem ele conta o peso inteiro.
+ * Nunca passa do peso (dados antigos tinham pontos maiores que o peso). Em branco conta como errada.
+ * Sem pesos, cai para a proporção simples.
+ */
+export function gradeOutOf20(items: { weight: number; correct: boolean; points?: number | null }[]): number {
   if (items.length === 0) return 0
   const total = items.reduce((sum, item) => sum + item.weight, 0)
   if (total <= 0) return round1((items.filter((item) => item.correct).length / items.length) * 20)
-  const earned = items.reduce((sum, item) => sum + (item.correct ? item.weight : 0), 0)
+  const earned = items.reduce((sum, item) => sum + (item.correct ? Math.min(item.points ?? item.weight, item.weight) : 0), 0)
   return round1((earned / total) * 20)
 }
 

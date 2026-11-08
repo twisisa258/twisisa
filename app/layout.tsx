@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   creator: SITE_NAME,
   publisher: SITE_NAME,
   category: 'education',
-  keywords: ['estudos', 'Moçambique', 'exames de admissão', 'simulados', 'biblioteca académica'],
+  keywords: ['plataforma de estudos Moçambique', 'exames de admissão', 'exames de admissão UEM', 'baixar exames de admissão', 'simulado de exame de admissão', 'exames anteriores', 'estudar para o exame de admissão', 'Twisisa'],
   formatDetection: { telephone: false, address: false, email: false },
   robots: {
     index: true,

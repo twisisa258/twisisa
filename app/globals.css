@@ -489,3 +489,23 @@ form[aria-busy="true"] button[type="submit"]::before {
 .btn-escuro:hover:not(:disabled) { filter: brightness(1.15); }
 .btn-destaque { background: var(--conquista, #d99a06); color: #fff; }
 .btn-destaque:hover:not(:disabled) { filter: brightness(0.94); }
+
+/* ───────── Movimento das páginas públicas (exames, simulado, blog) ─────────
+   .rv / .rv-in: entrada ao fazer scroll (components/ui/reveal.tsx). .rv-hero: entrada do topo ao abrir.
+   .ex-card: cartões que sobem ao passar o rato. Tudo desligado com «reduzir movimento». */
+.rv { opacity: 0; transform: translateY(22px); transition: opacity 0.6s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); transition-delay: var(--d, 0s); }
+.rv.rv-in { opacity: 1; transform: none; }
+@keyframes rv-up { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+.rv-hero > * { animation: rv-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 0.08s); }
+.rv-hero > *:nth-child(2) { --i: 1; }
+.rv-hero > *:nth-child(3) { --i: 2; }
+.rv-hero > *:nth-child(4) { --i: 3; }
+.rv-hero > *:nth-child(5) { --i: 4; }
+.ex-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+.ex-card:hover { transform: translateY(-3px); box-shadow: 0 16px 32px -20px rgba(20, 50, 40, 0.4); border-color: var(--marca); }
+.ex-card:active { transform: translateY(-1px); }
+@media (prefers-reduced-motion: reduce) {
+  .rv, .rv.rv-in { opacity: 1; transform: none; transition: none; }
+  .rv-hero > * { animation: none; }
+  .ex-card, .ex-card:hover, .ex-card:active { transform: none; transition: none; }
+}

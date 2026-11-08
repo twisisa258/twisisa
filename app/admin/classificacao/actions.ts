@@ -34,7 +34,7 @@ function kindOf(formData: FormData): Kind {
 function refresh() {
   revalidatePath('/admin/classificacao')
   revalidatePath('/admin/materiais')
-  revalidatePath('/biblioteca')
+  revalidatePath('/exames', 'layout')
 }
 
 // Categorias e níveis. O slug não muda ao renomear (links e filtros guardados continuam a funcionar).

@@ -76,7 +76,7 @@ export async function Listing({ userId, basePath, category, params }: { userId: 
       )}
 
       {!data ? (
-        <EmptyState tone="ajuda" title="Não foi possível carregar" description="Tenta outra vez dentro de instantes." actionLabel="Voltar à Biblioteca" actionHref="/biblioteca" icon={FolderOpen} />
+        <EmptyState tone="ajuda" title="Não foi possível carregar" description="Tenta outra vez dentro de instantes." actionLabel="Ver os exames" actionHref="/exames" icon={FolderOpen} />
       ) : data.total === 0 ? (
         anyFilter ? (
           <div className="sf tom-ajuda px-5 py-10 text-center">
@@ -87,7 +87,7 @@ export async function Listing({ userId, basePath, category, params }: { userId: 
             </Link>
           </div>
         ) : (
-          <EmptyState tone="ajuda" title="Ainda sem materiais aqui" description="Quando houver materiais nesta secção, aparecem aqui." actionLabel="Voltar à Biblioteca" actionHref="/biblioteca" icon={FolderOpen} />
+          <EmptyState tone="ajuda" title="Ainda sem materiais aqui" description="Quando houver materiais nesta secção, aparecem aqui." actionLabel="Ver os exames" actionHref="/exames" icon={FolderOpen} />
         )
       ) : (
         <LibraryProvider savedIds={savedIds}>

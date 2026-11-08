@@ -11,6 +11,9 @@ import { blogPath } from '@/lib/blog-pure'
 import { OG_IMAGE, SITE_LOCALE, SITE_NAME, SITE_URL, breadcrumbJsonLd } from '@/lib/seo'
 
 // Rascunhos, arquivados e artigos ainda por publicar devolvem 404. O cache evita ler duas vezes (metadados e página).
+// Artigos agendados passam a públicos sozinhos: a página refaz-se a cada 10 minutos.
+export const revalidate = 600
+
 const load = cache(getPublishedBySlug)
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {

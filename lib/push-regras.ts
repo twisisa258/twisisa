@@ -125,8 +125,8 @@ export function pickPush(ctx: PushContext, cfg: PushConfig): PushMessage | null 
       kind: 'materia-nova',
       refs: ctx.newMaterials.map((item) => item.id),
       title: many ? `${ctx.newMaterials.length} novos materiais no teu curso` : 'Nova matéria no teu curso',
-      body: many ? `${first.title} e mais ${ctx.newMaterials.length - 1} já estão na Biblioteca.` : `${first.title}${first.subject ? ` · ${first.subject}` : ''} já está na Biblioteca.`,
-      url: '/biblioteca',
+      body: many ? `${first.title} e mais ${ctx.newMaterials.length - 1} já estão disponíveis.` : `${first.title}${first.subject ? ` · ${first.subject}` : ''} já está disponível.`,
+      url: '/exames',
     }
   }
 

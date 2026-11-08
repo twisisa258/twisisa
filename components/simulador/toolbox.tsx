@@ -123,7 +123,7 @@ export function Toolbox({ attemptId, mode, item, wasWrong, onHints, onMarked, on
                   {wasWrong && <Tile icon={Lightbulb} tone="aviso" label="Porque errei" note="O Jonas encontra o engano" onClick={() => { close(); onOpenJonas('porque') }} />}
                   {answered && <Tile icon={Sparkles} tone="assistente" label="Pergunta ao Jonas" note="Explicação e dúvidas" onClick={() => { close(); onOpenJonas(null) }} />}
                   {!answered && !timed && <Tile icon={Lightbulb} tone="ajuda" label="Dica" note={item.hints.length ? `${item.hints.length} de ${item.options.length >= 3 ? 3 : 2} usadas` : 'Custa 25 % dos pontos'} onClick={() => setView('dica')} />}
-                  {(answered || !timed) && <Tile icon={BookOpen} tone="ajuda" label="Matéria relacionada" note="Da Biblioteca" onClick={() => setView('materia')} />}
+                  {(answered || !timed) && <Tile icon={BookOpen} tone="ajuda" label="Matéria relacionada" note="Dos exames e materiais" onClick={() => setView('materia')} />}
                   {answered && <Tile icon={Repeat} tone="sucesso" label="Questão parecida" note="Treina mais, criada por IA" onClick={() => setView('parecida')} />}
                   <Tile icon={item.marked ? BookmarkCheck : Bookmark} tone="assistente" label="Estudar depois" note={item.marked ? 'Guardada' : 'Escolhe quando'} onClick={() => setView('depois')} />
                   <Tile icon={Flag} tone="neutro" label="Reportar questão" note="Erro no enunciado" onClick={() => setView('reportar')} />
@@ -210,12 +210,12 @@ function RelatedView({ questionId }: { questionId: string }) {
   }, [questionId, tries])
 
   if (error) return <div><ErrorLine text={error} /><button type="button" onClick={() => setTries((n) => n + 1)} className="btn btn-secundario mt-3">Tentar de novo</button></div>
-  if (!state) return <p className="py-6 text-center text-[14px] text-texto-2" aria-live="polite">A procurar na Biblioteca…</p>
+  if (!state) return <p className="py-6 text-center text-[14px] text-texto-2" aria-live="polite">A procurar materiais…</p>
   if (state.items.length === 0) {
     return (
       <div className="py-2">
-        <p className="text-[14px]">Ainda não há materiais de {state.subject} na Biblioteca.</p>
-        <a href="/biblioteca" target="_blank" rel="noopener" className="btn btn-secundario mt-3">Abrir a Biblioteca<ExternalLink size={16} aria-hidden /></a>
+        <p className="text-[14px]">Ainda não há materiais de {state.subject}.</p>
+        <a href="/exames" target="_blank" rel="noopener" className="btn btn-secundario mt-3">Ver os exames<ExternalLink size={16} aria-hidden /></a>
       </div>
     )
   }

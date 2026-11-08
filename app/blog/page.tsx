@@ -8,12 +8,13 @@ import { EmptyState } from '@/components/states/empty-state'
 import { ErrorState } from '@/components/states/error-state'
 import { Segmentado } from '@/components/ui/segmentado'
 import { listBlogSubjects, listPublished, type BlogSummary } from '@/lib/blog'
-import { BLOG_TRACKS, blogPath, dataCurta, isBlogTrack } from '@/lib/blog-pure'
+import { BLOG_TRACKS, blogPath, blogSubjectPath, dataCurta, isBlogTrack } from '@/lib/blog-pure'
 import { SITE_URL, breadcrumbJsonLd, pageMetadata } from '@/lib/seo'
 
 type Params = Promise<Record<string, string | string[] | undefined>>
 const one = (value: string | string[] | undefined) => ((Array.isArray(value) ? value[0] : value) ?? '').trim()
-const DESCRIPTION = 'Guias de estudo, explicações por tema e dicas de exame e de admissão para estudantes moçambicanos.'
+const DESCRIPTION = 'Guias de estudo, explicações por tema e dicas de exame e de admissão para estudantes moçambicanos. Lê, pratica e prepara-te com exames anteriores.'
+const TITLE = 'Blog de estudos: guias, explicações e dicas de exame | Twisisa'
 
 function read(raw: Record<string, string | string[] | undefined>) {
   const percurso = one(raw.percurso)
@@ -31,7 +32,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Params 
   const f = read(await searchParams)
   const filtered = Boolean(f.q || f.percurso || f.disciplina || f.etiqueta)
   if (filtered) return { ...pageMetadata({ title: 'Blog | Twisisa', description: DESCRIPTION, path: '/blog', index: false }), alternates: { canonical: `${SITE_URL}/blog` } }
-  const base = pageMetadata({ title: f.pagina > 1 ? `Blog, página ${f.pagina} | Twisisa` : 'Blog | Twisisa', description: DESCRIPTION, path: f.pagina > 1 ? `/blog?pagina=${f.pagina}` : '/blog' })
+  const base = pageMetadata({ title: f.pagina > 1 ? `Blog de estudos, página ${f.pagina} | Twisisa` : TITLE, description: DESCRIPTION, path: f.pagina > 1 ? `/blog?pagina=${f.pagina}` : '/blog' })
   return { ...base, alternates: { canonical: `${SITE_URL}${f.pagina > 1 ? `/blog?pagina=${f.pagina}` : '/blog'}`, types: { 'application/rss+xml': `${SITE_URL}/blog/feed.xml` } } }
 }
 
@@ -104,6 +105,12 @@ export default async function BlogPage({ searchParams }: { searchParams: Params 
             </>
           )}
         </form>
+
+        {subjects.length > 0 && (
+          <nav aria-label="Disciplinas" className="mt-5 flex flex-wrap gap-2">
+            {subjects.map((subject) => <Link key={subject.id} href={blogSubjectPath(subject.name)} className="inline-flex min-h-9 items-center rounded-full border border-linha px-3.5 text-[14px] font-semibold text-texto no-underline hover:border-marca hover:text-marca">{subject.name}</Link>)}
+          </nav>
+        )}
 
         <div className="mt-5">
           <Segmentado label="Percurso" items={[{ href: url({ percurso: undefined, pagina: undefined }), label: 'Todos', active: !f.percurso }, ...BLOG_TRACKS.map((track) => ({ href: url({ percurso: track, pagina: undefined }), label: track === 'admissao' ? 'Admissão' : `${track}ª`, active: f.percurso === track }))]} />

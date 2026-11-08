@@ -140,6 +140,20 @@ export async function listBlogSubjects(): Promise<{ id: string; name: string }[]
   }
 }
 
+/** Etiquetas com artigos publicados, as mais usadas primeiro (páginas de tema e sitemap). */
+export async function listBlogTags(limit = 200): Promise<{ tag: string; total: number }[]> {
+  try {
+    const rows = (await pool.query(
+      `SELECT t.tag, count(*)::int AS total FROM (SELECT unnest(p.tags) AS tag FROM blog_posts p WHERE ${PUBLIC}) t GROUP BY t.tag ORDER BY total DESC, t.tag LIMIT $1`,
+      [limit],
+    )).rows
+    return rows.map((row) => ({ tag: row.tag as string, total: row.total as number }))
+  } catch (error) {
+    console.error('[BLOG] etiquetas', error)
+    return []
+  }
+}
+
 export async function listLatest(limit = 3): Promise<BlogSummary[]> {
   try {
     return (await pool.query(`SELECT ${COLUMNS} ${FROM} WHERE ${PUBLIC} ORDER BY p.published_at DESC LIMIT $1`, [limit])).rows.map(toSummary)

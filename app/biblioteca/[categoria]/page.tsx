@@ -13,7 +13,7 @@ type Props = { params: Promise<{ categoria: string }>; searchParams: Promise<Rec
 export async function generateMetadata({ params }: { params: Promise<{ categoria: string }> }) {
   const { categoria } = await params
   const main = MAIN_SECTIONS.find((section) => section.slug === categoria)
-  return { title: `${main?.title ?? 'Biblioteca'} | Twisisa`, robots: { index: false } }
+  return { title: `${main?.title ?? 'Materiais'} | Twisisa`, robots: { index: false } }
 }
 
 // Página própria de uma secção: só mostra materiais daquela categoria (exames, livros, guias, ...).
@@ -33,10 +33,10 @@ export default async function CategoriaPage({ params, searchParams }: Props) {
   return (
     <StudentFeatureShell
       firstName={firstName}
-      eyebrow="Biblioteca"
+      eyebrow="Materiais"
       title={name}
-      backHref={main ? '/biblioteca' : '/biblioteca/explorar'}
-      backLabel={main ? 'Biblioteca' : 'Explorar'}
+      backHref="/exames"
+      backLabel="Exames"
     >
       <UrlFeedback />
       <Listing userId={session.user.id} basePath={`/biblioteca/${categoria}`} category={categoria} params={parsed} />

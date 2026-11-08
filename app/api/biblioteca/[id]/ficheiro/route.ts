@@ -13,7 +13,7 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL })
 // onde o modal de feedback mostra o motivo. Pedidos feitos por fetch recebem o texto, que a interface põe no modal.
 function fail(request: Request, code: string, message: string, status: number, detail?: string) {
   if (request.headers.get('sec-fetch-mode') === 'navigate') {
-    let path = '/biblioteca'
+    let path = '/exames'
     try {
       const referer = new URL(request.headers.get('referer') ?? '')
       if (referer.origin === new URL(request.url).origin && !referer.pathname.startsWith('/api/')) path = referer.pathname
@@ -33,7 +33,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   if (!session?.user) {
     // Quem toca em «Descarregar» sem conta vai criá-la e volta à página onde estava.
     if (request.headers.get('sec-fetch-mode') === 'navigate') {
-      let next = '/biblioteca'
+      let next = '/exames'
       try {
         const referer = new URL(request.headers.get('referer') ?? '')
         if (referer.origin === new URL(request.url).origin && !referer.pathname.startsWith('/api/')) next = referer.pathname

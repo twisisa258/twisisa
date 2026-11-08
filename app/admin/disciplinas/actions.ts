@@ -22,7 +22,7 @@ function text(formData: FormData, key: string) {
 function refresh() {
   revalidatePath('/admin/disciplinas')
   revalidatePath('/admin/materiais')
-  revalidatePath('/biblioteca')
+  revalidatePath('/exames', 'layout')
 }
 
 export async function saveSubject(formData: FormData): Promise<ActionResult> {

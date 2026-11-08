@@ -136,6 +136,9 @@ export function dataCurta(date: Date) {
 }
 
 export const blogPath = (slug: string) => `/blog/${slug}`
+/** Páginas de tema (indexáveis): /blog/disciplina/matematica e /blog/etiqueta/funcoes. */
+export const blogSubjectPath = (subjectName: string) => `/blog/disciplina/${slugify(subjectName)}`
+export const blogTagPath = (tag: string) => `/blog/etiqueta/${encodeURIComponent(tag)}`
 
 /** Botão «Praticar»: leva ao Simulador já na disciplina e no tema do artigo (o Simulador lê d= e t=). */
 export function practiceLink(post: { subjectId: string | null; themeId: string | null }) {

@@ -8,7 +8,7 @@ import { BookOpen, Bookmark, ClipboardCheck, Flame, LayoutDashboard, Library, Sp
 // por isso todas as páginas do estudante têm as mesmas ligações, na mesma ordem e com a página atual marcada.
 const MAIN = [
   { href: '/aluno', label: 'Visão geral', icon: LayoutDashboard, exact: true },
-  { href: '/biblioteca', label: 'Biblioteca', icon: BookOpen },
+  { href: '/exames', label: 'Exames', icon: BookOpen },
   { href: '/aluno/simulador', label: 'Simulador', icon: ClipboardCheck },
   { href: '/aluno/desafios', label: 'Desafios', icon: Flame },
   { href: '/aluno/ranking', label: 'Ranking', icon: Trophy },

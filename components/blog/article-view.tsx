@@ -5,7 +5,7 @@ import { BlogBody } from '@/components/blog/blog-body'
 import { Toc } from '@/components/blog/toc'
 import { ShareButton } from '@/components/blog/share-button'
 import { parseBlogMarkdown, showToc, tableOfContents } from '@/lib/blog-markdown'
-import { BLOG_TRACK_LABEL, blogPath, dataCurta, dataLonga, practiceLink } from '@/lib/blog-pure'
+import { BLOG_TRACK_LABEL, blogPath, blogSubjectPath, blogTagPath, dataCurta, dataLonga, practiceLink } from '@/lib/blog-pure'
 import { SITE_URL } from '@/lib/seo'
 import type { BlogPost, BlogSummary } from '@/lib/blog'
 
@@ -23,7 +23,13 @@ export function ArticleView({ post, related }: { post: BlogPost; related: BlogSu
     <>
       <article>
         <header className="mx-auto max-w-[680px]">
-          {label && <p className="text-[13px] font-semibold text-marca">{label}</p>}
+          {label && (
+            <p className="text-[13px] font-semibold text-marca">
+              {post.subjectName ? <Link href={blogSubjectPath(post.subjectName)} className="no-underline hover:underline">{post.subjectName}</Link> : null}
+              {post.subjectName && (post.themeName || post.track) ? ' · ' : ''}
+              {post.themeName ?? (post.track ? BLOG_TRACK_LABEL[post.track] : '')}
+            </p>
+          )}
           <h1 className="mt-2 text-[clamp(1.75rem,1.4rem+1.8vw,2.75rem)] font-semibold leading-[1.15] tracking-[-0.035em] text-balance">{post.title}</h1>
           {post.excerpt && <p className="mt-4 text-[18px] leading-7 text-texto-2">{post.excerpt}</p>}
           <p className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[14px] text-texto-2">
@@ -52,6 +58,12 @@ export function ArticleView({ post, related }: { post: BlogPost; related: BlogSu
           <h2 id="praticar" className="text-[clamp(1.375rem,1.2rem+0.9vw,1.75rem)] font-semibold leading-[1.25] tracking-[-0.03em]">Agora pratica</h2>
           <p className="mt-2 text-[16px] leading-7 text-texto-2">Ler ajuda. Resolver questões é que fixa a matéria.</p>
           <Link href={practice.href} className="btn btn-primario btn-grande mt-5 w-full sm:w-auto">{practice.label}</Link>
+          <p className="mt-4 text-[15px] leading-6 text-texto-2">Prepara-te também com os <Link href="/exames" className="font-semibold text-marca underline-offset-4 hover:underline">exames de admissão de anos anteriores</Link>.</p>
+          {post.tags.length > 0 && (
+            <ul aria-label="Etiquetas" className="mt-5 flex flex-wrap gap-2">
+              {post.tags.map((tag) => <li key={tag}><Link href={blogTagPath(tag)} className="inline-flex min-h-9 items-center rounded-full border border-linha px-3 text-[13px] text-texto-2 no-underline hover:border-marca hover:text-marca">#{tag}</Link></li>)}
+            </ul>
+          )}
         </section>
 
         {related.length > 0 && (

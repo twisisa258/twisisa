@@ -6,16 +6,18 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 // Artigos reais do blog (últimos publicados), enviados por app/page.tsx. Sem artigos, a secção do blog não aparece.
 export type HomePost = { slug: string; category: string; title: string; description: string }
+// Universidades com exames públicos (de /exames): dão ligações diretas às páginas que o Google indexa.
+export type HomeInstitution = { slug: string; shortName: string; name: string; exams: number }
 
-// Separadores "Por dentro": conteúdo real da plataforma (Biblioteca, Simulador, Jonas, Blog).
+// Separadores "Por dentro": conteúdo real da plataforma (Exames, Simulador, Jonas, Blog).
 const tabs = [
   {
-    key: 'Biblioteca', href: '/biblioteca', title: 'Biblioteca',
-    text: 'Livros, exames e guias de estudos num só lugar, organizados por categoria e filtrados pelo teu percurso.',
-    items: ['Pesquisa por título e disciplina', 'Pré-visualização antes de abrir', 'Descarrega os materiais que precisas', 'Guarda os favoritos para voltar depois'],
+    key: 'Exames', href: '/exames', title: 'Exames',
+    text: 'Exames de admissão de anos anteriores, por universidade, disciplina e ano. Lês sem conta e descarregas o PDF com uma conta gratuita.',
+    items: ['Exames da UEM, UP e outras universidades', 'Temas principais a estudar em cada disciplina', 'Lê o exame sem criar conta', 'Descarrega o PDF e guarda os favoritos'],
   },
   {
-    key: 'Simulador', href: '/aluno/simulador', title: 'Simulador',
+    key: 'Simulador', href: '/simulado', title: 'Simulador',
     text: 'Pratica no teu ritmo, com correção e histórico, e volta ao que errou até perceber.',
     items: ['Prática: uma questão de cada vez, com correção imediata', 'Modo rápido: 10 questões, 30 segundos cada', 'Revisar erros: refaz o que erraste', 'Histórico dos teus resultados'],
   },
@@ -34,7 +36,7 @@ const tabs = [
 const words = ['regra', 'fórmula', 'passo 1', 'exceção', 'passo 2', 'definição', 'truque', 'data']
 
 function Visual({ k, posts }: { k: string; posts: HomePost[] }) {
-  if (k === 'Biblioteca') return <>{['Livros', 'Exames', 'Guias de estudos'].map((n) => <div className="tw-row" key={n}><b />{n}<small>Ver · Baixar</small></div>)}</>
+  if (k === 'Exames') return <>{['Matemática', 'Física', 'Química'].map((n) => <div className="tw-row" key={n}><b />Exame de {n}<small>Ler · Baixar</small></div>)}</>
   if (k === 'Simulador') return <>
     <div className="tw-ring"><span>30s</span></div>
     <div className="tw-dots">{Array.from({ length: 10 }, (_, i) => <i key={i} className={i < 6 ? 'f' : ''} />)}</div>
@@ -46,7 +48,7 @@ function Visual({ k, posts }: { k: string; posts: HomePost[] }) {
   return <>{posts.slice(0, 3).map((a) => <div className="tw-row" key={a.slug}><b />{a.title}</div>)}</>
 }
 
-export default function Page({ signedIn = false, posts = [] }: { signedIn?: boolean; posts?: HomePost[] }) {
+export default function Page({ signedIn = false, posts = [], institutions = [] }: { signedIn?: boolean; posts?: HomePost[]; institutions?: HomeInstitution[] }) {
   const [menu, setMenu] = useState(false)
   const [tab, setTab] = useState(0)
   const [divided, setDivided] = useState(false)
@@ -70,7 +72,7 @@ export default function Page({ signedIn = false, posts = [] }: { signedIn?: bool
             <Image src="/images/twisisa-mark.png" alt="" width={44} height={24} priority className="h-6 w-auto" />Twisisa
           </Link>
           <nav className="tw-nav" aria-label="Navegação principal">
-            <Link href="/biblioteca">Biblioteca</Link><Link href="/aluno/simulador">Simulador</Link>
+            <Link href="/exames">Exames</Link><Link href="/simulado">Simulado</Link>
             <Link href="/jonas">Jonas</Link><Link href="/blog">Blog</Link>
           </nav>
           <div className="flex items-center gap-2">
@@ -80,7 +82,7 @@ export default function Page({ signedIn = false, posts = [] }: { signedIn?: bool
           </div>
         </div>
         {menu && <nav className="tw-mob tw-menu" aria-label="Menu móvel" onClick={() => setMenu(false)}>
-          <Link href="/biblioteca">Biblioteca</Link><Link href="/aluno/simulador">Simulador</Link>
+          <Link href="/exames">Exames</Link><Link href="/simulado">Simulado</Link>
           <Link href="/jonas">Jonas</Link><Link href="/blog">Blog</Link><Link href="/planos">Planos</Link>{!signedIn && <Link href="/sign-in">Entrar</Link>}
         </nav>}
       </header>
@@ -111,12 +113,21 @@ export default function Page({ signedIn = false, posts = [] }: { signedIn?: bool
         <div className="tw-steps" style={{ marginTop: 40 }}>
           <div className="tw-card tw-step tw-rv"><b>01</b><h3 style={{ marginTop: 8 }}>Escolhe o percurso</h3><p>Diz o que estás a preparar. Podes mudar quando quiseres e o teu histórico mantém-se.</p>
             <div className="tw-chips"><span>10ª classe</span><span>12ª classe</span><span>Admissão</span></div></div>
-          <div className="tw-card tw-step tw-rv" style={{ ['--d' as string]: '.1s' }}><b>02</b><h3 style={{ marginTop: 8 }}>Estuda e pratica</h3><p>Lê na Biblioteca, tira dúvidas com o Jonas e testa o que sabes no Simulador.</p>
-            <div className="tw-chips"><span>Biblioteca</span><span>Jonas</span><span>Simulador</span></div></div>
+          <div className="tw-card tw-step tw-rv" style={{ ['--d' as string]: '.1s' }}><b>02</b><h3 style={{ marginTop: 8 }}>Estuda e pratica</h3><p>Lê os exames anteriores, tira dúvidas com o Jonas e testa o que sabes no Simulador.</p>
+            <div className="tw-chips"><span>Exames</span><span>Jonas</span><span>Simulador</span></div></div>
           <div className="tw-card tw-step tw-rv" style={{ ['--d' as string]: '.2s' }}><b>03</b><h3 style={{ marginTop: 8 }}>Revê e evolui</h3><p>Refaz os erros, acompanha o histórico e estuda no teu ritmo, com lembretes na hora que escolheres.</p>
             <div className="tw-chips"><span>Revisar erros</span><span>Histórico</span></div></div>
         </div>
       </div></section>
+
+      {/* EXAMES: universidades com conteúdo real; sem nenhuma a secção não aparece */}
+      {institutions.length > 0 && <section className="tw-sec" style={{ paddingTop: 0 }}><div className="tw-w">
+        <span className="tw-tag tw-rv">Exames</span>
+        <h2 className="tw-h2 tw-rv">Exames de admissão, por universidade.</h2>
+        <p className="tw-sub tw-rv">Lê os exames anteriores sem conta, vê os temas que mais saem e treina com questões reais.</p>
+        <div className="tw-art" style={{ marginTop: 32 }}>{institutions.map((i, n) => <Link href={`/exames/${i.slug}`} key={i.slug} className="tw-rv" style={{ ['--d' as string]: `${n * 0.08}s` }}><small>Exames de admissão</small><h3>{i.shortName}</h3><p>{i.name}{i.exams > 0 ? ` · ${i.exams} ${i.exams === 1 ? 'exame' : 'exames'}` : ''}</p></Link>)}</div>
+        <div className="tw-cta tw-rv" style={{ marginTop: 28 }}><Link href="/exames" className="tw-btn ol">Ver todos os exames</Link></div>
+      </div></section>}
 
       {/* BLOG: artigos reais da base de dados; sem artigos publicados a secção não aparece */}
       {posts.length > 0 && <section className="tw-sec" style={{ paddingTop: 0 }}><div className="tw-w">
@@ -149,7 +160,7 @@ export default function Page({ signedIn = false, posts = [] }: { signedIn?: bool
         <div className="tw-ft">
           <div><Link href="/" className="tw-brand"><Image src="/images/twisisa-mark.png" alt="" width={44} height={24} className="h-6 w-auto" />Twisisa</Link>
             <p style={{ marginTop: 12, maxWidth: 260, lineHeight: 1.6 }}>Percebe a matéria. Não decores. Feita em Moçambique.</p></div>
-          <div><h4>Explorar</h4><Link href="/biblioteca">Biblioteca</Link><Link href="/aluno/simulador">Simulador</Link><Link href="/blog">Blog</Link></div>
+          <div><h4>Explorar</h4><Link href="/exames">Exames de admissão</Link><Link href="/simulado">Simulado</Link><Link href="/blog">Blog</Link></div>
           <div><h4>Plataforma</h4><Link href="/jonas">Jonas</Link><Link href="/planos">Planos</Link><Link href={cta}>{signedIn ? 'Painel' : 'Criar conta'}</Link></div>
           <div><h4>Legal</h4><Link href="/privacidade">Privacidade</Link><Link href="/termos">Termos</Link></div>
         </div>

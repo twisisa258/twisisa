@@ -55,7 +55,8 @@ function Review({ item, attemptId }: { item: PlayItem; attemptId: string }) {
 }
 
 export function ResultView({ result }: { result: Result }) {
-  const pct = percent(result.correct, result.total)
+  // O anel e a mensagem seguem a nota (0 a 20): é o número que o estudante vai ter no exame.
+  const pct = Math.max(0, Math.min(100, Math.round(result.grade * 5)))
   const message = verdict(pct)
   const wrong = result.total - result.correct
   return (
@@ -64,7 +65,7 @@ export function ResultView({ result }: { result: Result }) {
         <div className="flex items-center gap-5">
           <div className="relative">
             <Ring pct={pct} />
-            <span className="absolute inset-0 flex flex-col items-center justify-center"><span className="text-3xl font-semibold tracking-[-0.04em]">{pct}%</span></span>
+            <span className="absolute inset-0 flex flex-col items-center justify-center"><span className="text-3xl font-semibold leading-none tracking-[-0.04em]">{formatGrade(result.grade)}</span><span className="mt-1 text-xs font-semibold text-texto-2">de 20</span></span>
           </div>
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-marca">{MODE_META[result.mode].label}{result.variant ? ` · ${result.variant}` : result.subject ? ` · ${result.subject}` : ''}</p>
@@ -72,11 +73,10 @@ export function ResultView({ result }: { result: Result }) {
             <p className="mt-1 text-sm leading-6 text-texto-2">{message.text}</p>
           </div>
         </div>
-        <dl className="mt-5 grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
+        <dl className="mt-5 grid grid-cols-3 gap-2 text-center">
           {[
-            ['Acertos', `${result.correct}/${result.total}`],
-            ['Pontos', `+${formatPoints(result.points)}`],
-            ['Nota', `${formatGrade(result.grade)}/20`],
+            ['Acertos', `${result.correct} de ${result.total}`],
+            ['Pontos', `${formatPoints(result.points)} de ${formatPoints(result.pointsPossible)}`],
             ['Tempo', formatDuration(result.seconds)],
           ].map(([label, value]) => (
             <div key={label} className="rounded-[16px] bg-marca/[0.05] px-2 py-3">
@@ -85,6 +85,7 @@ export function ResultView({ result }: { result: Result }) {
             </div>
           ))}
         </dl>
+        <p className="mt-3 text-xs leading-5 text-texto-2">Nota = 20 × pontos ganhos ÷ pontos possíveis. Questões que já viste e dicas pedidas valem menos pontos.</p>
         {result.timedOut && <p className="mt-3 flex items-center gap-2 text-xs text-aviso-texto"><Clock size={14} aria-hidden />O tempo acabou e a prova foi entregue automaticamente.</p>}
         <div className="mt-5 flex flex-col gap-2.5 sm:flex-row">
           <RestartButton mode={result.mode === 'revisao' ? 'pratica' : result.mode} subjectId={result.subjectId} variant={result.variant} topicId={result.topicId} label="Nova ronda" primary />
