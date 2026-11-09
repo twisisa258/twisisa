@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Download, ExternalLink } from 'lucide-react'
+import { Download } from 'lucide-react'
 import { JsonLd } from '@/components/json-ld'
-import { ExamRow } from '@/components/exames/exam-row'
+import { examYearLabel } from '@/components/exames/exam-row'
+import { PdfPreview } from '@/components/exames/pdf-preview'
 import { FaqList } from '@/components/exames/faq'
 import { Crumbs, PublicShell } from '@/components/exames/public-shell'
-import { faqExam, faqJsonLd, yearPath } from '@/lib/exames-pure'
+import { examPath, faqExam, faqJsonLd } from '@/lib/exames-pure'
 import { findExams, getPublicExam } from '@/lib/exames'
 import { OG_IMAGE, SITE_LOCALE, SITE_NAME, SITE_URL, breadcrumbJsonLd } from '@/lib/seo'
 
@@ -43,8 +44,8 @@ export default async function ExamPage({ params }: Props) {
   if (!exam) notFound()
   const subjectPath = `/exames/${exam.institution.slug}/${exam.subject.slug}`
   const path = `${subjectPath}/${exam.id}`
-  // Outros exames da mesma disciplina e universidade: liga as páginas entre si (e ajuda quem procura outro ano).
-  const siblings = (await findExams({ institutionId: exam.institution.id, subjectId: exam.subject.id, limit: 9 }).catch(() => ({ items: [], total: 0 }))).items.filter((item) => item.id !== exam.id).slice(0, 8)
+  // Outros anos da mesma disciplina e universidade (inclui este): liga as páginas entre si e ajuda quem procura outro ano.
+  const sameSubject = (await findExams({ institutionId: exam.institution.id, subjectId: exam.subject.id, limit: 12 }).catch(() => ({ items: [], total: 0 }))).items
   const faq = faqExam({ heading: exam.heading, subject: exam.subject.name, institution: exam.institution.shortName })
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -65,6 +66,7 @@ export default async function ExamPage({ params }: Props) {
     ],
   }
   const viewer = `/api/publico/exames/${exam.id}`
+  const download = `/api/biblioteca/${exam.id}/ficheiro?baixar=1`
   return (
     <PublicShell>
       <JsonLd data={jsonLd} />
@@ -72,29 +74,32 @@ export default async function ExamPage({ params }: Props) {
       <section className="tw5-top">
         <h1 className="tw5-h1">{exam.heading}</h1>
         <div className="tw5-actions">
-          <a href={`/api/biblioteca/${exam.id}/ficheiro?baixar=1`} className="tw-btn lg"><Download size={18} aria-hidden /> Descarregar o PDF</a>
-          <a href={viewer} target="_blank" rel="noopener" className="tw-btn lg ol"><ExternalLink size={18} aria-hidden /> Abrir numa aba</a>
+          <a href={download} className="tw-btn"><Download size={17} aria-hidden /> Descarregar PDF</a>
         </div>
-        {exam.year && <ul className="tw5-chips" style={{ marginTop: 22 }}><li><Link href={yearPath(exam.institution.slug, exam.year)}>Todos os exames {exam.institution.shortName} {exam.year}</Link></li></ul>}
       </section>
 
-      {/* O exame já aparece aqui, sem ser preciso tocar em nenhum botão. */}
-      <iframe src={`${viewer}#toolbar=0&navpanes=0`} title={exam.heading} className="tw5-view" loading="lazy" />
+      {/* O exame aparece aqui, folha a folha, sem tocar em nenhum botão. */}
+      <PdfPreview src={viewer} title={exam.heading} downloadHref={download} />
 
-      <div className="tw5-band">
-        <h2>Pratica {exam.subject.name}.</h2>
-        <div className="tw-cta"><Link href="/sign-up" className="tw-btn lg wh">Criar conta grátis</Link></div>
-      </div>
-
-      {siblings.length > 0 && (
+      {sameSubject.length > 1 && (
         <section className="tw5-sec" aria-labelledby="outros">
-          <h2 id="outros" className="tw5-h2">Outros exames de {exam.subject.name}</h2>
-          <ul className="tw5-rows">
-            {siblings.map((item) => <li key={item.id}><ExamRow exam={item} /></li>)}
+          <div className="tw6-lh"><h2 id="outros" className="tw5-h2">Outros anos</h2></div>
+          <ul className="tw5-chips sc" style={{ marginTop: 10 }}>
+            {sameSubject.map((item) => (
+              <li key={item.id}>
+                {item.id === exam.id
+                  ? <span aria-current="page">{examYearLabel(item) || item.title}</span>
+                  : <Link href={examPath(item)} title={item.heading}>{examYearLabel(item) || item.title}</Link>}
+              </li>
+            ))}
           </ul>
-          <div className="tw5-actions"><Link href={subjectPath} className="tw-btn ol">Temas de {exam.subject.name}</Link></div>
         </section>
       )}
+
+      <div className="tw6-tr">
+        <b>Pratica {exam.subject.name}</b>
+        <Link href="/sign-up" className="tw-btn sm">Criar conta</Link>
+      </div>
 
       <FaqList items={faq} />
     </PublicShell>

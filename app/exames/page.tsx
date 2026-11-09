@@ -4,7 +4,6 @@ import { ExamRow } from '@/components/exames/exam-row'
 import { FaqList } from '@/components/exames/faq'
 import { JsonLd } from '@/components/json-ld'
 import { Crumbs, PublicShell } from '@/components/exames/public-shell'
-import { Reveal } from '@/components/ui/reveal'
 import { faqHub, faqJsonLd } from '@/lib/exames-pure'
 import { findExams, listOtherCategories, listPublicInstitutions } from '@/lib/exames'
 import { SITE_URL, breadcrumbJsonLd, pageMetadata } from '@/lib/seo'
@@ -20,7 +19,7 @@ export const metadata = pageMetadata({
 export default async function ExamesPage() {
   const [institutions, recent, others] = await Promise.all([
     listPublicInstitutions().catch(() => []),
-    findExams({ limit: 8 }).catch(() => ({ items: [], total: 0 })),
+    findExams({ limit: 6 }).catch(() => ({ items: [], total: 0 })),
     listOtherCategories().catch(() => []),
   ])
   const faq = faqHub(institutions.map((item) => item.shortName))
@@ -47,7 +46,7 @@ export default async function ExamesPage() {
       <Crumbs items={[{ name: 'Início', href: '/' }, { name: 'Exames' }]} />
 
       <section className="tw5-top">
-        <h1 className="tw5-h1">Exames de <em>admissão.</em></h1>
+        <h1 className="tw5-h1">Exames</h1>
         <form role="search" action="/exames/pesquisa" method="get" className="tw5-search">
           <div>
             <label htmlFor="exames-q" className="sr-only">Pesquisar exames</label>
@@ -57,47 +56,42 @@ export default async function ExamesPage() {
         </form>
       </section>
 
-      <section className="tw5-sec" aria-labelledby="universidades">
-        <h2 id="universidades" className="tw5-h2">Universidades</h2>
+      <nav aria-label="Universidades">
         {institutions.length === 0 ? (
-          <p className="tw5-vazio">Ainda sem exames publicados.</p>
+          <p className="tw5-vazio" style={{ marginTop: 20 }}>Ainda sem exames publicados.</p>
         ) : (
-          <ul className="tw5-tiles">
-            {institutions.map((item, index) => (
-              <Reveal as="li" key={item.id} delay={Math.min(index, 5) * 0.06}>
-                <Link href={`/exames/${item.slug}`} className="tw5-tile">
-                  <b>{item.shortName}</b>
-                  <small>{item.name}</small>
-                  <span>{item.exams} {item.exams === 1 ? 'exame' : 'exames'} →</span>
-                </Link>
-              </Reveal>
+          <ul className="tw5-chips sc" style={{ marginTop: 18 }}>
+            {institutions.map((item) => (
+              <li key={item.id}>
+                <Link href={`/exames/${item.slug}`} title={item.name}>{item.shortName}<small>{item.exams}</small></Link>
+              </li>
             ))}
           </ul>
         )}
-      </section>
+      </nav>
 
       {recent.items.length > 0 && (
         <section className="tw5-sec" aria-labelledby="recentes">
-          <h2 id="recentes" className="tw5-h2">Mais recentes</h2>
+          <div className="tw6-lh"><h2 id="recentes" className="tw5-h2">Mais recentes</h2><span>{recent.total}</span></div>
           <ul className="tw5-rows">
             {recent.items.map((exam) => <li key={exam.id}><ExamRow exam={exam} /></li>)}
           </ul>
-          {recent.total > recent.items.length && <div className="tw5-actions"><Link href="/exames/pesquisa" className="tw-btn ol">Ver os {recent.total} exames</Link></div>}
+          {recent.total > recent.items.length && <Link href="/exames/pesquisa" className="tw-btn ol tw6-wide">Ver os {recent.total} exames</Link>}
         </section>
       )}
 
       {others.length > 0 && (
         <section className="tw5-sec" aria-labelledby="outros">
-          <h2 id="outros" className="tw5-h2">Outros materiais</h2>
-          <ul className="tw5-chips">
-            {others.map((item) => <li key={item.slug}><Link href={`/biblioteca/${item.slug}`}>{item.name} · {item.total}</Link></li>)}
+          <div className="tw6-lh"><h2 id="outros" className="tw5-h2">Outros materiais</h2></div>
+          <ul className="tw5-chips" style={{ marginTop: 10 }}>
+            {others.map((item) => <li key={item.slug}><Link href={`/biblioteca/${item.slug}`}>{item.name}<small>{item.total}</small></Link></li>)}
           </ul>
         </section>
       )}
 
-      <div className="tw5-band">
-        <h2>Treina o que leste.</h2>
-        <div className="tw-cta"><Link href="/simulado" className="tw-btn lg wh"><Target size={18} aria-hidden /> Ver o simulador</Link></div>
+      <div className="tw6-tr">
+        <b>Treina o que leste</b>
+        <Link href="/simulado" className="tw-btn sm"><Target size={16} aria-hidden /> Simulador</Link>
       </div>
 
       <FaqList items={faq} />

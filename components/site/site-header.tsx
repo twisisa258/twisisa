@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { useSession } from '@/lib/auth-client'
+import { ThemeToggle } from '@/components/site/theme-toggle'
 
 // O mesmo cabeçalho da página inicial, em todas as páginas públicas: logo (volta ao início), quatro ligações e conta.
 const NAV = [
@@ -14,7 +15,7 @@ const NAV = [
   { href: '/blog', label: 'Blog' },
 ] as const
 
-export function SiteHeader() {
+export function SiteHeader({ themed = false }: { themed?: boolean }) {
   const path = usePathname() ?? ''
   const [menu, setMenu] = useState(false)
   const { data, isPending } = useSession()
@@ -30,6 +31,7 @@ export function SiteHeader() {
           {NAV.map((item) => <Link key={item.href} href={item.href} aria-current={on(item.href)}>{item.label}</Link>)}
         </nav>
         <div className={`flex items-center gap-2 ${isPending ? 'invisible' : ''}`}>
+          {themed && <ThemeToggle />}
           {!signedIn && <span className="hidden md:block"><Link href="/sign-in" className="tw-btn ol sm">Entrar</Link></span>}
           <Link href={signedIn ? '/aluno' : '/sign-up'} className="tw-btn sm">{signedIn ? 'Painel' : 'Criar conta'}</Link>
           <button className="tw-menu tw-burger" onClick={() => setMenu(!menu)} aria-label={menu ? 'Fechar menu' : 'Abrir menu'} aria-expanded={menu}>{menu ? '✕' : '☰'}</button>
