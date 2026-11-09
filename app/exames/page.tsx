@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Search, Target } from 'lucide-react'
 import { ExamRow } from '@/components/exames/exam-row'
 import { FaqList } from '@/components/exames/faq'
 import { JsonLd } from '@/components/json-ld'
@@ -52,7 +53,7 @@ export default async function ExamesPage() {
             <label htmlFor="exames-q" className="sr-only">Pesquisar exames</label>
             <input id="exames-q" name="q" type="search" maxLength={80} autoComplete="off" placeholder="Ex.: Matemática UEM 2023" />
           </div>
-          <button type="submit" className="tw-btn">Pesquisar</button>
+          <button type="submit" className="tw-btn"><Search size={18} aria-hidden /> Pesquisar</button>
         </form>
       </section>
 
@@ -96,7 +97,7 @@ export default async function ExamesPage() {
 
       <div className="tw5-band">
         <h2>Treina o que leste.</h2>
-        <div className="tw-cta"><Link href="/simulado" className="tw-btn lg wh">Ver o simulador</Link></div>
+        <div className="tw-cta"><Link href="/simulado" className="tw-btn lg wh"><Target size={18} aria-hidden /> Ver o simulador</Link></div>
       </div>
 
       <FaqList items={faq} />

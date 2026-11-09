@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ArrowRight, Download } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import { JsonLd } from '@/components/json-ld'
 import { FaqList } from '@/components/exames/faq'
@@ -57,8 +58,8 @@ export default async function SubjectExamPage({ params }: Props) {
         <h1 className="tw5-h1">{subject.name} <em>{institution.shortName}.</em></h1>
         <p className="tw5-sub">Exame de admissão</p>
         <div className="tw5-actions">
-          <Link href="/sign-up" className="tw-btn lg">Praticar</Link>
-          {topics.length > 0 && <a href={`${base}/temas.pdf`} className="tw-btn lg ol">Temas em PDF</a>}
+          <Link href="/sign-up" className="tw-btn lg"><ArrowRight size={18} aria-hidden /> Praticar</Link>
+          {topics.length > 0 && <a href={`${base}/temas.pdf`} className="tw-btn lg ol"><Download size={18} aria-hidden /> Temas em PDF</a>}
         </div>
       </section>
 

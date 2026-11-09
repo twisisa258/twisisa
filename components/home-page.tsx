@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { BookOpen, History, ListChecks, MessageCircle, Star, Target, Trophy, Compass } from 'lucide-react'
+import { ArrowRight, BookOpen, History, ListChecks, MessageCircle, Star, Target, Trophy, Compass } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { MODE_META } from '@/lib/simulator-shared'
 // Artigos reais do blog (últimos publicados), enviados por app/page.tsx. Sem artigos, a secção do blog não aparece.
@@ -108,8 +108,8 @@ export default function Page({ signedIn = false, posts = [], institutions = [], 
           <h1>Percebe. <em>Não decores.</em></h1>
           <p className="tw2-lead">Exames, simulador e explicador. Num só lugar.</p>
           <div className="tw-cta">
-            <Link href={cta} className="tw-btn lg">{signedIn ? 'Ir ao painel' : 'Começar a estudar'}</Link>
-            <Link href="/exames" className="tw-btn lg ol">Ver exames</Link>
+            <Link href={cta} className="tw-btn lg">{signedIn ? 'Ir ao painel' : 'Começar a estudar'} <ArrowRight size={18} aria-hidden /></Link>
+            <Link href="/exames" className="tw-btn lg ol"><BookOpen size={18} aria-hidden /> Ver exames</Link>
           </div>
         </div>
       </div></section>
@@ -231,7 +231,7 @@ export default function Page({ signedIn = false, posts = [], institutions = [], 
       {/* FECHO */}
       <section className="tw2-close"><div className="tw-w">
         <h2 className="tw-rv">Começa a perceber.</h2>
-        <div className="tw-cta tw-rv" style={{ ['--d' as string]: '.08s' }}><Link href={cta} className="tw-btn lg wh">{signedIn ? 'Ir ao painel' : 'Criar conta'}</Link></div>
+        <div className="tw-cta tw-rv" style={{ ['--d' as string]: '.08s' }}><Link href={cta} className="tw-btn lg wh">{signedIn ? 'Ir ao painel' : 'Criar conta'} <ArrowRight size={18} aria-hidden /></Link></div>
       </div></section>
 
       <footer className="tw-foot"><div className="tw-w">

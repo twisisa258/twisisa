@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { Download, ExternalLink } from 'lucide-react'
 import { JsonLd } from '@/components/json-ld'
 import { ExamRow } from '@/components/exames/exam-row'
 import { FaqList } from '@/components/exames/faq'
@@ -71,13 +72,14 @@ export default async function ExamPage({ params }: Props) {
       <section className="tw5-top">
         <h1 className="tw5-h1">{exam.heading}</h1>
         <div className="tw5-actions">
-          <a href={viewer} target="_blank" rel="noopener" className="tw-btn lg ol">Abrir o exame</a>
-          <a href={`/api/biblioteca/${exam.id}/ficheiro?baixar=1`} className="tw-btn lg">Descarregar o PDF</a>
+          <a href={`/api/biblioteca/${exam.id}/ficheiro?baixar=1`} className="tw-btn lg"><Download size={18} aria-hidden /> Descarregar o PDF</a>
+          <a href={viewer} target="_blank" rel="noopener" className="tw-btn lg ol"><ExternalLink size={18} aria-hidden /> Abrir numa aba</a>
         </div>
         {exam.year && <ul className="tw5-chips" style={{ marginTop: 22 }}><li><Link href={yearPath(exam.institution.slug, exam.year)}>Todos os exames {exam.institution.shortName} {exam.year}</Link></li></ul>}
       </section>
 
-      <iframe src={`${viewer}#toolbar=0&navpanes=0`} title={exam.heading} className="tw5-view" />
+      {/* O exame já aparece aqui, sem ser preciso tocar em nenhum botão. */}
+      <iframe src={`${viewer}#toolbar=0&navpanes=0`} title={exam.heading} className="tw5-view" loading="lazy" />
 
       <div className="tw5-band">
         <h2>Pratica {exam.subject.name}.</h2>

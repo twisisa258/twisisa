@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ArrowRight, Target } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import { ExamRow } from '@/components/exames/exam-row'
 import { FaqList } from '@/components/exames/faq'
@@ -51,8 +52,8 @@ export default async function InstitutionExamsPage({ params }: Props) {
         <h1 className="tw5-h1">Exames <em>{institution.shortName}.</em></h1>
         <p className="tw5-sub">{institution.name}</p>
         <div className="tw5-actions">
-          <Link href="/sign-up" className="tw-btn lg">Praticar</Link>
-          <Link href="/simulado" className="tw-btn lg ol">Ver o simulador</Link>
+          <Link href="/sign-up" className="tw-btn lg"><ArrowRight size={18} aria-hidden /> Praticar</Link>
+          <Link href="/simulado" className="tw-btn lg ol"><Target size={18} aria-hidden /> Ver o simulador</Link>
         </div>
       </section>
 

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Search } from 'lucide-react'
 import { ExamRow } from '@/components/exames/exam-row'
 import { Crumbs, PublicShell } from '@/components/exames/public-shell'
 import { findExams } from '@/lib/exames'
@@ -30,7 +31,7 @@ export default async function PesquisaExamesPage({ searchParams }: { searchParam
             <label htmlFor="pesq-q" className="sr-only">Pesquisar exames</label>
             <input id="pesq-q" name="q" type="search" defaultValue={q} maxLength={80} autoComplete="off" placeholder="Ex.: Matemática UEM 2023" />
           </div>
-          <button type="submit" className="tw-btn">Pesquisar</button>
+          <button type="submit" className="tw-btn"><Search size={18} aria-hidden /> Pesquisar</button>
         </form>
         <p className="tw5-sub">{total === 0 ? 'Nenhum exame encontrado.' : `${total} ${total === 1 ? 'exame' : 'exames'}`}</p>
       </section>

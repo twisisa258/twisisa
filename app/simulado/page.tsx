@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { BookOpen, Target } from 'lucide-react'
 import { FaqList } from '@/components/exames/faq'
 import { JsonLd } from '@/components/json-ld'
 import { Crumbs, PublicShell } from '@/components/exames/public-shell'
@@ -38,8 +39,8 @@ export default async function SimuladoPage() {
         <h1 className="tw5-h1">Treina como no <em>exame.</em></h1>
         <p className="tw5-sub">Questões reais, correção na hora, nota de 0 a 20.</p>
         <div className="tw5-actions">
-          <Link href="/aluno/simulador" className="tw-btn lg">Começar a treinar</Link>
-          <Link href="/exames" className="tw-btn lg ol">Ver exames</Link>
+          <Link href="/aluno/simulador" className="tw-btn lg"><Target size={18} aria-hidden /> Começar a treinar</Link>
+          <Link href="/exames" className="tw-btn lg ol"><BookOpen size={18} aria-hidden /> Ver exames</Link>
         </div>
       </section>
 

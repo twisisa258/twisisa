@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Página inicial + páginas secundárias (exames, simulador, blog, planos) no mesmo estilo.
+# Página inicial + páginas secundárias (exames, simulador, blog, planos), navegação comum e botão Voltar.
 # Corre na raiz do projeto:  cd ~/twisisa && bash aplicar-paginas.sh
 set -e
 [ -f components/home-page.tsx ] && [ -f app/globals.css ] && [ -f app/page.tsx ] || { echo "Corre este script na raiz do projeto (~/twisisa)."; exit 1; }
@@ -188,6 +188,7 @@ cat > "app/exames/[inst]/[disc]/[id]/page.tsx" <<'TWISISA_F2_EOF'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { Download, ExternalLink } from 'lucide-react'
 import { JsonLd } from '@/components/json-ld'
 import { ExamRow } from '@/components/exames/exam-row'
 import { FaqList } from '@/components/exames/faq'
@@ -258,13 +259,14 @@ export default async function ExamPage({ params }: Props) {
       <section className="tw5-top">
         <h1 className="tw5-h1">{exam.heading}</h1>
         <div className="tw5-actions">
-          <a href={viewer} target="_blank" rel="noopener" className="tw-btn lg ol">Abrir o exame</a>
-          <a href={`/api/biblioteca/${exam.id}/ficheiro?baixar=1`} className="tw-btn lg">Descarregar o PDF</a>
+          <a href={`/api/biblioteca/${exam.id}/ficheiro?baixar=1`} className="tw-btn lg"><Download size={18} aria-hidden /> Descarregar o PDF</a>
+          <a href={viewer} target="_blank" rel="noopener" className="tw-btn lg ol"><ExternalLink size={18} aria-hidden /> Abrir numa aba</a>
         </div>
         {exam.year && <ul className="tw5-chips" style={{ marginTop: 22 }}><li><Link href={yearPath(exam.institution.slug, exam.year)}>Todos os exames {exam.institution.shortName} {exam.year}</Link></li></ul>}
       </section>
 
-      <iframe src={`${viewer}#toolbar=0&navpanes=0`} title={exam.heading} className="tw5-view" />
+      {/* O exame já aparece aqui, sem ser preciso tocar em nenhum botão. */}
+      <iframe src={`${viewer}#toolbar=0&navpanes=0`} title={exam.heading} className="tw5-view" loading="lazy" />
 
       <div className="tw5-band">
         <h2>Pratica {exam.subject.name}.</h2>
@@ -291,6 +293,7 @@ mkdir -p "app/exames/[inst]/[disc]"
 cat > "app/exames/[inst]/[disc]/page.tsx" <<'TWISISA_F3_EOF'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ArrowRight, Download } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import { JsonLd } from '@/components/json-ld'
 import { FaqList } from '@/components/exames/faq'
@@ -348,8 +351,8 @@ export default async function SubjectExamPage({ params }: Props) {
         <h1 className="tw5-h1">{subject.name} <em>{institution.shortName}.</em></h1>
         <p className="tw5-sub">Exame de admissão</p>
         <div className="tw5-actions">
-          <Link href="/sign-up" className="tw-btn lg">Praticar</Link>
-          {topics.length > 0 && <a href={`${base}/temas.pdf`} className="tw-btn lg ol">Temas em PDF</a>}
+          <Link href="/sign-up" className="tw-btn lg"><ArrowRight size={18} aria-hidden /> Praticar</Link>
+          {topics.length > 0 && <a href={`${base}/temas.pdf`} className="tw-btn lg ol"><Download size={18} aria-hidden /> Temas em PDF</a>}
         </div>
       </section>
 
@@ -496,6 +499,7 @@ mkdir -p "app/exames/[inst]"
 cat > "app/exames/[inst]/page.tsx" <<'TWISISA_F5_EOF'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ArrowRight, Target } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import { ExamRow } from '@/components/exames/exam-row'
 import { FaqList } from '@/components/exames/faq'
@@ -547,8 +551,8 @@ export default async function InstitutionExamsPage({ params }: Props) {
         <h1 className="tw5-h1">Exames <em>{institution.shortName}.</em></h1>
         <p className="tw5-sub">{institution.name}</p>
         <div className="tw5-actions">
-          <Link href="/sign-up" className="tw-btn lg">Praticar</Link>
-          <Link href="/simulado" className="tw-btn lg ol">Ver o simulador</Link>
+          <Link href="/sign-up" className="tw-btn lg"><ArrowRight size={18} aria-hidden /> Praticar</Link>
+          <Link href="/simulado" className="tw-btn lg ol"><Target size={18} aria-hidden /> Ver o simulador</Link>
         </div>
       </section>
 
@@ -595,6 +599,7 @@ TWISISA_F5_EOF
 mkdir -p "app/exames"
 cat > "app/exames/page.tsx" <<'TWISISA_F6_EOF'
 import Link from 'next/link'
+import { Search, Target } from 'lucide-react'
 import { ExamRow } from '@/components/exames/exam-row'
 import { FaqList } from '@/components/exames/faq'
 import { JsonLd } from '@/components/json-ld'
@@ -648,7 +653,7 @@ export default async function ExamesPage() {
             <label htmlFor="exames-q" className="sr-only">Pesquisar exames</label>
             <input id="exames-q" name="q" type="search" maxLength={80} autoComplete="off" placeholder="Ex.: Matemática UEM 2023" />
           </div>
-          <button type="submit" className="tw-btn">Pesquisar</button>
+          <button type="submit" className="tw-btn"><Search size={18} aria-hidden /> Pesquisar</button>
         </form>
       </section>
 
@@ -692,7 +697,7 @@ export default async function ExamesPage() {
 
       <div className="tw5-band">
         <h2>Treina o que leste.</h2>
-        <div className="tw-cta"><Link href="/simulado" className="tw-btn lg wh">Ver o simulador</Link></div>
+        <div className="tw-cta"><Link href="/simulado" className="tw-btn lg wh"><Target size={18} aria-hidden /> Ver o simulador</Link></div>
       </div>
 
       <FaqList items={faq} />
@@ -704,6 +709,7 @@ TWISISA_F6_EOF
 mkdir -p "app/exames/pesquisa"
 cat > "app/exames/pesquisa/page.tsx" <<'TWISISA_F7_EOF'
 import Link from 'next/link'
+import { Search } from 'lucide-react'
 import { ExamRow } from '@/components/exames/exam-row'
 import { Crumbs, PublicShell } from '@/components/exames/public-shell'
 import { findExams } from '@/lib/exames'
@@ -735,7 +741,7 @@ export default async function PesquisaExamesPage({ searchParams }: { searchParam
             <label htmlFor="pesq-q" className="sr-only">Pesquisar exames</label>
             <input id="pesq-q" name="q" type="search" defaultValue={q} maxLength={80} autoComplete="off" placeholder="Ex.: Matemática UEM 2023" />
           </div>
-          <button type="submit" className="tw-btn">Pesquisar</button>
+          <button type="submit" className="tw-btn"><Search size={18} aria-hidden /> Pesquisar</button>
         </form>
         <p className="tw5-sub">{total === 0 ? 'Nenhum exame encontrado.' : `${total} ${total === 1 ? 'exame' : 'exames'}`}</p>
       </section>
@@ -864,6 +870,7 @@ TWISISA_F8_EOF
 mkdir -p "app/simulado"
 cat > "app/simulado/page.tsx" <<'TWISISA_F9_EOF'
 import Link from 'next/link'
+import { BookOpen, Target } from 'lucide-react'
 import { FaqList } from '@/components/exames/faq'
 import { JsonLd } from '@/components/json-ld'
 import { Crumbs, PublicShell } from '@/components/exames/public-shell'
@@ -903,8 +910,8 @@ export default async function SimuladoPage() {
         <h1 className="tw5-h1">Treina como no <em>exame.</em></h1>
         <p className="tw5-sub">Questões reais, correção na hora, nota de 0 a 20.</p>
         <div className="tw5-actions">
-          <Link href="/aluno/simulador" className="tw-btn lg">Começar a treinar</Link>
-          <Link href="/exames" className="tw-btn lg ol">Ver exames</Link>
+          <Link href="/aluno/simulador" className="tw-btn lg"><Target size={18} aria-hidden /> Começar a treinar</Link>
+          <Link href="/exames" className="tw-btn lg ol"><BookOpen size={18} aria-hidden /> Ver exames</Link>
         </div>
       </section>
 
@@ -1188,7 +1195,7 @@ cat > "components/home-page.tsx" <<'TWISISA_F15_EOF'
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { BookOpen, History, ListChecks, MessageCircle, Star, Target, Trophy, Compass } from 'lucide-react'
+import { ArrowRight, BookOpen, History, ListChecks, MessageCircle, Star, Target, Trophy, Compass } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { MODE_META } from '@/lib/simulator-shared'
 // Artigos reais do blog (últimos publicados), enviados por app/page.tsx. Sem artigos, a secção do blog não aparece.
@@ -1294,8 +1301,8 @@ export default function Page({ signedIn = false, posts = [], institutions = [], 
           <h1>Percebe. <em>Não decores.</em></h1>
           <p className="tw2-lead">Exames, simulador e explicador. Num só lugar.</p>
           <div className="tw-cta">
-            <Link href={cta} className="tw-btn lg">{signedIn ? 'Ir ao painel' : 'Começar a estudar'}</Link>
-            <Link href="/exames" className="tw-btn lg ol">Ver exames</Link>
+            <Link href={cta} className="tw-btn lg">{signedIn ? 'Ir ao painel' : 'Começar a estudar'} <ArrowRight size={18} aria-hidden /></Link>
+            <Link href="/exames" className="tw-btn lg ol"><BookOpen size={18} aria-hidden /> Ver exames</Link>
           </div>
         </div>
       </div></section>
@@ -1417,7 +1424,7 @@ export default function Page({ signedIn = false, posts = [], institutions = [], 
       {/* FECHO */}
       <section className="tw2-close"><div className="tw-w">
         <h2 className="tw-rv">Começa a perceber.</h2>
-        <div className="tw-cta tw-rv" style={{ ['--d' as string]: '.08s' }}><Link href={cta} className="tw-btn lg wh">{signedIn ? 'Ir ao painel' : 'Criar conta'}</Link></div>
+        <div className="tw-cta tw-rv" style={{ ['--d' as string]: '.08s' }}><Link href={cta} className="tw-btn lg wh">{signedIn ? 'Ir ao painel' : 'Criar conta'} <ArrowRight size={18} aria-hidden /></Link></div>
       </div></section>
 
       <footer className="tw-foot"><div className="tw-w">
@@ -1563,8 +1570,9 @@ export async function countPublishedQuestions(): Promise<number> {
 }
 TWISISA_F19_EOF
 
-if ! grep -q "twisisa-home\] movimento" app/globals.css; then
-  cat >> app/globals.css <<'TWISISA_CSS1_EOF'
+sed -i '/\/\* \[twisisa-home\]/,$d' app/globals.css
+
+cat >> app/globals.css <<'TWISISA_CSS1_EOF'
 
 /* [twisisa-home] movimento e botões da página inicial (skills de design engineering) */
 .tw-btn{border:2px solid transparent;transition:transform .16s cubic-bezier(.23,1,.32,1),box-shadow .2s ease,background-color .2s ease,border-color .2s ease,color .2s ease}
@@ -1605,9 +1613,7 @@ if ! grep -q "twisisa-home\] movimento" app/globals.css; then
 .tw-js .tw-rv.tw-in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.tw-js .tw-rv{transform:none;transition:opacity .3s ease}.tw-hero h1,.tw-hero .tw-cta{animation:none}}
 TWISISA_CSS1_EOF
-fi
-if ! grep -q "twisisa-home-2\]" app/globals.css; then
-  cat >> app/globals.css <<'TWISISA_CSS2_EOF'
+cat >> app/globals.css <<'TWISISA_CSS2_EOF'
 
 /* [twisisa-home-2] apresentação com imagem em círculo, problemas (escuro) e promessas (amarelo) */
 .tw{--am:#ffcf33;--co:#ff6b4a;--dk:#0a1a14}
@@ -1666,9 +1672,7 @@ if ! grep -q "twisisa-home-2\]" app/globals.css; then
 .tw2-close h2{font:800 clamp(2rem,7vw,3.6rem)/1.05 'Manrope',sans-serif;letter-spacing:-.045em;color:#fff}
 @media (prefers-reduced-motion:reduce){.tw2-hero h1,.tw2-lead,.tw2-copy .tw-cta,.tw2-img,.tw2-photo::before,.tw2-pill{animation:none}}
 TWISISA_CSS2_EOF
-fi
-if ! grep -q "twisisa-home-3\]" app/globals.css; then
-  cat >> app/globals.css <<'TWISISA_CSS3_EOF'
+cat >> app/globals.css <<'TWISISA_CSS3_EOF'
 
 /* [twisisa-home-3] números, plataforma por dentro, passos e perguntas */
 .tw3-nums{background:var(--g);color:#fff;padding:34px 0}
@@ -1719,9 +1723,7 @@ if ! grep -q "twisisa-home-3\]" app/globals.css; then
   .tw3-how ol{grid-template-columns:repeat(3,1fr);gap:28px}
 }
 TWISISA_CSS3_EOF
-fi
-if ! grep -q "twisisa-home-4\]" app/globals.css; then
-  cat >> app/globals.css <<'TWISISA_CSS4_EOF'
+cat >> app/globals.css <<'TWISISA_CSS4_EOF'
 
 /* [twisisa-home-4] imagem primeiro, botões na mesma linha, cores suaves e mais conteúdo */
 .tw{--am:#e8c872}
@@ -1774,9 +1776,7 @@ if ! grep -q "twisisa-home-4\]" app/globals.css; then
   .tw4-for>.tw-w>div{grid-template-columns:repeat(3,1fr)}
 }
 TWISISA_CSS4_EOF
-fi
-if ! grep -q "twisisa-home-5\]" app/globals.css; then
-  cat >> app/globals.css <<'TWISISA_CSS5_EOF'
+cat >> app/globals.css <<'TWISISA_CSS5_EOF'
 
 /* [twisisa-home-5] páginas secundárias no mesmo estilo da página inicial */
 .tw{--color-texto-2:#34453b}
@@ -1822,14 +1822,17 @@ if ! grep -q "twisisa-home-5\]" app/globals.css; then
 .tw5-chips span{color:var(--ink)}
 @media (hover:hover) and (pointer:fine){.tw5-chips a:hover{background:var(--g);color:#fff}}
 .tw5-chips a:active{transform:scale(.96)}
-.tw5-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.tw5-actions{display:flex;gap:10px;margin-top:26px}
+.tw5-actions .tw-btn{flex:1 1 0;min-width:0;white-space:nowrap}
+@media (max-width:480px){.tw5-actions .tw-btn{padding:0 14px;height:50px;font-size:.88rem}.tw5-actions .tw-btn svg{width:16px;height:16px;flex:none}}
+@media (min-width:480px){.tw5-actions .tw-btn{flex:0 0 auto}}
 .tw5-topic{padding:24px 0;border-top:2px solid var(--ink)}
 .tw5-topic:last-child{border-bottom:2px solid var(--ink)}
 .tw5-topic h3{margin:0;font:800 1.35rem/1.2 'Manrope',system-ui,sans-serif;letter-spacing:-.03em}
 .tw5-topic h3 i{font-style:normal;color:var(--g);margin-right:8px}
 .tw5-topic p{margin:10px 0 0;font-size:1.02rem;line-height:1.65;white-space:pre-line}
 .tw5-topic .dica{margin-top:14px;padding:12px 16px;border-radius:14px;background:var(--gs);font-weight:700;color:var(--gd)}
-.tw5-view{display:none;width:100%;height:78dvh;margin-top:30px;border:2px solid var(--ink);border-radius:20px;background:#fff}
+.tw5-view{display:block;width:100%;height:62dvh;margin-top:30px;border:2px solid var(--ink);border-radius:20px;background:#fff}
 .tw5-band{margin-top:60px;padding:34px 26px;border-radius:24px;background:var(--g);color:#fff;display:grid;gap:18px;justify-items:start}
 .tw5-band h2{margin:0;font:800 clamp(1.6rem,5vw,2.3rem)/1.08 'Manrope',system-ui,sans-serif;letter-spacing:-.045em;color:#fff}
 .tw5-band .tw-cta{margin:0;justify-content:flex-start}
@@ -1847,7 +1850,7 @@ if ! grep -q "twisisa-home-5\]" app/globals.css; then
   .tw5{padding-top:34px}
   .tw5-back nav{display:flex}
   .tw5-tiles{grid-template-columns:repeat(3,1fr)}
-  .tw5-view{display:block}
+  .tw5-view{height:78dvh}
   .tw5-band{grid-template-columns:1fr auto;align-items:center;padding:40px 44px}
 }
 @media (prefers-reduced-motion:reduce){.tw5-top{animation:none}}
@@ -1856,5 +1859,4 @@ if ! grep -q "twisisa-home-5\]" app/globals.css; then
 .tw-ft a{color:var(--ink);font-weight:600}
 .tw-ft h4{color:var(--ink)}
 TWISISA_CSS5_EOF
-fi
 echo "ok: páginas atualizadas"
