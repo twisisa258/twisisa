@@ -8,7 +8,8 @@ import { siteBaseUrl } from '@/lib/email'
 // Web push: o aluno liga no telemóvel (modal de permissão e interruptor no perfil) e o servidor envia com as chaves VAPID.
 // Variáveis: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY e, opcional, VAPID_SUBJECT (mailto: ou https:).
 
-export type PushPayload = { title: string; body: string; url: string }
+/** `tag` agrupa notificações do mesmo tipo (a nova substitui a anterior do mesmo tipo, não as de outros tipos). */
+export type PushPayload = { title: string; body: string; url: string; tag?: string }
 export type PushReport = { total: number; ok: number; removed: number; statuses: number[] }
 
 let configured = false

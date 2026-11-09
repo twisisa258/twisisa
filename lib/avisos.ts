@@ -1,4 +1,4 @@
-import { WEEK_DAYS_GOAL, formatLeft, plural } from '@/lib/desafios-regras'
+import { WEEK_DAYS_GOAL, formatLeft, plural, streakNeed } from '@/lib/desafios-regras'
 import type { DesafiosSnapshot } from '@/lib/desafios'
 
 // Avisos e lembretes do aluno: cartões dinâmicos calculados a partir dos desafios (sem guardar nada).
@@ -14,15 +14,16 @@ export function buildAvisos(s: DesafiosSnapshot): Aviso[] {
   const avisos: Aviso[] = []
   const goal = s.goal
   const left = Math.max(0, goal - s.todayAnswered)
+  const keep = Math.max(0, streakNeed(goal) - s.todayAnswered)
   const hoursLeft = s.secondsLeft / 3600
 
-  if (s.streak.current > 0 && !s.streak.todayMet) {
+  if (s.streak.current > 0 && !s.streak.todayCounted) {
     avisos.push({
       id: 'streak-risk',
       tone: hoursLeft <= 6 ? 'urgent' : 'warning',
       icon: 'flame',
       title: 'Sequência em risco',
-      text: `Faltam ${plural(left, 'questão', 'questões')} hoje para manteres ${plural(s.streak.current, 'dia seguido', 'dias seguidos')}. O dia acaba em ${formatLeft(s.secondsLeft)}.`,
+      text: `Faltam ${plural(keep, 'questão', 'questões')} hoje para manteres ${plural(s.streak.current, 'dia seguido', 'dias seguidos')}. O dia acaba em ${formatLeft(s.secondsLeft)}.`,
       href: PRACTICE,
       cta: 'Praticar agora',
     })
@@ -36,7 +37,7 @@ export function buildAvisos(s: DesafiosSnapshot): Aviso[] {
       tone: 'warning',
       icon: 'flame',
       title: 'Perdeste a sequência',
-      text: `Chegaste a ${plural(lost.length, 'dia seguido', 'dias seguidos')}, e isso conta. Hoje começas outra, com a mesma meta.`,
+      text: `Chegaste a ${plural(lost.length, 'dia seguido', 'dias seguidos')}, e isso conta. Hoje ${plural(streakNeed(goal), 'questão chega', 'questões chegam')} para recomeçar.`,
       href: PRACTICE,
       cta: 'Recomeçar',
     })

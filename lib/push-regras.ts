@@ -1,3 +1,5 @@
+import { streakNeed } from '@/lib/desafios-regras'
+
 // Regras do motor de notificações push. Puro (sem base de dados nem rede): decide QUAL mensagem enviar, ou nenhuma.
 // Os números (intervalo, limite diário, horas de silêncio, cooldowns) vêm da tabela app_settings, chave «push»; estes são só os valores por defeito.
 
@@ -58,6 +60,8 @@ export type PushContext = {
   goal: number
   answered: number
   todayMet: boolean
+  /** A sequência de hoje já está garantida (acção mínima feita). Sem valor, conta como não garantida. */
+  streakSafe?: boolean
   streak: number
   daysSinceActive: number | null
   hot: number
@@ -103,9 +107,10 @@ export function pickPush(ctx: PushContext, cfg: PushConfig): PushMessage | null 
     const tier = cfg.deadlineTiers.find((t) => hoursLeft <= t)
     if (tier !== undefined && hoursLeft > 0 && !h.refs.includes(`desafio-prazo:${ctx.now.date}:${tier}`)) {
       const left = Math.max(1, ctx.goal - ctx.answered)
+      const keep = Math.max(1, streakNeed(ctx.goal) - ctx.answered)
       const hours = Math.max(1, Math.ceil(hoursLeft))
-      const body = ctx.streak > 0
-        ? `Faltam ${plural(left, 'questão', 'questões')} para não perderes a tua sequência de ${plural(ctx.streak, 'dia', 'dias')}.`
+      const body = ctx.streak > 0 && !ctx.streakSafe
+        ? `Faltam ${plural(keep, 'questão', 'questões')} para não perderes a tua sequência de ${plural(ctx.streak, 'dia', 'dias')}.`
         : variant(ctx, 'prazo', [`Faltam ${plural(left, 'questão', 'questões')} para cumprires a meta de hoje.`, `Com ${plural(left, 'questão', 'questões')} cumpres o desafio de hoje.`])
       return { kind: 'desafio-prazo', refs: [`${ctx.now.date}:${tier}`], title: `Faltam ${hours} ${hours === 1 ? 'hora' : 'horas'} para fechar o teu desafio diário`, body, url: '/aluno/simulador' }
     }

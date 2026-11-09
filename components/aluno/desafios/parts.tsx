@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import type { DesafiosSnapshot } from '@/lib/desafios'
 import {
   DAILY_ACCURACY, DAILY_SUBJECT_GOAL, MIN_SAMPLE, READY_VOLUME, WEAK_BELOW, WEEK_CLASS_SUBJECTS, WEEK_CLASS_SUBJECT_QUESTIONS,
-  WEEK_DAYS_GOAL, WEEK_POINTS_GOAL, WEEK_SUBJECT_QUESTIONS, formatLeft, plural, type Mission,
+  WEEK_DAYS_GOAL, WEEK_POINTS_GOAL, WEEK_SUBJECT_QUESTIONS, formatLeft, plural, streakNeed, type Mission,
 } from '@/lib/desafios-regras'
 import { formatPoints } from '@/lib/simulator-shared'
 
@@ -39,8 +39,11 @@ export function StreakCard({ s }: { s: DesafiosSnapshot }) {
       </div>
       <div className="mt-5">
         <div className="h-1.5 overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-white transition-[width] duration-500 motion-reduce:transition-none" style={{ width: `${pct}%` }} /></div>
-        <p className="mt-2.5 text-[13px] leading-5 text-white/85">
-          {s.streak.todayMet ? 'Meta de hoje cumprida.' : `Hoje: ${s.todayAnswered} de ${s.goal} questões. O dia acaba em ${formatLeft(s.secondsLeft)}.`}
+        <p className="mt-2.5 truncate whitespace-nowrap text-[13px] leading-5 text-white/85">
+          {s.streak.todayCounted ? 'Sequência de hoje garantida.' : `Faltam ${Math.max(0, streakNeed(s.goal) - s.todayAnswered)} para a sequência de hoje.`}
+        </p>
+        <p className="truncate whitespace-nowrap text-[13px] leading-5 text-white/85">
+          {s.streak.todayMet ? 'Meta de hoje cumprida.' : `Meta: ${s.todayAnswered} de ${s.goal} · acaba em ${formatLeft(s.secondsLeft)}`}
         </p>
       </div>
     </section>
@@ -107,7 +110,7 @@ export function ReadinessCard({ s }: { s: DesafiosSnapshot }) {
         <p className="mt-1 text-sm text-texto-2">Cada curso exige provas diferentes. Com o curso escolhido, os desafios passam a treinar essas disciplinas e vês quão perto estás.</p>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row">
           <Link href="/aluno/perfil#percurso" className="btn btn-primario">Escolher curso</Link>
-          <Link href="/aluno/descobrir-curso" className="btn btn-secundario">Não sei: fazer o teste vocacional</Link>
+          <Link href="/aluno/descobrir-curso" className="btn btn-secundario">Não sei: teste vocacional</Link>
         </div>
       </section>
     )

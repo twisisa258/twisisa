@@ -65,7 +65,7 @@ export function EscolherCursoFlow({ courses, initialCourseId, initialCombos, onC
       <p className="text-[14px] leading-5 text-texto-2">Assim treinas só as disciplinas das provas dele.</p>
       <ListaEscolha rotulo="Curso" valor={courseId} onChange={setCourseId} itens={courses} vazio="Ainda não há cursos desta instituição na plataforma." />
       <button type="button" onClick={continuar} disabled={pending || !courseId} aria-busy={pending} className="btn btn-primario btn-grande w-full">{pending ? <><Spinner />A guardar…</> : 'Continuar'}</button>
-      {orientacaoHref && <Link href={orientacaoHref} className="btn btn-secundario w-full">Não sei o curso: fazer o teste vocacional</Link>}
+      {orientacaoHref && <Link href={orientacaoHref} className="btn btn-secundario w-full">Não sei: teste vocacional</Link>}
     </div>
   )
 }

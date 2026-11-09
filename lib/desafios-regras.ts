@@ -3,8 +3,12 @@
 
 export const TZ = 'Africa/Maputo'
 
-/** Questões respondidas num dia para o dia contar na sequência. Sem exceções: nada de «congelar» a sequência. */
+/** Meta diária por omissão: questões respondidas num dia para cumprir a meta (barra de progresso, missões, semana). */
 export const DAILY_GOAL = 10
+/** Sequência: acção mínima do dia (3 questões) para o dia contar. É separada da meta diária: cumprir a meta não é preciso para manter a sequência. */
+export const STREAK_MIN = 3
+/** Questões necessárias para o dia contar na sequência: nunca mais do que a meta do aluno. */
+export const streakNeed = (goal: number = DAILY_GOAL) => Math.max(1, Math.min(STREAK_MIN, goal))
 export const DAILY_SUBJECT_GOAL = 5
 /** Percentagem de acertos pedida na missão de precisão (com pelo menos DAILY_GOAL respostas no dia). */
 export const DAILY_ACCURACY = 70
@@ -46,16 +50,21 @@ export function formatLeft(seconds: number) {
 export type Streak = {
   current: number
   best: number
+  /** Meta diária de hoje cumprida (barra de progresso). Não decide a sequência. */
   todayMet: boolean
+  /** O dia de hoje já conta na sequência (acção mínima feita). */
+  todayCounted: boolean
   /** A última sequência que acabou (quando a atual é 0). */
   lost: { length: number; endedOn: string } | null
   lastActiveDay: string | null
 }
 
-// Sequência = dias seguidos com a meta diária cumprida. Continua «viva» até ao fim do dia de hoje:
-// se hoje ainda não cumpriste mas ontem sim, conta até à meia-noite. Falhar um dia inteiro põe tudo a zero.
+// Sequência = dias seguidos com a acção mínima feita (`streakNeed`), separada da meta diária (`todayMet`).
+// Continua «viva» até ao fim do dia de hoje: se hoje ainda não contou mas ontem sim, conta até à meia-noite.
+// Falhar um dia inteiro põe tudo a zero.
 export function computeStreak(days: DayRow[], today: string, goal: number = DAILY_GOAL): Streak {
-  const goalDays = days.filter((row) => row.answered >= goal).map((row) => row.day).sort()
+  const need = streakNeed(goal)
+  const goalDays = days.filter((row) => row.answered >= need).map((row) => row.day).sort()
   const set = new Set(goalDays)
   const runs: { length: number; end: string }[] = []
   for (const day of goalDays) {
@@ -65,9 +74,10 @@ export function computeStreak(days: DayRow[], today: string, goal: number = DAIL
       last.end = day
     } else runs.push({ length: 1, end: day })
   }
-  const todayMet = set.has(today)
+  const todayCounted = set.has(today)
+  const todayMet = (days.find((row) => row.day === today)?.answered ?? 0) >= goal
   const yesterday = addDays(today, -1)
-  const aliveEnd = todayMet ? today : set.has(yesterday) ? yesterday : null
+  const aliveEnd = todayCounted ? today : set.has(yesterday) ? yesterday : null
   const alive = aliveEnd ? runs.find((run) => run.end === aliveEnd) : undefined
   const current = alive?.length ?? 0
   const finished = alive ? null : runs[runs.length - 1]
@@ -76,6 +86,7 @@ export function computeStreak(days: DayRow[], today: string, goal: number = DAIL
     current,
     best: runs.reduce((max, run) => Math.max(max, run.length), 0),
     todayMet,
+    todayCounted,
     lost: current === 0 && finished ? { length: finished.length, endedOn: finished.end } : null,
     lastActiveDay: lastActive,
   }

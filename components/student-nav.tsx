@@ -7,9 +7,9 @@ import { BookOpen, Bookmark, ClipboardCheck, Flame, LayoutDashboard, Library, Sp
 // Menu único do estudante: o computador (StudentSidebar) e o telemóvel (StudentMobileSidebar) usam esta mesma lista,
 // por isso todas as páginas do estudante têm as mesmas ligações, na mesma ordem e com a página atual marcada.
 const MAIN = [
-  { href: '/aluno', label: 'Visão geral', icon: LayoutDashboard, exact: true },
+  { href: '/aluno', label: 'Hoje', icon: LayoutDashboard, exact: true },
+  { href: '/aluno/simulador', label: 'Treinar', icon: ClipboardCheck },
   { href: '/exames', label: 'Exames', icon: BookOpen },
-  { href: '/aluno/simulador', label: 'Simulador', icon: ClipboardCheck },
   { href: '/aluno/desafios', label: 'Desafios', icon: Flame },
   { href: '/aluno/ranking', label: 'Ranking', icon: Trophy },
   { href: '/jonas', label: 'Jonas', icon: Sparkles },
@@ -22,7 +22,7 @@ const SAVED = [
 ] as const
 
 const PERSONAL = [
-  { href: '/aluno/perfil', label: 'O meu perfil', icon: UserRound },
+  { href: '/aluno/perfil', label: 'Eu', icon: UserRound },
 ] as const
 
 type Item = { href: string; label: string; icon: typeof BookOpen; exact?: boolean }

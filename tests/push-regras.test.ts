@@ -78,3 +78,12 @@ test('hora de Maputo', () => {
   assert.equal(t.date, '2026-11-04')
   assert.equal(t.minutes, 20 * 60 + 30)
 })
+
+test('prazo do desafio: com a sequência garantida, fala da meta e não da sequência', () => {
+  const tarde = { date: '2026-11-04', minutes: 20 * 60 + 30 }
+  const msg = pickPush(base({ now: tarde, streak: 5, streakSafe: true, answered: 4 }), cfg)
+  assert.equal(msg?.kind, 'desafio-prazo')
+  assert.doesNotMatch(msg!.body, /sequência/)
+  const risk = pickPush(base({ now: tarde, streak: 5, answered: 1 }), cfg)
+  assert.match(risk!.body, /Faltam 2 questões para não perderes/)
+})

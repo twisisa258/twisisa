@@ -108,6 +108,13 @@ Edital 2027 da UP-Maputo, UniLicungo, UniPúnguè e UniRovuma: 184 cursos, 248 o
 ## Exames públicos, temas e importação com o Jonas
 Páginas públicas `/exames` (Google), temas principais (`/admin/temas-principais`), importação de exames com o Jonas (`/admin/importar`): `docs/EXAMES-PUBLICOS-E-JONAS.md`. Depende de `unpdf` e `pdf-lib`. Migrações 0037 e 0038.
 
+## Fase 0 (09/11/2026), FEITO, FALTA TESTE
+- **Sequência separada da meta:** a sequência conta com 3 questões (`STREAK_MIN`, `streakNeed` em `lib/desafios-regras.ts`); a meta diária continua a ser a barra e as missões. Novo campo `streak.todayCounted`. Avisos, push e cartão da Sequência em `/aluno/desafios` usam os dois conceitos em separado. O «congelar» não faz parte da Fase 0.
+- **Push:** a notificação de teste abria `/aluno/lembretes` (404) e agora abre `/aluno/notificacoes`. O `sw.js` usa a `tag` enviada no push (o motor envia o tipo da mensagem) em vez de uma fixa: tipos diferentes já não se substituem. Diagnóstico em `scripts/diagnostico-push.sh`. Por confirmar com o site real: execuções do GitHub Actions, `CRON_SECRET`, migrações 0027, 0028 e 0032.
+- **Nomes no menu do estudante:** Hoje (antes «Visão geral»), Treinar (antes «Simulador»), Exames, Desafios, Ranking, Jonas, Eu (antes «O meu perfil»). «Simulado» só entra no menu quando o módulo `simulados` abrir (hoje «Em breve»). Faltam os títulos de página e textos que ainda dizem «Simulador».
+- **Texto que não quebra:** `.btn` passou a `white-space: nowrap` (antes `text-wrap: balance`). Os dois rótulos longos encontrados foram encurtados («Não sei: teste vocacional»). Cards ainda por auditar. Regras novas em `DESIGN.md` e `PRODUTO.md`.
+- `components/feature-card.tsx` não é usado em nenhuma página (a pesquisa dizia que era igual com e sem ligação, mas está morto): apagar quando houver aval.
+
 ## Pendentes, por prioridade
 P0 (antes de receber estudantes)
 1. Ensaio completo com 3 a 5 estudantes reais num telemóvel (conta, e-mail, percurso, simulado, ranking, Jonas, Biblioteca).

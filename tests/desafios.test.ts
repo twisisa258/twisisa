@@ -24,7 +24,7 @@ test('sequência: viva até à meia-noite e zero depois de um dia falhado', () =
   assert.deepEqual(dead.lost, { length: 3, endedOn: '2026-10-30' })
 })
 
-test('sequência: só conta o dia com a meta; guarda a melhor', () => {
+test('sequência: conta o dia com a acção mínima (3), não com a meta; guarda a melhor', () => {
   const days = [row('2026-10-01'), row('2026-10-02'), row('2026-10-03'), row('2026-10-04'), row('2026-10-20', 9), row('2026-10-30')]
   const s = computeStreak(days, '2026-10-30')
   assert.equal(s.best, 4)
@@ -81,7 +81,7 @@ test('formatLeft', () => {
 function snapshot(over: Partial<DesafiosSnapshot> = {}): DesafiosSnapshot {
   return {
     today: '2026-10-30', weekday: 4, secondsLeft: 3 * 3600,
-    streak: { current: 0, best: 0, todayMet: false, lost: null, lastActiveDay: '2026-10-30' },
+    streak: { current: 0, best: 0, todayMet: false, todayCounted: false, lost: null, lastActiveDay: '2026-10-30' },
     daysSinceActive: 0, todayAnswered: 0, todayCorrect: 0, weekPoints: 0, weekGoalDays: 0, weekDaysLeft: 3,
     daily: [], weekly: [{ id: 'w-dias', title: '', detail: null, current: 0, target: 5, unit: 'dias', status: 'em_curso', href: null }],
     admission: false, course: null, subjects: [], readiness: null, weak: null, errorCount: 0, goal: 10, ...over,
@@ -89,19 +89,33 @@ function snapshot(over: Partial<DesafiosSnapshot> = {}): DesafiosSnapshot {
 }
 
 test('avisos: sequência em risco vem primeiro e é urgente perto da meia-noite', () => {
-  const avisos = buildAvisos(snapshot({ streak: { current: 5, best: 5, todayMet: false, lost: null, lastActiveDay: '2026-10-29' }, daysSinceActive: 1, todayAnswered: 4 }))
+  const avisos = buildAvisos(snapshot({ streak: { current: 5, best: 5, todayMet: false, todayCounted: false, lost: null, lastActiveDay: '2026-10-29' }, daysSinceActive: 1, todayAnswered: 1 }))
   assert.equal(avisos[0].id, 'streak-risk')
   assert.equal(avisos[0].tone, 'urgent')
-  assert.match(avisos[0].text, /Faltam 6 questões/)
+  assert.match(avisos[0].text, /Faltam 2 questões/)
 })
 
 test('avisos: perdeu a sequência, inatividade, curso por escolher e sem prática', () => {
-  const lost = buildAvisos(snapshot({ streak: { current: 0, best: 7, todayMet: false, lost: { length: 7, endedOn: '2026-10-25' }, lastActiveDay: '2026-10-26' }, daysSinceActive: 4 }))
+  const lost = buildAvisos(snapshot({ streak: { current: 0, best: 7, todayMet: false, todayCounted: false, lost: { length: 7, endedOn: '2026-10-25' }, lastActiveDay: '2026-10-26' }, daysSinceActive: 4 }))
   assert.equal(lost[0].id, 'streak-lost')
   assert.ok(!lost.some((a) => a.id === 'inactive'))
-  assert.equal(buildAvisos(snapshot({ daysSinceActive: 3, streak: { current: 0, best: 0, todayMet: false, lost: null, lastActiveDay: '2026-10-27' } }))[0].title, 'Há 3 dias sem praticar')
+  assert.equal(buildAvisos(snapshot({ daysSinceActive: 3, streak: { current: 0, best: 0, todayMet: false, todayCounted: false, lost: null, lastActiveDay: '2026-10-27' } }))[0].title, 'Há 3 dias sem praticar')
   assert.ok(buildAvisos(snapshot({ admission: true, course: null })).some((a) => a.id === 'course'))
-  assert.equal(buildAvisos(snapshot({ daysSinceActive: null, streak: { current: 0, best: 0, todayMet: false, lost: null, lastActiveDay: null } }))[0].id, 'first')
-  const done = buildAvisos(snapshot({ streak: { current: 3, best: 3, todayMet: true, lost: null, lastActiveDay: '2026-10-30' }, todayAnswered: 10 }))
+  assert.equal(buildAvisos(snapshot({ daysSinceActive: null, streak: { current: 0, best: 0, todayMet: false, todayCounted: false, lost: null, lastActiveDay: null } }))[0].id, 'first')
+  const done = buildAvisos(snapshot({ streak: { current: 3, best: 3, todayMet: true, todayCounted: true, lost: null, lastActiveDay: '2026-10-30' }, todayAnswered: 10 }))
   assert.equal(done[done.length - 1].id, 'done')
+})
+
+test('sequência separada da meta: 3 questões mantêm a sequência sem cumprir a meta', () => {
+  const days = [row('2026-10-29'), row('2026-10-30', 3)]
+  const s = computeStreak(days, '2026-10-30')
+  assert.equal(s.current, 2)
+  assert.equal(s.todayCounted, true)
+  assert.equal(s.todayMet, false)
+  const two = computeStreak([row('2026-10-29'), row('2026-10-30', 2)], '2026-10-30')
+  assert.equal(two.todayCounted, false)
+  assert.equal(two.current, 1)
+  assert.equal(computeStreak([row('2026-10-30', 2)], '2026-10-30', 2).todayCounted, true)
+  const safe = buildAvisos(snapshot({ streak: { current: 4, best: 4, todayMet: false, todayCounted: true, lost: null, lastActiveDay: '2026-10-30' }, daysSinceActive: 0, todayAnswered: 3 }))
+  assert.ok(!safe.some((a) => a.id === 'streak-risk'))
 })

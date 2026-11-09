@@ -15,7 +15,7 @@ self.addEventListener('push', (event) => {
       body: data.body || '',
       icon: '/icons/icon-192.png',
       badge: '/icons/icon-192.png',
-      tag: 'twisisa-lembrete',
+      tag: typeof data.tag === 'string' && data.tag ? data.tag.slice(0, 64) : 'twisisa-lembrete',
       data: { url },
     }),
   )

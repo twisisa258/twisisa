@@ -204,7 +204,7 @@ body {
    Ação = cantos suaves (14 px). Pílula fica só para etiquetas e estados (.chip).
    Primário: um por ecrã. Secundário: tonal. Terciário: só texto. Perigo: contorno vermelho. */
 @layer components {
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 18px; border-radius: 14px; font-size: 15px; font-weight: 600; line-height: 1.2; text-align: center; text-wrap: balance; text-decoration: none; cursor: pointer; transition: transform 0.08s ease, background-color 0.15s ease; -webkit-user-select: none; user-select: none; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 18px; border-radius: 14px; font-size: 15px; font-weight: 600; line-height: 1.2; text-align: center; white-space: nowrap; text-decoration: none; cursor: pointer; transition: transform 0.08s ease, background-color 0.15s ease; -webkit-user-select: none; user-select: none; }
   .btn:active:not(:disabled) { transform: translateY(1px); }
   .btn:disabled, .btn[aria-disabled='true'] { cursor: default; opacity: 0.45; }
   .btn-grande { min-height: 52px; font-size: 16px; }

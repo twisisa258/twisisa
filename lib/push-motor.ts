@@ -75,6 +75,7 @@ async function buildContext(row: Row, now: ReturnType<typeof maputoNow>): Promis
     goal: snapshot.goal,
     answered: snapshot.todayAnswered,
     todayMet: snapshot.streak.todayMet,
+    streakSafe: snapshot.streak.todayCounted,
     streak: snapshot.streak.current,
     daysSinceActive: snapshot.daysSinceActive,
     hot: snapshot.errorCount + due,
@@ -104,7 +105,7 @@ export async function runPushTick(limit = 300) {
     try {
       const message = pickPush(await buildContext(row, now), cfg)
       if (!message) continue
-      const delivered = await pushToUser(row.user_id, { title: message.title, body: message.body, url: message.url })
+      const delivered = await pushToUser(row.user_id, { title: message.title, body: message.body, url: message.url, tag: message.kind })
       if (delivered === 0) continue
       for (const ref of message.refs) {
         await pool.query(`INSERT INTO push_log (id, user_id, kind, ref, title) VALUES ($1, $2, $3, $4, $5)`, [randomUUID(), row.user_id, message.kind, ref, message.title])
