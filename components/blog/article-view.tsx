@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { BookOpenCheck } from 'lucide-react'
 import { BlogBody } from '@/components/blog/blog-body'
+import { Crumbs } from '@/components/exames/public-shell'
 import { Toc } from '@/components/blog/toc'
 import { ShareButton } from '@/components/blog/share-button'
 import { parseBlogMarkdown, showToc, tableOfContents } from '@/lib/blog-markdown'
@@ -21,6 +22,7 @@ export function ArticleView({ post, related }: { post: BlogPost; related: BlogSu
   const when = post.publishedAt ?? post.updatedAt
   return (
     <>
+      <div className="mx-auto max-w-[680px]"><Crumbs items={[{ name: 'Início', href: '/' }, { name: 'Blog', href: '/blog' }, { name: post.title }]} /></div>
       <article>
         <header className="mx-auto max-w-[680px]">
           {label && (

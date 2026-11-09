@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { BlogShell } from '@/components/blog/blog-shell'
 import { categoryLabel } from '@/components/blog/article-view'
+import { Crumbs } from '@/components/exames/public-shell'
 import { JsonLd } from '@/components/json-ld'
 import { Reveal } from '@/components/ui/reveal'
 import type { BlogSummary } from '@/lib/blog'
@@ -22,7 +23,7 @@ export function TopicListing({ title, intro, path, items, total, page, pages, cr
     <BlogShell>
       <JsonLd data={jsonLd} />
       <main id="conteudo" className="mx-auto w-full max-w-[720px] px-5 pt-6">
-        <nav aria-label="Caminho" className="mb-4 text-[14px]"><Link href="/blog" className="inline-flex min-h-11 items-center text-texto-2 underline-offset-4 hover:text-marca hover:underline">← Blog</Link></nav>
+        <Crumbs items={[{ name: 'Início', href: '/' }, { name: 'Blog', href: '/blog' }, { name: crumbName }]} />
         <section className="rv-hero">
           <h1 className="text-[clamp(1.75rem,1.4rem+1.8vw,2.75rem)] font-semibold leading-[1.1] tracking-[-0.035em]">{title}</h1>
           <p className="mt-3 max-w-[52ch] text-[17px] leading-7 text-texto-2">{intro}</p>

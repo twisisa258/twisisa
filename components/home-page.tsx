@@ -2,7 +2,9 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { BookOpen, History, ListChecks, MessageCircle, Star, Target, Trophy, Compass } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { MODE_META } from '@/lib/simulator-shared'
 // Artigos reais do blog (últimos publicados), enviados por app/page.tsx. Sem artigos, a secção do blog não aparece.
 export type HomePost = { slug: string; category: string; title: string; description: string }
 // Universidades com exames públicos (enviadas por app/page.tsx): ligações diretas a /exames/<universidade>.
@@ -23,6 +25,26 @@ const perguntas = [
   { q: 'Quanto custa?', a: 'Criar conta é grátis. O plano Plus é opcional e está na página de planos.' },
   { q: 'Funciona no telemóvel?', a: 'Sim. Abre no navegador do telemóvel, sem instalar nada.' },
   { q: 'Como é calculada a nota?', a: 'De 0 a 20: 20 × pontos ganhos ÷ pontos possíveis. As questões mais difíceis valem mais.' },
+  { q: 'Posso treinar só os meus erros?', a: 'Sim. O modo «Revisar erros» repete só as questões que erraste, até as dominares.' },
+  { q: 'Como me ajuda o Jonas?', a: 'Explica a matéria passo a passo e tira dúvidas, como um explicador que responde a qualquer hora.' },
+  { q: 'Que universidades tenho?', a: 'As que aparecem na página de exames. Vamos acrescentando mais e mais anos.' },
+]
+
+const funcoes = [
+  { Icon: BookOpen, t: 'Exames por universidade', d: 'Por disciplina e por ano' },
+  { Icon: ListChecks, t: 'Temas principais', d: 'O que mais sai em cada disciplina' },
+  { Icon: Target, t: 'Simulador com nota', d: 'Correção a cada resposta, nota de 0 a 20' },
+  { Icon: MessageCircle, t: 'Jonas', d: 'Explica passo a passo' },
+  { Icon: Trophy, t: 'Desafios e ranking', d: 'Metas diárias e a classificação da semana' },
+  { Icon: History, t: 'Histórico', d: 'Vê a tua evolução simulado a simulado' },
+  { Icon: Star, t: 'Favoritos', d: 'Guarda exames para estudar depois' },
+  { Icon: Compass, t: 'Descobre o teu curso', d: 'Um teste para quem ainda não escolheu' },
+]
+
+const percursos = [
+  { t: '10ª classe', cor: 'g', itens: ['Questões por disciplina', 'Explicações do Jonas', 'Revisão dos teus erros'] },
+  { t: '12ª classe', cor: 'k', itens: ['Exames da classe', 'Modo rápido, ao ritmo do exame', 'Preparação para a admissão'] },
+  { t: 'Admissão', cor: 'o', itens: ['Exames de anos anteriores', 'Temas que mais saem', 'Simulado com nota de 0 a 20'] },
 ]
 
 export default function Page({ signedIn = false, posts = [], institutions = [], stats = { questoes: 0 } }: { signedIn?: boolean; posts?: HomePost[]; institutions?: HomeInstitution[]; stats?: HomeStats }) {
@@ -59,7 +81,7 @@ export default function Page({ signedIn = false, posts = [], institutions = [], 
             <Image src="/images/twisisa-mark.png" alt="" width={44} height={24} priority className="h-6 w-auto" />Twisisa
           </Link>
           <nav className="tw-nav" aria-label="Navegação principal">
-            <Link href="/exames">Exames</Link><Link href="/aluno/simulador">Simulador</Link>
+            <Link href="/exames">Exames</Link><Link href="/simulado">Simulador</Link>
             <Link href="/jonas">Jonas</Link><Link href="/blog">Blog</Link>
           </nav>
           <div className="flex items-center gap-2">
@@ -69,26 +91,26 @@ export default function Page({ signedIn = false, posts = [], institutions = [], 
           </div>
         </div>
         {menu && <nav className="tw-mob tw-menu" aria-label="Menu móvel" onClick={() => setMenu(false)}>
-          <Link href="/exames">Exames</Link><Link href="/aluno/simulador">Simulador</Link>
+          <Link href="/exames">Exames</Link><Link href="/simulado">Simulador</Link>
           <Link href="/jonas">Jonas</Link><Link href="/blog">Blog</Link><Link href="/planos">Planos</Link>{!signedIn && <Link href="/sign-in">Entrar</Link>}
         </nav>}
       </header>
 
       {/* APRESENTAÇÃO: o que é, numa frase, com a imagem em círculo e as três áreas à volta */}
       <section className="tw2-hero"><div className="tw-w">
-        <div className="tw2-copy">
-          <h1>Percebe. <em>Não decores.</em></h1>
-          <p className="tw2-lead">Exames, simulador e explicador. Num só lugar.</p>
-          <div className="tw-cta">
-            <Link href={cta} className="tw-btn lg">{signedIn ? 'Ir para o painel' : 'Começar a estudar'}</Link>
-            <Link href="/exames" className="tw-btn lg ol">Ver exames</Link>
-          </div>
-        </div>
         <div className="tw2-photo">
           <div className="tw2-img"><Image src="/images/estudantes-estudo.jpg" alt="Estudantes a estudar juntos" fill priority sizes="(min-width: 820px) 460px, 76vw" /></div>
           <Link href="/exames" className="tw2-pill p1">Exames</Link>
           <Link href="/aluno/simulador" className="tw2-pill p2">Simulador</Link>
           <Link href="/jonas" className="tw2-pill p3">Jonas</Link>
+        </div>
+        <div className="tw2-copy">
+          <h1>Percebe. <em>Não decores.</em></h1>
+          <p className="tw2-lead">Exames, simulador e explicador. Num só lugar.</p>
+          <div className="tw-cta">
+            <Link href={cta} className="tw-btn lg">{signedIn ? 'Ir ao painel' : 'Começar a estudar'}</Link>
+            <Link href="/exames" className="tw-btn lg ol">Ver exames</Link>
+          </div>
         </div>
       </div></section>
 
@@ -147,6 +169,36 @@ export default function Page({ signedIn = false, posts = [], institutions = [], 
         </div>
       </div></section>
 
+      {/* TRÊS FORMAS DE TREINAR: os modos reais do simulador */}
+      <section className="tw4-modes"><div className="tw-w">
+        <h2 className="tw2-h tw-rv">Três formas de treinar.</h2>
+        <ul>{(['pratica', 'rapido', 'revisao'] as const).map((m, n) => <li key={m} className="tw-rv" style={{ ['--d' as string]: `${[0, 0.06, 0.1][n]}s` }}>
+          <b>{MODE_META[m].label}</b><span>{MODE_META[m].tagline}</span><em>{MODE_META[m].meta}</em>
+        </li>)}</ul>
+      </div></section>
+
+      {/* TUDO NUM SÓ LUGAR */}
+      <section className="tw4-all"><div className="tw-w">
+        <h2 className="tw2-h tw-rv">Tudo num só lugar.</h2>
+        <ul>{funcoes.map(({ Icon, t, d }, n) => <li key={t} className="tw-rv" style={{ ['--d' as string]: `${[0, 0.05, 0.09, 0.12][n % 4]}s` }}>
+          <span className="ic"><Icon size={22} aria-hidden /></span><div><b>{t}</b><span>{d}</span></div>
+        </li>)}</ul>
+      </div></section>
+
+      {/* PARA QUEM É */}
+      <section className="tw4-for"><div className="tw-w">
+        <h2 className="tw2-h tw-rv">Para quem é.</h2>
+        <div>{percursos.map((p, n) => <Link key={p.t} href={cta} className={`tw-rv ${p.cor}`} style={{ ['--d' as string]: `${[0, 0.06, 0.1][n]}s` }}>
+          <h3>{p.t}</h3><ul>{p.itens.map((i) => <li key={i}>{i}</li>)}</ul><span className="go">Começar →</span>
+        </Link>)}</div>
+      </div></section>
+
+      {/* DESCOBRE O CURSO */}
+      <section className="tw4-find"><div className="tw-w tw-rv">
+        <h2>Ainda não sabes que curso escolher?</h2>
+        <Link href="/aluno/descobrir-curso" className="tw-btn lg wh">Fazer o teste</Link>
+      </div></section>
+
       {/* COMO FUNCIONA */}
       <section className="tw3-how"><div className="tw-w">
         <h2 className="tw2-h tw-rv">Começar é rápido.</h2>
@@ -155,7 +207,7 @@ export default function Page({ signedIn = false, posts = [], institutions = [], 
           <li className="tw-rv" style={{ ['--d' as string]: '.07s' }}><b>2</b><span>Escolhe o teu percurso</span></li>
           <li className="tw-rv" style={{ ['--d' as string]: '.12s' }}><b>3</b><span>Treina e vê a tua nota</span></li>
         </ol>
-        <div className="tw-cta tw-rv"><Link href={cta} className="tw-btn lg">{signedIn ? 'Ir para o painel' : 'Criar conta grátis'}</Link></div>
+        <div className="tw-cta tw-rv"><Link href={cta} className="tw-btn lg">{signedIn ? 'Ir ao painel' : 'Criar conta grátis'}</Link></div>
       </div></section>
 
       {/* PERGUNTAS */}
@@ -179,13 +231,13 @@ export default function Page({ signedIn = false, posts = [], institutions = [], 
       {/* FECHO */}
       <section className="tw2-close"><div className="tw-w">
         <h2 className="tw-rv">Começa a perceber.</h2>
-        <div className="tw-cta tw-rv" style={{ ['--d' as string]: '.08s' }}><Link href={cta} className="tw-btn lg wh">{signedIn ? 'Ir para o painel' : 'Criar conta'}</Link></div>
+        <div className="tw-cta tw-rv" style={{ ['--d' as string]: '.08s' }}><Link href={cta} className="tw-btn lg wh">{signedIn ? 'Ir ao painel' : 'Criar conta'}</Link></div>
       </div></section>
 
       <footer className="tw-foot"><div className="tw-w">
         <div className="tw-ft">
           <div><Link href="/" className="tw-brand"><Image src="/images/twisisa-mark.png" alt="" width={44} height={24} className="h-6 w-auto" />Twisisa</Link></div>
-          <div><h4>Explorar</h4><Link href="/exames">Exames</Link><Link href="/aluno/simulador">Simulador</Link><Link href="/blog">Blog</Link></div>
+          <div><h4>Explorar</h4><Link href="/exames">Exames</Link><Link href="/simulado">Simulador</Link><Link href="/blog">Blog</Link></div>
           <div><h4>Plataforma</h4><Link href="/jonas">Jonas</Link><Link href="/planos">Planos</Link><Link href={cta}>{signedIn ? 'Painel' : 'Criar conta'}</Link></div>
           <div><h4>Legal</h4><Link href="/privacidade">Privacidade</Link><Link href="/termos">Termos</Link></div>
         </div>

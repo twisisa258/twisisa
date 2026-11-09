@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Clock, RotateCcw, Target } from 'lucide-react'
 import { FaqList } from '@/components/exames/faq'
 import { JsonLd } from '@/components/json-ld'
 import { Crumbs, PublicShell } from '@/components/exames/public-shell'
@@ -17,11 +16,7 @@ export const metadata = pageMetadata({
   path: '/simulado',
 })
 
-const MODES = [
-  { icon: Target, mode: MODE_META.pratica },
-  { icon: Clock, mode: MODE_META.rapido },
-  { icon: RotateCcw, mode: MODE_META.revisao },
-] as const
+const MODES = [{ mode: MODE_META.pratica }, { mode: MODE_META.rapido }, { mode: MODE_META.revisao }] as const
 
 export default async function SimuladoPage() {
   const institutions = await listPublicInstitutions().catch(() => [])
@@ -37,50 +32,49 @@ export default async function SimuladoPage() {
   return (
     <PublicShell>
       <JsonLd data={jsonLd} />
-      <Crumbs items={[{ name: 'Início', href: '/' }, { name: 'Simulado' }]} />
+      <Crumbs items={[{ name: 'Início', href: '/' }, { name: 'Simulador' }]} />
 
-      <section className="rv-hero">
-        <h1 className="max-w-[20ch] text-[clamp(2rem,1.4rem+3vw,3.4rem)] font-semibold leading-[1.05] tracking-[-0.045em]">Simulado de exame de admissão</h1>
-        <p className="mt-4 max-w-[58ch] text-[17px] leading-7 text-texto-2">Treina com questões de exames anteriores, vê a correção a cada resposta e acaba com uma nota de 0 a 20. Sem decorar: o Jonas explica o que erraste.</p>
-        <div className="mt-6 flex flex-wrap gap-2">
-          <Link href="/sign-up" className="btn btn-primario btn-grande">Começar a treinar</Link>
-          <Link href="/exames" className="btn btn-secundario btn-grande">Ler exames anteriores</Link>
+      <section className="tw5-top">
+        <h1 className="tw5-h1">Treina como no <em>exame.</em></h1>
+        <p className="tw5-sub">Questões reais, correção na hora, nota de 0 a 20.</p>
+        <div className="tw5-actions">
+          <Link href="/aluno/simulador" className="tw-btn lg">Começar a treinar</Link>
+          <Link href="/exames" className="tw-btn lg ol">Ver exames</Link>
         </div>
       </section>
 
-      <section className="mt-12" aria-labelledby="modos">
-        <h2 id="modos" className="text-2xl font-semibold tracking-[-0.03em]">Três formas de treinar</h2>
-        <ul className="mt-5 grid gap-3 md:grid-cols-3">
-          {MODES.map(({ icon: Icon, mode }, index) => (
-            <Reveal as="li" key={mode.label} delay={index * 0.08} className="rounded-2xl border border-linha bg-white p-5">
-              <span className="grid size-10 place-items-center rounded-xl bg-marca-suave text-marca"><Icon size={20} aria-hidden /></span>
-              <h3 className="mt-3 text-[18px] font-semibold">{mode.label}</h3>
-              <p className="mt-1.5 text-[15px] leading-6 text-texto-2">{mode.tagline}.</p>
-              <p className="mt-3 text-xs font-semibold text-marca">{mode.meta}</p>
-            </Reveal>
-          ))}
+      <section className="tw5-sec" aria-labelledby="modos">
+        <h2 id="modos" className="tw5-h2">Três formas de treinar</h2>
+        <div className="tw4-modes" style={{ padding: 0 }}>
+          <ul style={{ marginTop: 0 }}>
+            {MODES.map(({ mode }, index) => (
+              <Reveal as="li" key={mode.label} delay={index * 0.07}>
+                <b>{mode.label}</b><span>{mode.tagline}</span><em>{mode.meta}</em>
+              </Reveal>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section className="tw5-sec" aria-labelledby="pontos">
+        <h2 id="pontos" className="tw5-h2">Pontos e nota</h2>
+        <ul className="tw5-rows">
+          <li className="tw5-row"><b>Cada questão certa</b><em>{POINTS_MIN} a {POINTS_MAX} pontos</em></li>
+          <li className="tw5-row"><b>Dica pedida</b><em>−25 % dos pontos</em></li>
+          <li className="tw5-row"><b>Nota</b><em>20 × ganhos ÷ possíveis</em></li>
         </ul>
       </section>
 
-      <Reveal as="section" className="mt-12 rounded-2xl border border-linha bg-white p-6">
-        <h2 className="text-2xl font-semibold tracking-[-0.03em]">Como contam os pontos e a nota</h2>
-        <ul className="mt-4 space-y-3 text-[15px] leading-7 text-texto-2">
-          <li><strong className="text-texto">Pontos:</strong> cada questão certa vale entre {POINTS_MIN} e {POINTS_MAX} pontos, conforme a dificuldade. Errar vale 0. Uma questão que já viste vale menos, para o treino não virar decoreba. Cada dica que pedes tira 25 % dos pontos dessa questão.</li>
-          <li><strong className="text-texto">Nota (0 a 20):</strong> é 20 × (pontos ganhos ÷ pontos possíveis). É a nota que terias se este simulado fosse o exame.</li>
-          <li><strong className="text-texto">Ranking:</strong> soma os teus pontos na semana (recomeça à segunda-feira) ou no total, entre estudantes do mesmo percurso.</li>
-        </ul>
-      </Reveal>
-
       {institutions.length > 0 && (
-        <Reveal as="section" className="mt-12">
-          <h2 className="text-2xl font-semibold tracking-[-0.03em]">Prepara a tua universidade</h2>
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {institutions.map((item) => <li key={item.id}><Link href={`/exames/${item.slug}`} className="ex-card inline-flex rounded-full border border-linha bg-white px-4 py-2 text-sm font-semibold text-texto no-underline">Exames {item.shortName}</Link></li>)}
+        <section className="tw5-sec">
+          <h2 className="tw5-h2">Escolhe a universidade</h2>
+          <ul className="tw5-chips">
+            {institutions.map((item) => <li key={item.id}><Link href={`/exames/${item.slug}`}>{item.shortName}</Link></li>)}
           </ul>
-        </Reveal>
+        </section>
       )}
 
-      <Reveal><FaqList items={faq} /></Reveal>
+      <FaqList items={faq} />
     </PublicShell>
   )
 }

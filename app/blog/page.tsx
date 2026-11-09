@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { BlogShell } from '@/components/blog/blog-shell'
+import { Crumbs } from '@/components/exames/public-shell'
 import { categoryLabel } from '@/components/blog/article-view'
 import { JsonLd } from '@/components/json-ld'
 import { EmptyState } from '@/components/states/empty-state'
@@ -84,6 +85,7 @@ export default async function BlogPage({ searchParams }: { searchParams: Params 
     <BlogShell>
       <JsonLd data={jsonLd} />
       <main id="conteudo" className="mx-auto w-full max-w-[720px] px-5 pt-6">
+        <Crumbs items={[{ name: 'Início', href: '/' }, { name: 'Blog' }]} />
         <h1 className="text-[clamp(1.75rem,1.4rem+1.8vw,2.75rem)] font-semibold leading-[1.1] tracking-[-0.035em]">Blog</h1>
         <p className="mt-3 max-w-[48ch] text-[17px] leading-7 text-texto-2">Guias, explicações por tema e dicas de exame e de admissão.</p>
 

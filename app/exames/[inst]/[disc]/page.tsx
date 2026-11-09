@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Download, FileText } from 'lucide-react'
 import { JsonLd } from '@/components/json-ld'
 import { FaqList } from '@/components/exames/faq'
 import { Crumbs, PublicShell } from '@/components/exames/public-shell'
@@ -54,27 +53,24 @@ export default async function SubjectExamPage({ params }: Props) {
     <PublicShell>
       <JsonLd data={jsonLd} />
       <Crumbs items={[{ name: 'Início', href: '/' }, { name: 'Exames', href: '/exames' }, { name: institution.shortName, href: `/exames/${institution.slug}` }, { name: subject.name }]} />
-      <section className="rv-hero space-y-3">
-        <h1 className="text-[clamp(1.9rem,1.4rem+2.4vw,3rem)] font-semibold leading-[1.08] tracking-[-0.04em]">Exame de admissão de {subject.name} {institution.shortName}</h1>
-        <p className="mt-3 max-w-[62ch] text-[17px] leading-7 text-texto-2">
-          Tudo o que precisas para o exame de {subject.name} da {institution.name}: os temas a que deves dar prioridade, exames de anos anteriores para ler e praticar, e questões reais para treinares no Twisisa.
-        </p>
-        <div className="flex flex-wrap gap-2 pt-1">
-          <Link href="/sign-up" className="btn btn-primario btn-grande">Praticar com questões reais</Link>
-          {topics.length > 0 && <a href={`${base}/temas.pdf`} className="btn btn-secundario btn-grande"><Download size={17} aria-hidden /> Descarregar os temas em PDF</a>}
+      <section className="tw5-top">
+        <h1 className="tw5-h1">{subject.name} <em>{institution.shortName}.</em></h1>
+        <p className="tw5-sub">Exame de admissão</p>
+        <div className="tw5-actions">
+          <Link href="/sign-up" className="tw-btn lg">Praticar</Link>
+          {topics.length > 0 && <a href={`${base}/temas.pdf`} className="tw-btn lg ol">Temas em PDF</a>}
         </div>
-        {topics.length > 0 && <p className="text-xs text-texto-2">Para descarregar é preciso criar uma conta gratuita.</p>}
       </section>
 
       {topics.length > 0 && (
-        <section className="mt-10" aria-labelledby="temas">
-          <h2 id="temas" className="text-2xl font-semibold tracking-[-0.03em]">Os {topics.length} temas principais de {subject.name}</h2>
-          <ol className="mt-5 space-y-4">
+        <section className="tw5-sec" aria-labelledby="temas">
+          <h2 id="temas" className="tw5-h2">{topics.length} temas principais</h2>
+          <ol style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {topics.map((topic) => (
-              <Reveal as="li" key={topic.position} className="rounded-2xl border border-linha bg-white p-5">
-                <h3 className="text-lg font-semibold"><span className="mr-2 text-marca">{topic.position}.</span>{topic.title}</h3>
-                <p className="mt-2 whitespace-pre-line text-[15px] leading-7 text-[#4f574f]">{topic.summary}</p>
-                {topic.tips && <p className="mt-3 rounded-xl bg-marca-suave px-3.5 py-2.5 text-sm leading-6 text-marca"><strong className="font-semibold">Dica:</strong> {topic.tips}</p>}
+              <Reveal as="li" key={topic.position} className="tw5-topic">
+                <h3><i>{topic.position}</i>{topic.title}</h3>
+                <p>{topic.summary}</p>
+                {topic.tips && <p className="dica">Dica: {topic.tips}</p>}
               </Reveal>
             ))}
           </ol>
@@ -82,17 +78,12 @@ export default async function SubjectExamPage({ params }: Props) {
       )}
 
       {exams.length > 0 && (
-        <section className="mt-10" aria-labelledby="exames">
-          <h2 id="exames" className="text-2xl font-semibold tracking-[-0.03em]">Exames anteriores de {subject.name} na {institution.shortName}</h2>
-          <p className="mt-2 text-sm text-texto-2">Podes ler todos sem conta. Para os descarregar em PDF, cria uma conta gratuita.</p>
-          <ul className="mt-4 divide-y divide-[#edf0e9] rounded-2xl border border-linha bg-white">
+        <section className="tw5-sec" aria-labelledby="exames">
+          <h2 id="exames" className="tw5-h2">Exames anteriores</h2>
+          <ul className="tw5-rows">
             {exams.map((exam) => (
               <li key={exam.id}>
-                <Link href={`${base}/${exam.id}`} className="flex items-center gap-3 px-4 py-3.5 text-texto no-underline hover:bg-[#f6f8f3]">
-                  <FileText size={18} className="shrink-0 text-marca" aria-hidden />
-                  <span className="min-w-0 flex-1 text-[15px] font-semibold">{exam.heading}</span>
-                  <span className="shrink-0 text-sm font-semibold text-marca">Ler</span>
-                </Link>
+                <Link href={`${base}/${exam.id}`} className="tw5-row"><b>{exam.heading}</b>{exam.year && <em>{exam.year}</em>}<u>Ler</u></Link>
               </li>
             ))}
           </ul>
@@ -100,33 +91,33 @@ export default async function SubjectExamPage({ params }: Props) {
       )}
 
       {courses.length > 0 && (
-        <section className="mt-10" aria-labelledby="cursos">
-          <h2 id="cursos" className="text-2xl font-semibold tracking-[-0.03em]">Cursos da {institution.shortName} que pedem {subject.name}</h2>
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {courses.map((course) => <li key={course.name} className="rounded-full border border-linha bg-white px-3.5 py-1.5 text-sm">{course.name}</li>)}
+        <section className="tw5-sec" aria-labelledby="cursos">
+          <h2 id="cursos" className="tw5-h2">Cursos que pedem {subject.name}</h2>
+          <ul className="tw5-chips">
+            {courses.map((course) => <li key={course.name}><span>{course.name}</span></li>)}
           </ul>
         </section>
       )}
 
       {years.length > 0 && (
-        <Reveal as="section" className="mt-10">
-          <h2 className="text-xl font-semibold tracking-[-0.02em]">Exames da {institution.shortName} por ano</h2>
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {years.map((year) => <li key={year}><Link href={yearPath(institution.slug, year)} className="ex-card inline-flex rounded-full border border-linha bg-white px-4 py-2 text-sm font-semibold text-texto no-underline">{year}</Link></li>)}
+        <section className="tw5-sec">
+          <h2 className="tw5-h2">Por ano</h2>
+          <ul className="tw5-chips">
+            {years.map((year) => <li key={year}><Link href={yearPath(institution.slug, year)}>{year}</Link></li>)}
           </ul>
-        </Reveal>
+        </section>
       )}
 
       {otherSubjects.length > 0 && (
-        <Reveal as="section" className="mt-10">
-          <h2 className="text-xl font-semibold tracking-[-0.02em]">Outras disciplinas da {institution.shortName}</h2>
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {otherSubjects.map((item) => <li key={item.id}><Link href={`/exames/${institution.slug}/${item.slug}`} className="ex-card inline-flex rounded-full border border-linha bg-white px-4 py-2 text-sm font-semibold text-texto no-underline">{item.name}</Link></li>)}
+        <section className="tw5-sec">
+          <h2 className="tw5-h2">Outras disciplinas</h2>
+          <ul className="tw5-chips">
+            {otherSubjects.map((item) => <li key={item.id}><Link href={`/exames/${institution.slug}/${item.slug}`}>{item.name}</Link></li>)}
           </ul>
-        </Reveal>
+        </section>
       )}
 
-      <Reveal><FaqList items={faq} /></Reveal>
+      <FaqList items={faq} />
     </PublicShell>
   )
 }

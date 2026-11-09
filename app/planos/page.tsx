@@ -1,4 +1,6 @@
 import { Check } from 'lucide-react'
+import { Crumbs } from '@/components/exames/public-shell'
+import { SiteFrame } from '@/components/site/site-frame'
 import { PLANO } from '@/lib/plano'
 
 export const metadata = { title: 'Planos' }
@@ -11,8 +13,10 @@ const benefits = [
 
 export default function PlanosPage() {
   return (
-    <main className="min-h-screen bg-fundo px-5 py-16 text-texto sm:px-8 sm:py-24">
+    <SiteFrame>
+    <main id="conteudo" className="px-5 py-10 text-texto sm:px-8 sm:py-14">
       <div className="mx-auto max-w-5xl">
+        <Crumbs items={[{ name: 'Início', href: '/' }, { name: 'Planos' }]} />
 
         <div className="grid items-center gap-12 lg:grid-cols-[1fr_400px] lg:gap-20">
 
@@ -85,5 +89,6 @@ export default function PlanosPage() {
 
       </div>
     </main>
+    </SiteFrame>
   )
 }

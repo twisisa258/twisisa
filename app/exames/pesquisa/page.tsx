@@ -1,8 +1,6 @@
 import Link from 'next/link'
-import { Search } from 'lucide-react'
 import { ExamRow } from '@/components/exames/exam-row'
 import { Crumbs, PublicShell } from '@/components/exames/public-shell'
-import { Reveal } from '@/components/ui/reveal'
 import { findExams } from '@/lib/exames'
 import { pageMetadata } from '@/lib/seo'
 
@@ -25,34 +23,34 @@ export default async function PesquisaExamesPage({ searchParams }: { searchParam
   return (
     <PublicShell>
       <Crumbs items={[{ name: 'Início', href: '/' }, { name: 'Exames', href: '/exames' }, { name: 'Pesquisa' }]} />
-      <h1 className="text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">{q ? `Exames para «${q}»` : 'Todos os exames'}</h1>
-      <form role="search" action="/exames/pesquisa" method="get" className="mt-5 flex max-w-[560px] items-center gap-2">
-        <label htmlFor="pesq-q" className="sr-only">Pesquisar exames</label>
-        <div className="relative min-w-0 flex-1">
-          <Search size={18} aria-hidden className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-texto-2" />
-          <input id="pesq-q" name="q" type="search" defaultValue={q} maxLength={80} autoComplete="off" placeholder="Ex.: Matemática UEM 2023" className="min-h-[52px] w-full rounded-2xl border border-linha bg-white pl-11 pr-4 text-[16px] outline-none placeholder:text-texto-2 focus:border-marca" />
-        </div>
-        <button type="submit" className="btn btn-primario btn-grande shrink-0">Pesquisar</button>
-      </form>
-      <p className="mt-3 text-sm text-texto-2">{total === 0 ? 'Nenhum exame encontrado.' : `${total} ${total === 1 ? 'exame' : 'exames'}`}</p>
+      <section className="tw5-top">
+        <h1 className="tw5-h1">{q ? <>«{q}»</> : <>Todos os <em>exames.</em></>}</h1>
+        <form role="search" action="/exames/pesquisa" method="get" className="tw5-search">
+          <div>
+            <label htmlFor="pesq-q" className="sr-only">Pesquisar exames</label>
+            <input id="pesq-q" name="q" type="search" defaultValue={q} maxLength={80} autoComplete="off" placeholder="Ex.: Matemática UEM 2023" />
+          </div>
+          <button type="submit" className="tw-btn">Pesquisar</button>
+        </form>
+        <p className="tw5-sub">{total === 0 ? 'Nenhum exame encontrado.' : `${total} ${total === 1 ? 'exame' : 'exames'}`}</p>
+      </section>
 
       {items.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-linha bg-white p-6">
-          <p className="font-semibold">Não encontrámos nada{q ? ` para «${q}»` : ''}.</p>
-          <p className="mt-1 text-sm leading-6 text-texto-2">Tenta só a disciplina (Matemática), a universidade (UEM) ou o ano (2023). Também podes escolher a universidade na página dos exames.</p>
-          <Link href="/exames" className="btn btn-secundario mt-4">Ver as universidades</Link>
+        <div className="tw5-sec tw5-vazio">
+          <p style={{ margin: 0 }}>Tenta só a disciplina, a universidade ou o ano.</p>
+          <div className="tw5-actions"><Link href="/exames" className="tw-btn">Ver as universidades</Link></div>
         </div>
       ) : (
-        <ul className="mt-6 grid gap-2.5 md:grid-cols-2">
-          {items.map((exam, index) => <Reveal as="li" key={exam.id} delay={Math.min(index, 6) * 0.04}><ExamRow exam={exam} /></Reveal>)}
+        <ul className="tw5-rows" style={{ marginTop: 34 }}>
+          {items.map((exam) => <li key={exam.id}><ExamRow exam={exam} /></li>)}
         </ul>
       )}
 
       {pages > 1 && (
-        <nav aria-label="Paginação" className="mt-8 flex items-center justify-between gap-3 border-t border-linha pt-6">
-          {page > 1 ? <Link href={link(page - 1)} rel="prev" className="btn btn-secundario btn-grande">Anterior</Link> : <span />}
-          <span className="text-sm text-texto-2">Página {page} de {pages}</span>
-          {page < pages ? <Link href={link(page + 1)} rel="next" className="btn btn-secundario btn-grande">Seguinte</Link> : <span />}
+        <nav aria-label="Paginação" className="tw5-pager">
+          {page > 1 ? <Link href={link(page - 1)} rel="prev" className="tw-btn ol">← Anterior</Link> : <span />}
+          <span>{page} / {pages}</span>
+          {page < pages ? <Link href={link(page + 1)} rel="next" className="tw-btn">Seguinte →</Link> : <span />}
         </nav>
       )}
     </PublicShell>

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowRight } from 'lucide-react'
 import { ExamRow } from '@/components/exames/exam-row'
 import { FaqList } from '@/components/exames/faq'
 import { JsonLd } from '@/components/json-ld'
@@ -48,27 +47,24 @@ export default async function InstitutionExamsPage({ params }: Props) {
     <PublicShell>
       <JsonLd data={jsonLd} />
       <Crumbs items={[{ name: 'Início', href: '/' }, { name: 'Exames', href: '/exames' }, { name: institution.shortName }]} />
-      <section className="rv-hero">
-        <h1 className="text-[clamp(1.9rem,1.4rem+2.4vw,3rem)] font-semibold leading-[1.08] tracking-[-0.04em]">Exames de admissão {institution.shortName}</h1>
-        <p className="mt-3 max-w-[60ch] text-[17px] leading-7 text-texto-2">{institution.name}. Escolhe a disciplina, lê os exames de anos anteriores e treina com questões reais.</p>
-        <div className="mt-5 flex flex-wrap gap-2">
-          <Link href="/sign-up" className="btn btn-primario btn-grande">Praticar com questões reais</Link>
-          <Link href="/simulado" className="btn btn-secundario btn-grande">Como funciona o simulado</Link>
+      <section className="tw5-top">
+        <h1 className="tw5-h1">Exames <em>{institution.shortName}.</em></h1>
+        <p className="tw5-sub">{institution.name}</p>
+        <div className="tw5-actions">
+          <Link href="/sign-up" className="tw-btn lg">Praticar</Link>
+          <Link href="/simulado" className="tw-btn lg ol">Ver o simulador</Link>
         </div>
       </section>
 
       {subjects.length > 0 && (
-        <section className="mt-12" aria-labelledby="disciplinas">
-          <h2 id="disciplinas" className="text-2xl font-semibold tracking-[-0.03em]">Disciplinas</h2>
-          <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="tw5-sec" aria-labelledby="disciplinas">
+          <h2 id="disciplinas" className="tw5-h2">Disciplinas</h2>
+          <ul className="tw5-tiles">
             {subjects.map((item, index) => (
               <Reveal as="li" key={item.id} delay={Math.min(index, 5) * 0.06}>
-                <Link href={`${base}/${item.slug}`} className="ex-card flex h-full items-start justify-between gap-3 rounded-2xl border border-linha bg-white p-5 text-texto no-underline">
-                  <span>
-                    <span className="block text-lg font-semibold tracking-[-0.02em]">{item.name}</span>
-                    <span className="mt-1 block text-xs font-semibold text-marca">{item.topics > 0 ? `${item.topics} temas principais` : 'Exames anteriores'}{item.exams > 0 ? ` · ${item.exams} ${item.exams === 1 ? 'exame' : 'exames'}` : ''}</span>
-                  </span>
-                  <ArrowRight size={18} aria-hidden className="mt-1 shrink-0 text-marca" />
+                <Link href={`${base}/${item.slug}`} className="tw5-tile">
+                  <b>{item.name}</b>
+                  <span>{item.topics > 0 ? `${item.topics} temas` : 'Exames'}{item.exams > 0 ? ` · ${item.exams} ${item.exams === 1 ? 'exame' : 'exames'}` : ''} →</span>
                 </Link>
               </Reveal>
             ))}
@@ -77,24 +73,24 @@ export default async function InstitutionExamsPage({ params }: Props) {
       )}
 
       {years.length > 0 && (
-        <Reveal as="section" className="mt-12">
-          <h2 className="text-2xl font-semibold tracking-[-0.03em]">Exames {institution.shortName} por ano</h2>
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {years.map((item) => <li key={item.year}><Link href={yearPath(institution.slug, item.year)} className="ex-card inline-flex items-center gap-2 rounded-full border border-linha bg-white px-4 py-2 text-sm font-semibold text-texto no-underline">{item.year}<span className="text-xs font-medium text-texto-2">{item.count}</span></Link></li>)}
-          </ul>
-        </Reveal>
-      )}
-
-      {recent.items.length > 0 && (
-        <section className="mt-12" aria-labelledby="recentes">
-          <h2 id="recentes" className="text-2xl font-semibold tracking-[-0.03em]">Exames mais recentes da {institution.shortName}</h2>
-          <ul className="mt-5 grid gap-2.5 md:grid-cols-2">
-            {recent.items.map((exam, index) => <Reveal as="li" key={exam.id} delay={Math.min(index, 4) * 0.05}><ExamRow exam={exam} /></Reveal>)}
+        <section className="tw5-sec">
+          <h2 className="tw5-h2">Por ano</h2>
+          <ul className="tw5-chips">
+            {years.map((item) => <li key={item.year}><Link href={yearPath(institution.slug, item.year)}>{item.year} · {item.count}</Link></li>)}
           </ul>
         </section>
       )}
 
-      <Reveal><FaqList items={faq} /></Reveal>
+      {recent.items.length > 0 && (
+        <section className="tw5-sec" aria-labelledby="recentes">
+          <h2 id="recentes" className="tw5-h2">Mais recentes</h2>
+          <ul className="tw5-rows">
+            {recent.items.map((exam) => <li key={exam.id}><ExamRow exam={exam} /></li>)}
+          </ul>
+        </section>
+      )}
+
+      <FaqList items={faq} />
     </PublicShell>
   )
 }

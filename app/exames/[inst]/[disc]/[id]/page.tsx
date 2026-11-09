@@ -1,12 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Download, ExternalLink } from 'lucide-react'
 import { JsonLd } from '@/components/json-ld'
 import { ExamRow } from '@/components/exames/exam-row'
 import { FaqList } from '@/components/exames/faq'
 import { Crumbs, PublicShell } from '@/components/exames/public-shell'
-import { Reveal } from '@/components/ui/reveal'
 import { faqExam, faqJsonLd, yearPath } from '@/lib/exames-pure'
 import { findExams, getPublicExam } from '@/lib/exames'
 import { OG_IMAGE, SITE_LOCALE, SITE_NAME, SITE_URL, breadcrumbJsonLd } from '@/lib/seo'
@@ -70,40 +68,33 @@ export default async function ExamPage({ params }: Props) {
     <PublicShell>
       <JsonLd data={jsonLd} />
       <Crumbs items={[{ name: 'Início', href: '/' }, { name: 'Exames', href: '/exames' }, { name: exam.institution.shortName, href: `/exames/${exam.institution.slug}` }, { name: exam.subject.name, href: subjectPath }, { name: exam.heading }]} />
-      <section className="rv-hero space-y-3">
-      <h1 className="text-[clamp(1.8rem,1.3rem+2.2vw,2.8rem)] font-semibold leading-[1.1] tracking-[-0.04em]">{exam.heading}</h1>
-      <p className="max-w-[62ch] text-[17px] leading-7 text-texto-2">
-        {exam.description || `Exame de admissão de ${exam.subject.name} da ${exam.institution.name}${exam.year ? `, de ${exam.year}` : ''}.`} Lê-o aqui, sem criar conta. Para o descarregar em PDF é preciso uma conta gratuita.
-      </p>
-      <div className="flex flex-wrap gap-2 pt-1">
-        <a href={viewer} target="_blank" rel="noopener" className="btn btn-secundario btn-grande"><ExternalLink size={17} aria-hidden /> Abrir o exame</a>
-        <a href={`/api/biblioteca/${exam.id}/ficheiro?baixar=1`} className="btn btn-primario btn-grande"><Download size={17} aria-hidden /> Descarregar o PDF</a>
-      </div>
-      {exam.year && <p className="text-sm text-texto-2">Ver todos os <Link href={yearPath(exam.institution.slug, exam.year)} className="font-semibold text-marca no-underline hover:underline">exames da {exam.institution.shortName} de {exam.year}</Link>.</p>}
+      <section className="tw5-top">
+        <h1 className="tw5-h1">{exam.heading}</h1>
+        <div className="tw5-actions">
+          <a href={viewer} target="_blank" rel="noopener" className="tw-btn lg ol">Abrir o exame</a>
+          <a href={`/api/biblioteca/${exam.id}/ficheiro?baixar=1`} className="tw-btn lg">Descarregar o PDF</a>
+        </div>
+        {exam.year && <ul className="tw5-chips" style={{ marginTop: 22 }}><li><Link href={yearPath(exam.institution.slug, exam.year)}>Todos os exames {exam.institution.shortName} {exam.year}</Link></li></ul>}
       </section>
 
-      <iframe src={`${viewer}#toolbar=0&navpanes=0`} title={exam.heading} className="mt-6 hidden h-[78dvh] w-full rounded-2xl border border-linha bg-white md:block" />
-      <p className="mt-3 text-xs text-texto-2 md:hidden">No telemóvel, toca em «Abrir o exame» para o ler.</p>
+      <iframe src={`${viewer}#toolbar=0&navpanes=0`} title={exam.heading} className="tw5-view" />
 
-      <Reveal as="section" className="mt-10 rounded-2xl border border-linha bg-white p-5">
-        <h2 className="text-xl font-semibold tracking-[-0.02em]">Pratica este exame</h2>
-        <p className="mt-2 text-[15px] leading-7 text-texto-2">No Twisisa podes treinar com questões reais de {exam.subject.name} da {exam.institution.shortName}, ver a explicação do Jonas quando errares e acompanhar a tua evolução.</p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Link href="/sign-up" className="btn btn-primario">Criar conta gratuita</Link>
-          <Link href={subjectPath} className="btn btn-terciario">Ver os temas principais de {exam.subject.name}</Link>
-        </div>
-      </Reveal>
+      <div className="tw5-band">
+        <h2>Pratica {exam.subject.name}.</h2>
+        <div className="tw-cta"><Link href="/sign-up" className="tw-btn lg wh">Criar conta grátis</Link></div>
+      </div>
 
       {siblings.length > 0 && (
-        <section className="mt-10" aria-labelledby="outros">
-          <h2 id="outros" className="text-xl font-semibold tracking-[-0.02em]">Outros exames de {exam.subject.name} da {exam.institution.shortName}</h2>
-          <ul className="mt-4 grid gap-2.5 md:grid-cols-2">
-            {siblings.map((item, index) => <Reveal as="li" key={item.id} delay={Math.min(index, 4) * 0.05}><ExamRow exam={item} /></Reveal>)}
+        <section className="tw5-sec" aria-labelledby="outros">
+          <h2 id="outros" className="tw5-h2">Outros exames de {exam.subject.name}</h2>
+          <ul className="tw5-rows">
+            {siblings.map((item) => <li key={item.id}><ExamRow exam={item} /></li>)}
           </ul>
+          <div className="tw5-actions"><Link href={subjectPath} className="tw-btn ol">Temas de {exam.subject.name}</Link></div>
         </section>
       )}
 
-      <Reveal><FaqList items={faq} /></Reveal>
+      <FaqList items={faq} />
     </PublicShell>
   )
 }

@@ -1,25 +1,30 @@
 import Link from 'next/link'
-import { ChevronRight } from 'lucide-react'
 import { SiteFrame } from '@/components/site/site-frame'
 
-// Moldura das páginas públicas de exames: cabeçalho e rodapé comuns, conteúdo ao centro. Sem sessão no servidor (a página fica estática).
+// Moldura das páginas secundárias de exames: cabeçalho e rodapé da página inicial e o conteúdo ao centro.
 export function PublicShell({ children }: { children: React.ReactNode }) {
   return (
     <SiteFrame>
-      <main id="conteudo" className="mx-auto max-w-[1040px] px-5 pb-8 pt-8">{children}</main>
+      <main id="conteudo" className="tw5">{children}</main>
     </SiteFrame>
   )
 }
 
+// Voltar: um botão claro para o nível de cima (a última ligação do caminho) e o caminho completo ao lado, no computador.
 export function Crumbs({ items }: { items: { name: string; href?: string }[] }) {
+  const parents = items.filter((item) => item.href)
+  const back = parents[parents.length - 1]
   return (
-    <nav aria-label="Caminho" className="mb-5 flex flex-wrap items-center gap-1 text-sm text-texto-2">
-      {items.map((item, index) => (
-        <span key={item.name} className="inline-flex items-center gap-1">
-          {index > 0 && <ChevronRight size={14} aria-hidden className="text-texto-2/70" />}
-          {item.href ? <Link href={item.href} className="font-semibold text-marca no-underline hover:underline">{item.name}</Link> : <span aria-current="page">{item.name}</span>}
-        </span>
-      ))}
-    </nav>
+    <div className="tw5-back">
+      {back?.href && <Link href={back.href} className="tw-btn ol sm">← {back.name}</Link>}
+      <nav aria-label="Caminho">
+        {items.map((item, index) => (
+          <span key={`${item.name}-${index}`}>
+            {index > 0 && <i aria-hidden="true">/</i>}
+            {item.href ? <Link href={item.href}>{item.name}</Link> : <b aria-current="page">{item.name}</b>}
+          </span>
+        ))}
+      </nav>
+    </div>
   )
 }

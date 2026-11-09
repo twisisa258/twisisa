@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation'
 import { ExamRow } from '@/components/exames/exam-row'
 import { JsonLd } from '@/components/json-ld'
 import { Crumbs, PublicShell } from '@/components/exames/public-shell'
-import { Reveal } from '@/components/ui/reveal'
 import { examPath, isYear, yearPath } from '@/lib/exames-pure'
 import { getYearPage } from '@/lib/exames'
 import { SITE_URL, breadcrumbJsonLd, pageMetadata } from '@/lib/seo'
@@ -48,27 +47,27 @@ export default async function YearExamsPage({ params }: Props) {
     <PublicShell>
       <JsonLd data={jsonLd} />
       <Crumbs items={[{ name: 'Início', href: '/' }, { name: 'Exames', href: '/exames' }, { name: institution.shortName, href: `/exames/${institution.slug}` }, { name: String(year) }]} />
-      <section className="rv-hero">
-        <h1 className="text-[clamp(1.9rem,1.4rem+2.4vw,3rem)] font-semibold leading-[1.08] tracking-[-0.04em]">Exames de admissão {institution.shortName} {year}</h1>
-        <p className="mt-3 max-w-[60ch] text-[17px] leading-7 text-texto-2">Todos os exames da {institution.name} de {year} que temos no Twisisa. Lê-os sem conta; para descarregar o PDF cria uma conta gratuita.</p>
+      <section className="tw5-top">
+        <h1 className="tw5-h1">{institution.shortName} <em>{year}.</em></h1>
+        <p className="tw5-sub">{exams.length} {exams.length === 1 ? 'exame' : 'exames'}</p>
       </section>
 
       {[...bySubject.entries()].map(([subject, list]) => (
-        <section key={subject} className="mt-10">
-          <h2 className="text-xl font-semibold tracking-[-0.02em]">{subject}</h2>
-          <ul className="mt-4 grid gap-2.5 md:grid-cols-2">
-            {list.map((exam, index) => <Reveal as="li" key={exam.id} delay={Math.min(index, 4) * 0.05}><ExamRow exam={exam} /></Reveal>)}
+        <section key={subject} className="tw5-sec">
+          <h2 className="tw5-h2">{subject}</h2>
+          <ul className="tw5-rows">
+            {list.map((exam) => <li key={exam.id}><ExamRow exam={exam} /></li>)}
           </ul>
         </section>
       ))}
 
       {years.length > 1 && (
-        <Reveal as="section" className="mt-12">
-          <h2 className="text-xl font-semibold tracking-[-0.02em]">Outros anos da {institution.shortName}</h2>
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {years.filter((item) => item.year !== year).map((item) => <li key={item.year}><Link href={yearPath(institution.slug, item.year)} className="ex-card inline-flex items-center gap-2 rounded-full border border-linha bg-white px-4 py-2 text-sm font-semibold text-texto no-underline">{item.year}<span className="text-xs font-medium text-texto-2">{item.count}</span></Link></li>)}
+        <section className="tw5-sec">
+          <h2 className="tw5-h2">Outros anos</h2>
+          <ul className="tw5-chips">
+            {years.filter((item) => item.year !== year).map((item) => <li key={item.year}><Link href={yearPath(institution.slug, item.year)}>{item.year} · {item.count}</Link></li>)}
           </ul>
-        </Reveal>
+        </section>
       )}
     </PublicShell>
   )
