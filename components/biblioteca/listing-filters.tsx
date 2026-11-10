@@ -72,7 +72,7 @@ export function ListingFilters({
         <button
           type="button"
           onClick={() => router.push(withParams(basePath, { q, categoria }))}
-          className="col-span-2 inline-flex h-11 items-center justify-center gap-1.5 rounded-xl px-3 text-xs font-semibold text-marca hover:bg-[#eaf1ec] sm:col-span-1"
+          className="col-span-2 inline-flex h-11 items-center justify-center gap-1.5 rounded-xl px-3 text-xs font-semibold text-marca hover:bg-superficie-2 sm:col-span-1"
         >
           <X size={14} /> Limpar
         </button>

@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils'
 
 /** Bloco base de skeleton. Decorativo: o contentor que o usa deve ter role="status" e aria-label. */
 export function Skeleton({ className }: { className?: string }) {
-  return <div aria-hidden="true" className={cn('animate-pulse rounded-xl bg-[#e8ece4] motion-reduce:animate-none', className)} />
+  return <div aria-hidden="true" className={cn('animate-pulse rounded-xl bg-linha motion-reduce:animate-none', className)} />
 }
 
 /** Contentor acessível: anuncia "A carregar" uma só vez aos leitores de ecrã. */

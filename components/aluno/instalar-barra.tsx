@@ -51,7 +51,7 @@ export function InstalarBarra() {
   }
 
   return (
-    <div role="region" aria-label="Instalar a app" className="flex items-center gap-3 border-b border-[#cfe0d5] bg-marca-suave px-4 py-2 text-[13px] leading-5 text-texto">
+    <div role="region" aria-label="Instalar a app" className="flex items-center gap-3 border-b border-linha bg-marca-suave px-4 py-2 text-[13px] leading-5 text-texto">
       <p className="min-w-0 flex-1">
         {modo === 'android'
           ? 'Instala a Twisisa no ecrã principal para abrir mais depressa.'

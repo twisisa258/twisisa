@@ -11,7 +11,7 @@ const MODES: Record<AttemptMode, { label: string; icon: typeof Target }> = {
 
 export function ModePicker({ modes, current, subjectId }: { modes: AttemptMode[]; current: AttemptMode; subjectId: string }) {
   return (
-    <div role="tablist" aria-label="Modo" className="grid gap-1 rounded-2xl bg-[#eceee7] p-1" style={{ gridTemplateColumns: `repeat(${modes.length}, minmax(0, 1fr))` }}>
+    <div role="tablist" aria-label="Modo" className="grid gap-1 rounded-2xl bg-linha p-1" style={{ gridTemplateColumns: `repeat(${modes.length}, minmax(0, 1fr))` }}>
       {modes.map((mode) => {
         const { label, icon: Icon } = MODES[mode]
         const active = mode === current

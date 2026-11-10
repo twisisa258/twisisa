@@ -6,7 +6,7 @@ import { BackToSignIn, NewPasswordForm } from '@/components/password-reset-form'
 export default async function ResetPasswordPage({ searchParams }: { searchParams: Promise<{ token?: string; error?: string }> }) {
   const { token, error } = await searchParams
   const valid = Boolean(token) && !error
-  return <main className="flex min-h-screen items-center justify-center bg-fundo px-5 py-12 text-texto"><div className="w-full max-w-[420px]"><Brand /><div className="mt-8 rounded-[28px] border border-[#e0e2d9] bg-white p-6 shadow-[0_24px_60px_rgba(35,54,44,0.08)] sm:p-8">{valid ? (
+  return <main className="flex min-h-screen items-center justify-center bg-fundo px-5 py-12 text-texto"><div className="w-full max-w-[420px]"><Brand /><div className="mt-8 rounded-[28px] border border-linha bg-white p-6 shadow-[0_24px_60px_rgba(35,54,44,0.08)] sm:p-8">{valid ? (
     <>
       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-marca">recuperar conta</p>
       <h1 className="mt-3 text-3xl font-medium tracking-[-0.06em]">Escolhe a nova palavra-passe.</h1>

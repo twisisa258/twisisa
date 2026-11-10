@@ -62,7 +62,7 @@ export function StudyLaterList({ initial }: { initial: MarkItem[] }) {
       {items.map((item) => (
         <article key={item.id} className={`rounded-2xl border p-4 ${item.due ? 'border-assistente/40 bg-assistente-suave/50' : 'border-linha bg-white'}`}>
           <div className="flex items-center gap-2 text-xs">
-            <span className={`chip ${item.due ? 'bg-assistente-suave text-assistente' : 'bg-[#f1efe8] text-[#444441]'}`}><Bookmark size={12} aria-hidden />{dayLabel(item.remindOn, item.due)}</span>
+            <span className={`chip ${item.due ? 'bg-assistente-suave text-assistente' : 'bg-conquista-suave text-texto'}`}><Bookmark size={12} aria-hidden />{dayLabel(item.remindOn, item.due)}</span>
             <span className="truncate text-texto-2">{item.subject}{item.topic ? ` · ${item.topic}` : ''}</span>
           </div>
           <p className="mt-2 line-clamp-3 text-[15px] leading-6"><MathText text={item.statement} /></p>

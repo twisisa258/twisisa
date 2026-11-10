@@ -72,7 +72,7 @@ export function PercursoPicker({ initialTrack, initialOtherLevel, initialInstitu
         <section aria-labelledby="instituicao-titulo">
           <h2 id="instituicao-titulo" className="text-base font-semibold">A que instituição te candidatas?</h2>
           {institutions.length === 0 ? (
-            <p className="mt-3 rounded-2xl border border-dashed border-[#d5dacd] bg-white p-5 text-sm leading-6 text-[#3f6357]">Ainda não há instituições disponíveis. Volta mais tarde ou escolhe a 10ª ou a 12ª classe.</p>
+            <p className="mt-3 rounded-2xl border border-dashed border-linha bg-white p-5 text-sm leading-6 text-marca">Ainda não há instituições disponíveis. Volta mais tarde ou escolhe a 10ª ou a 12ª classe.</p>
           ) : (
             <div role="radiogroup" aria-labelledby="instituicao-titulo" className="mt-4 grid gap-3 sm:grid-cols-2">
               {institutions.map((item) => {
@@ -84,17 +84,17 @@ export function PercursoPicker({ initialTrack, initialOtherLevel, initialInstitu
                     role="radio"
                     aria-checked={selected}
                     onClick={() => setInstitutionId(item.id)}
-                    className={`flex items-center gap-3 rounded-3xl border bg-white p-4 text-left transition ${selected ? 'border-2 border-marca bg-[#f3f7f4]' : 'border-linha hover:border-[#c4d3c8]'}`}
+                    className={`flex items-center gap-3 rounded-3xl border bg-white p-4 text-left transition ${selected ? 'border-2 border-marca bg-superficie-2' : 'border-linha hover:border-linha'}`}
                   >
-                    <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-linha bg-[#f3f4ef] text-xs font-bold text-marca">
+                    <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-linha bg-superficie-2 text-xs font-bold text-marca">
                       {item.logoUrl ? <img src={item.logoUrl} alt="" className="size-full object-contain" /> : item.shortName}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="flex items-center gap-2 text-sm font-semibold">{item.shortName}{item.soon && <span className="rounded-full bg-[#f4eddb] px-2 py-0.5 text-[10px] font-semibold text-aviso-texto">Em breve</span>}</span>
-                      <span className="mt-0.5 block truncate text-xs text-[#3f6357]">{item.name}</span>
-                      {item.description && <span className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-[#3f6357]">{bold(item.description)}</span>}
+                      <span className="flex items-center gap-2 text-sm font-semibold">{item.shortName}{item.soon && <span className="rounded-full bg-conquista-suave px-2 py-0.5 text-[10px] font-semibold text-aviso-texto">Em breve</span>}</span>
+                      <span className="mt-0.5 block truncate text-xs text-marca">{item.name}</span>
+                      {item.description && <span className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-marca">{bold(item.description)}</span>}
                     </span>
-                    {selected ? <Check size={18} aria-hidden="true" className="shrink-0 text-marca" /> : <ChevronRight size={18} aria-hidden="true" className="shrink-0 text-[#3f6357]" />}
+                    {selected ? <Check size={18} aria-hidden="true" className="shrink-0 text-marca" /> : <ChevronRight size={18} aria-hidden="true" className="shrink-0 text-marca" />}
                   </button>
                 )
               })}

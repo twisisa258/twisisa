@@ -5,10 +5,10 @@ import type { Aviso, AvisoIcon, AvisoTone } from '@/lib/avisos'
 export const ICONS: Record<AvisoIcon, LucideIcon> = { flame: Flame, clock: Clock, target: Target, book: BookOpen, alert: AlertTriangle, check: Check, calendar: CalendarDays }
 
 export const TONES: Record<AvisoTone, { card: string; icon: string; cta: string }> = {
-  urgent: { card: 'border border-[#f3c9b4] bg-[#fff4ee]', icon: 'bg-aviso text-white', cta: 'text-[#9a3412]' },
-  warning: { card: 'border border-[#f6d9ad] bg-aviso-suave', icon: 'bg-aviso text-white', cta: 'text-[#8a5a12]' },
+  urgent: { card: 'border border-erro-suave bg-conquista-suave', icon: 'bg-aviso text-white', cta: 'text-erro-texto' },
+  warning: { card: 'border border-[#f6d9ad] bg-aviso-suave', icon: 'bg-aviso text-white', cta: 'text-conquista-texto' },
   info: { card: 'border border-linha bg-white', icon: 'bg-marca-suave text-marca', cta: 'text-marca' },
-  success: { card: 'border border-[#cfe0d5] bg-marca-suave', icon: 'bg-marca text-white', cta: 'text-marca' },
+  success: { card: 'border border-linha bg-marca-suave', icon: 'bg-marca text-white', cta: 'text-marca' },
 }
 
 // Avisos e lembretes do aluno (calculados em lib/avisos.ts). Cada cartão é uma ligação para a ação.

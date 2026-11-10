@@ -14,13 +14,13 @@ export function ListaEscolha({ itens, valor, onChange, rotulo, procuraDepois = 8
   const agulha = simples(texto.trim())
   const visiveis = itens.filter((item) => !agulha || simples(`${item.label} ${item.detail ?? ''}`).includes(agulha))
 
-  if (itens.length === 0) return <p className="rounded-xl border border-dashed border-[#d5dacd] bg-white p-3 text-[13px] text-texto-2">{vazio}</p>
+  if (itens.length === 0) return <p className="rounded-xl border border-dashed border-linha bg-white p-3 text-[13px] text-texto-2">{vazio}</p>
   return (
     <div className="grid gap-2">
       {itens.length > procuraDepois && (
         <div className="relative">
-          <Search size={16} aria-hidden className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9aa29c]" />
-          <input type="search" value={texto} onChange={(event) => setTexto(event.target.value)} placeholder="Procurar" aria-label={`Procurar: ${rotulo}`} className="h-11 w-full rounded-xl border border-[#dfe3d9] bg-white pl-10 pr-3.5 text-sm outline-none transition-colors placeholder:text-[#6f7871] focus:border-marca focus:ring-2 focus:ring-marca/10" />
+          <Search size={16} aria-hidden className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-texto-2" />
+          <input type="search" value={texto} onChange={(event) => setTexto(event.target.value)} placeholder="Procurar" aria-label={`Procurar: ${rotulo}`} className="h-11 w-full rounded-xl border border-linha bg-white pl-10 pr-3.5 text-sm outline-none transition-colors placeholder:text-texto-2 focus:border-marca focus:ring-2 focus:ring-marca/10" />
         </div>
       )}
       <div role="radiogroup" aria-label={rotulo} className={`flex flex-col gap-2 ${itens.length > procuraDepois ? 'max-h-[44dvh] overflow-y-auto pr-0.5' : ''}`}>

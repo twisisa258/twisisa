@@ -17,9 +17,9 @@ type Institution = { id: string; shortName: string; name: string; soon: boolean 
 type Etapa = 'sobre' | 'percurso' | 'curso' | 'combo' | 'meta'
 type Combo = { optionId: string; label: string }
 
-const field = 'h-12 w-full rounded-xl border border-[#dfe1d9] bg-white px-3 text-[15px] outline-none focus:border-marca'
+const field = 'h-12 w-full rounded-xl border border-linha bg-white px-3 text-[15px] outline-none focus:border-marca'
 const primary = 'flex h-[52px] w-full items-center justify-center gap-2 rounded-2xl bg-marca text-[15px] font-semibold text-white transition hover:bg-marca-escura disabled:opacity-50'
-const secondary = 'flex h-12 w-full items-center justify-center rounded-2xl border border-linha bg-white text-[14px] font-semibold text-texto transition hover:bg-[#f4f7f2] disabled:opacity-50'
+const secondary = 'flex h-12 w-full items-center justify-center rounded-2xl border border-linha bg-white text-[14px] font-semibold text-texto transition hover:bg-superficie-2 disabled:opacity-50'
 
 // DD/MM/AAAA: só dígitos, com as barras postas pelo campo.
 const maskDate = (raw: string) => {
@@ -207,7 +207,7 @@ export function OnboardingFlow({
           <span className="size-11" aria-hidden="true" />
         )}
         <div role="progressbar" aria-valuemin={1} aria-valuemax={etapas.length} aria-valuenow={posicao + 1} aria-label={`Passo ${posicao + 1} de ${etapas.length}`} className="flex gap-1.5">
-          {etapas.map((e, n) => <span key={e} className={`h-1.5 w-6 rounded-full ${n <= posicao ? 'bg-marca' : 'bg-[#dfe1d9]'}`} />)}
+          {etapas.map((e, n) => <span key={e} className={`h-1.5 w-6 rounded-full ${n <= posicao ? 'bg-marca' : 'bg-linha'}`} />)}
         </div>
         <span className="size-11" aria-hidden="true" />
       </header>

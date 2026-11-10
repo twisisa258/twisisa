@@ -4,6 +4,7 @@ import { JsonLd } from '@/components/json-ld'
 import { FeedbackProvider } from '@/components/feedback-provider'
 import { GoogleAnalytics } from '@/components/google-analytics'
 import { CookieCard } from '@/components/cookies/cookie-card'
+import { ThemeScript } from '@/components/shell/theme-script'
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_LOCALE, SITE_NAME, SITE_TITLE, SITE_URL, siteJsonLd } from '@/lib/seo'
 import './globals.css'
 
@@ -50,8 +51,11 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: '#1d4d41',
+  colorScheme: 'light dark',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f8f8f5' },
+    { media: '(prefers-color-scheme: dark)', color: '#0b1310' },
+  ],
 }
 
 export default function RootLayout({
@@ -62,6 +66,7 @@ export default function RootLayout({
   return (
     <html lang="pt-MZ" suppressHydrationWarning>
       <head>
+        <ThemeScript />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700&display=swap" />

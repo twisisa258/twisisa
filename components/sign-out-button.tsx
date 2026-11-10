@@ -25,7 +25,7 @@ export function SignOutButton() {
   }
 
   return (
-    <button type="button" onClick={signOut} disabled={pending} aria-busy={pending} className="inline-flex items-center gap-2 rounded-full border border-[#d7d9d0] bg-white px-4 py-2 text-xs font-semibold text-[#39433e] disabled:opacity-60">
+    <button type="button" onClick={signOut} disabled={pending} aria-busy={pending} className="inline-flex items-center gap-2 rounded-full border border-linha bg-white px-4 py-2 text-xs font-semibold text-texto disabled:opacity-60">
       {pending ? <><Spinner className="size-3.5" />A sair…</> : 'Sair'}
     </button>
   )

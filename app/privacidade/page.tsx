@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Brand } from '@/components/brand'
+import { SiteFrame } from '@/components/site/site-frame'
 import { GerirCookies } from '@/components/cookies/gerir-cookies'
 
 const sections = [
@@ -13,5 +13,5 @@ const sections = [
 ]
 
 export default function PrivacyPage() {
-  return <main className="min-h-screen bg-fundo text-texto"><header className="border-b border-[#e5e6df] bg-fundo/95"><div className="mx-auto flex h-[72px] max-w-[900px] items-center justify-between px-5"><Brand /><Link href="/" className="text-sm font-medium text-marca">Voltar ao início</Link></div></header><article className="mx-auto max-w-[760px] px-5 py-14 sm:py-20"><p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-marca">Informação legal</p><h1 className="mt-4 text-4xl font-medium tracking-[-0.06em] sm:text-5xl">Política de privacidade</h1><p className="mt-5 text-sm leading-6 text-[#737a73]">Última atualização: 28 de outubro de 2026</p><div className="mt-12 space-y-9">{sections.map(([title, body]) => <section key={title}><h2 className="text-lg font-semibold tracking-[-0.03em]">{title}</h2><p className="mt-3 text-sm leading-7 text-[#606860]">{body}</p></section>)}</div><div className="mt-14 border-t border-[#e2e4dc] pt-6 text-sm text-[#737a73]"><p>Ao utilizar o Twisisa, concordas com esta política e com o tratamento dos dados descrito acima.</p><div className="mt-4 flex flex-wrap items-center gap-3"><Link href="/termos" className="inline-block font-semibold text-marca">Ler os termos de uso</Link><GerirCookies /></div></div></article></main>
+  return <SiteFrame><main id="conteudo" className="text-texto"><article className="mx-auto max-w-[760px] px-5 py-14 sm:py-20"><p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-marca">Informação legal</p><h1 className="mt-4 text-4xl font-medium tracking-[-0.06em] sm:text-5xl">Política de privacidade</h1><p className="mt-5 text-sm leading-6 text-texto-2">Última atualização: 28 de outubro de 2026</p><div className="mt-12 space-y-9">{sections.map(([title, body]) => <section key={title}><h2 className="text-lg font-semibold tracking-[-0.03em]">{title}</h2><p className="mt-3 text-sm leading-7 text-texto-2">{body}</p></section>)}</div><div className="mt-14 border-t border-linha pt-6 text-sm text-texto-2"><p>Ao utilizar o Twisisa, concordas com esta política e com o tratamento dos dados descrito acima.</p><div className="mt-4 flex flex-wrap items-center gap-3"><Link href="/termos" className="inline-block font-semibold text-marca">Ler os termos de uso</Link><GerirCookies /></div></div></article></main></SiteFrame>
 }

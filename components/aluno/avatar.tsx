@@ -7,7 +7,7 @@ export function Avatar({ name, image, size = 40, className = '' }: { name: strin
   return (
     <span
       style={{ width: size, height: size, fontSize: Math.round(size * 0.4) }}
-      className={`relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[#e1ece5] to-[#cfe0d5] font-semibold text-marca ${className}`}
+      className={`relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-marca-suave to-[#cfe0d5] font-semibold text-marca ${className}`}
     >
       {src ? <img src={src} alt="" loading="lazy" decoding="async" className="size-full object-cover" /> : name.trim().slice(0, 1).toUpperCase()}
     </span>

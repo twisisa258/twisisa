@@ -34,8 +34,8 @@ function Review({ item, attemptId }: { item: PlayItem; attemptId: string }) {
           const right = fb?.correctOptionId === option.id
           const mine = item.selectedOptionId === option.id
           return (
-            <li key={option.id} className={`flex items-start gap-3 rounded-[14px] p-3 text-sm ${right ? 'bg-sucesso-suave' : mine ? 'bg-erro-suave' : 'bg-[#f6f8f3]'}`}>
-              <span className={`flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${right ? 'bg-sucesso text-white' : mine ? 'bg-erro text-white' : 'bg-[#edf3ee] text-marca'}`}>{LETTERS[i]}</span>
+            <li key={option.id} className={`flex items-start gap-3 rounded-[14px] p-3 text-sm ${right ? 'bg-sucesso-suave' : mine ? 'bg-erro-suave' : 'bg-superficie-2'}`}>
+              <span className={`flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${right ? 'bg-sucesso text-white' : mine ? 'bg-erro text-white' : 'bg-superficie-2 text-marca'}`}>{LETTERS[i]}</span>
               <span className="min-w-0 flex-1 space-y-2">
                 {option.image && <QuestionImage image={option.image} zoomable={false} />}
                 {option.body && <span className="block leading-6"><MathText text={option.body} /></span>}
@@ -61,7 +61,7 @@ export function ResultView({ result }: { result: Result }) {
   const wrong = result.total - result.correct
   return (
     <div className="max-w-[720px] space-y-6">
-      <section className="rounded-2xl bg-gradient-to-br from-white to-[#f3f6f0] shadow-[0_1px_2px_rgba(20,50,40,0.05)] p-5 sm:p-7">
+      <section className="rounded-2xl bg-gradient-to-br from-white to-marca-suave shadow-[0_1px_2px_rgba(20,50,40,0.05)] p-5 sm:p-7">
         <div className="flex items-center gap-5">
           <div className="relative">
             <Ring pct={pct} />
@@ -96,13 +96,13 @@ export function ResultView({ result }: { result: Result }) {
       </section>
 
       {result.bySubject.length > 1 && (
-        <section className="rounded-2xl bg-gradient-to-br from-white to-[#f3f6f0] shadow-[0_1px_2px_rgba(20,50,40,0.05)] p-5">
+        <section className="rounded-2xl bg-gradient-to-br from-white to-marca-suave shadow-[0_1px_2px_rgba(20,50,40,0.05)] p-5">
           <h3 className="text-sm font-semibold">Por disciplina</h3>
           <ul className="mt-3 space-y-3">
             {result.bySubject.map((entry) => (
               <li key={entry.subject}>
                 <div className="flex justify-between text-sm"><span>{entry.subject}</span><span className="text-texto-2">{entry.correct}/{entry.total}</span></div>
-                <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-[#e3e8de]"><div className="h-full rounded-full bg-marca" style={{ width: `${percent(entry.correct, entry.total)}%` }} /></div>
+                <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-linha"><div className="h-full rounded-full bg-marca" style={{ width: `${percent(entry.correct, entry.total)}%` }} /></div>
               </li>
             ))}
           </ul>
@@ -115,7 +115,7 @@ export function ResultView({ result }: { result: Result }) {
           {result.items.map((item) => {
             const ok = item.feedback?.isCorrect
             return (
-              <li key={item.position} className="overflow-hidden rounded-2xl bg-gradient-to-br from-white to-[#f3f6f0] shadow-[0_1px_2px_rgba(20,50,40,0.05)]">
+              <li key={item.position} className="overflow-hidden rounded-2xl bg-gradient-to-br from-white to-marca-suave shadow-[0_1px_2px_rgba(20,50,40,0.05)]">
                 <details className="group">
                   <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3.5 [&::-webkit-details-marker]:hidden">
                     <span className={`flex size-7 shrink-0 items-center justify-center rounded-full text-white ${ok ? 'bg-sucesso' : 'bg-erro'}`}>{ok ? <Check size={15} aria-hidden /> : <X size={15} aria-hidden />}</span>

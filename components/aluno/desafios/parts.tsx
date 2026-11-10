@@ -14,7 +14,7 @@ const card = 'sf'
 function Bar({ value, tone = 'green' }: { value: number; tone?: 'green' | 'red' | 'sand' }) {
   const color = tone === 'red' || tone === 'sand' ? 'bg-aviso' : 'bg-marca'
   return (
-    <div className="h-1.5 overflow-hidden rounded-full bg-[#e8ebe3]" role="presentation">
+    <div className="h-1.5 overflow-hidden rounded-full bg-linha" role="presentation">
       <div className={`h-full rounded-full transition-[width] duration-500 motion-reduce:transition-none ${color}`} style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
     </div>
   )
@@ -63,7 +63,7 @@ function MissionRow({ mission }: { mission: Mission }) {
       </span>
       <span className="min-w-0 flex-1">
         <span className={`block text-sm font-semibold ${done ? 'text-texto-2' : 'text-texto'}`}>{mission.title}</span>
-        {mission.detail && <span className={`mt-0.5 block text-xs ${failed ? 'font-medium text-[#9a3412]' : 'text-texto-2'}`}>{mission.detail}</span>}
+        {mission.detail && <span className={`mt-0.5 block text-xs ${failed ? 'font-medium text-erro-texto' : 'text-texto-2'}`}>{mission.detail}</span>}
         <span className="mt-2 block"><Bar value={pct} tone={failed ? 'red' : 'green'} /></span>
         <span className="mt-1 block text-xs text-texto-2">{value}</span>
       </span>
@@ -160,9 +160,9 @@ export function Regras({ admission, goal }: { admission: boolean; goal: number }
     <details className={`${card} group`}>
       <summary className="flex min-h-[56px] cursor-pointer list-none items-center justify-between gap-3 px-4 text-sm font-semibold text-texto marker:hidden sm:px-5 [&::-webkit-details-marker]:hidden">
         Regras
-        <ChevronDown size={18} aria-hidden="true" className="shrink-0 text-[#9aa29c] transition-transform duration-200 group-open:rotate-180 motion-reduce:transition-none" />
+        <ChevronDown size={18} aria-hidden="true" className="shrink-0 text-texto-2 transition-transform duration-200 group-open:rotate-180 motion-reduce:transition-none" />
       </summary>
-      <ul className="space-y-2.5 border-t border-[#eceee7] px-4 py-4 text-sm leading-6 text-texto-2 sm:px-5">
+      <ul className="space-y-2.5 border-t border-linha px-4 py-4 text-sm leading-6 text-texto-2 sm:px-5">
         {rules.map((rule) => <li key={rule} className="flex gap-2"><ArrowRight size={14} className="mt-1.5 shrink-0 text-marca" aria-hidden="true" /><span>{rule}</span></li>)}
       </ul>
     </details>

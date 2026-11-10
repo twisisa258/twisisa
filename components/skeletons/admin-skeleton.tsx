@@ -45,7 +45,7 @@ export function AdminMateriaisNovoSkeleton() {
   return (
     <SkeletonRegion label="A preparar o carregamento" className={adminPageSkeletonClass}>
       <AdminHeaderSkeleton />
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-[#d6e2d9] bg-white px-6 py-16">
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-linha bg-white px-6 py-16">
         <Skeleton className="size-14 rounded-2xl" />
         <Skeleton className="h-5 w-64" />
         <Skeleton className="h-4 w-80 max-w-full" />

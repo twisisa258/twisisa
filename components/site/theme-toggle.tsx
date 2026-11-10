@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 
 const KEY = 'tw-tema'
 
-// Modo claro / escuro das páginas de exames. Segue o sistema até a pessoa escolher; a escolha fica guardada neste aparelho.
+// Modo claro / escuro de toda a plataforma. Segue o sistema até a pessoa escolher; a escolha fica guardada neste aparelho.
 export function ThemeToggle() {
   const [dark, setDark] = useState(false)
 
@@ -22,7 +22,7 @@ export function ThemeToggle() {
   }
 
   return (
-    <button type="button" className="tw6-ic" onClick={toggle} aria-label={dark ? 'Mudar para o modo claro' : 'Mudar para o modo escuro'}>
+    <button type="button" className="sh-ic" onClick={toggle} aria-label={dark ? 'Mudar para o modo claro' : 'Mudar para o modo escuro'}>
       {dark ? <Sun size={18} aria-hidden /> : <Moon size={18} aria-hidden />}
     </button>
   )

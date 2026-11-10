@@ -27,7 +27,7 @@ import { saveCandidate, savePersonal, saveSchool } from './actions'
 
 export const metadata = { title: 'O meu perfil | Twisisa', description: 'Gere as tuas informações pessoais e preferências.' }
 
-const linkButton = 'inline-flex h-10 items-center rounded-xl border border-[#dfe3d9] bg-white px-4 text-sm font-semibold text-marca transition-colors hover:bg-[#f1f4ef]'
+const linkButton = 'inline-flex h-10 items-center rounded-xl border border-linha bg-white px-4 text-sm font-semibold text-marca transition-colors hover:bg-superficie-2'
 
 export default async function PerfilPage() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -141,7 +141,7 @@ export default async function PerfilPage() {
             <Link href="/aluno/percurso" className={linkButton}>{levelName ? 'Alterar percurso' : 'Escolher percurso'}</Link>
           </div>
           {isAdmission && (
-            <div className="grid gap-4 border-t border-[#eceee7] pt-4">
+            <div className="grid gap-4 border-t border-linha pt-4">
               {institutionCourses.length === 0 ? (
                 <p className="text-sm text-texto-2">Ainda não há cursos desta instituição na plataforma.</p>
               ) : (
@@ -200,7 +200,7 @@ export default async function PerfilPage() {
             <h1 className="truncate text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">{name}</h1>
             <p className="truncate text-sm text-texto-2">{current?.nickname ? `@${current.nickname}` : session.user.email}</p>
             <div className="mt-3">
-              <div className="h-1.5 overflow-hidden rounded-full bg-[#e3e6dc]" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent} aria-label="Perfil completo">
+              <div className="h-1.5 overflow-hidden rounded-full bg-linha" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent} aria-label="Perfil completo">
                 <div className="h-full rounded-full bg-marca transition-[width] duration-500 motion-reduce:transition-none" style={{ width: `${percent}%` }} />
               </div>
               <p className="mt-1.5 flex items-center gap-1 text-xs text-texto-2">

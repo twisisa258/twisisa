@@ -7,7 +7,7 @@ export const adminPageSkeletonClass = 'flex min-h-[28rem] flex-1 flex-col gap-4'
 
 export function AdminHeaderSkeleton({ withAction = true }: { withAction?: boolean }) {
   return (
-    <div className="flex shrink-0 items-center justify-between gap-3 rounded-2xl border border-[#d5e5da] bg-gradient-to-br from-[#d9eadf] via-[#e9f3ec] to-[#f6f8f3] px-4 py-4 sm:px-6 sm:py-5">
+    <div className="flex shrink-0 items-center justify-between gap-3 rounded-2xl border border-linha bg-gradient-to-br from-marca-suave via-marca-suave to-marca-suave px-4 py-4 sm:px-6 sm:py-5">
       <div className="flex min-w-0 items-center gap-3">
         <Skeleton className="size-11 shrink-0 rounded-2xl bg-white/80" />
         <div>
@@ -31,7 +31,7 @@ export function AdminToolbarSkeleton() {
 
 export function AdminTabsSkeleton({ count = 2 }: { count?: number }) {
   return (
-    <div className="grid shrink-0 gap-1 rounded-xl bg-[#eceee8] p-1" style={{ gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))` }}>
+    <div className="grid shrink-0 gap-1 rounded-xl bg-linha p-1" style={{ gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))` }}>
       {Array.from({ length: count }).map((_, i) => (
         <Skeleton key={i} className="h-10 rounded-lg bg-white/70" />
       ))}
@@ -42,9 +42,9 @@ export function AdminTabsSkeleton({ count = 2 }: { count?: number }) {
 export function AdminPanelSkeleton({ children, pager = true }: { children: React.ReactNode; pager?: boolean }) {
   return (
     <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-linha bg-white">
-      <div className="min-h-0 flex-1 divide-y divide-[#edf0e9] overflow-hidden px-4 sm:px-5">{children}</div>
+      <div className="min-h-0 flex-1 divide-y divide-linha overflow-hidden px-4 sm:px-5">{children}</div>
       {pager && (
-        <div className="flex shrink-0 items-center justify-between gap-3 border-t border-[#edf0e9] px-4 py-3 sm:px-5">
+        <div className="flex shrink-0 items-center justify-between gap-3 border-t border-linha px-4 py-3 sm:px-5">
           <Skeleton className="h-4 w-16" />
           <Skeleton className="h-3 w-24" />
           <Skeleton className="h-4 w-16" />

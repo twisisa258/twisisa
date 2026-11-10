@@ -27,7 +27,7 @@ export default async function HistoricoPage() {
         <Link href="/aluno/simulador" className="inline-flex items-center gap-2 text-xs font-semibold text-texto-2 hover:text-marca"><ArrowLeft size={14} aria-hidden />Voltar ao Simulador</Link>
 
         {!history ? (
-          <div role="alert" className="rounded-2xl bg-gradient-to-br from-white to-[#f3f6f0] shadow-[0_1px_2px_rgba(20,50,40,0.05)] px-5 py-10 text-center">
+          <div role="alert" className="rounded-2xl bg-gradient-to-br from-white to-marca-suave shadow-[0_1px_2px_rgba(20,50,40,0.05)] px-5 py-10 text-center">
             <h2 className="text-base font-semibold">Não foi possível carregar o histórico</h2>
             <Link href="/aluno/simulador/historico" className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-marca px-5 text-sm font-semibold text-white">Tentar de novo</Link>
           </div>
@@ -36,7 +36,7 @@ export default async function HistoricoPage() {
         ) : (
           <>
             {totals && totals.total > 0 && (
-              <p className="rounded-2xl bg-gradient-to-br from-white to-[#f3f6f0] shadow-[0_1px_2px_rgba(20,50,40,0.05)] px-4 py-3 text-sm text-texto-2">
+              <p className="rounded-2xl bg-gradient-to-br from-white to-marca-suave shadow-[0_1px_2px_rgba(20,50,40,0.05)] px-4 py-3 text-sm text-texto-2">
                 <span className="font-semibold text-texto">{history.entries.length} {history.entries.length === 1 ? 'sessão' : 'sessões'}</span> · {percent(totals.correct, totals.total)}% de acertos no total
               </p>
             )}
@@ -55,7 +55,7 @@ export default async function HistoricoPage() {
                 const pct = percent(entry.correct, entry.total)
                 return (
                   <li key={entry.id}>
-                    <Link href={`/aluno/simulador/sessao/${entry.id}`} className="flex items-center gap-3 rounded-2xl bg-gradient-to-br from-white to-[#f3f6f0] shadow-[0_1px_2px_rgba(20,50,40,0.05)] px-4 py-3.5 transition-transform hover:-translate-y-0.5">
+                    <Link href={`/aluno/simulador/sessao/${entry.id}`} className="flex items-center gap-3 rounded-2xl bg-gradient-to-br from-white to-marca-suave shadow-[0_1px_2px_rgba(20,50,40,0.05)] px-4 py-3.5 transition-transform hover:-translate-y-0.5">
                       <span className="flex size-10 shrink-0 items-center justify-center rounded-[14px] bg-marca/[0.08] text-marca"><Icon size={20} aria-hidden /></span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm font-semibold">{MODE_META[entry.mode].label}{entry.subject ? ` · ${entry.subject}` : ''}</span>

@@ -50,7 +50,7 @@ export function ProfileAccordion({ items }: { items: AccordionItem[] }) {
 
   return (
     <AccordionContext.Provider value={{ saved }}>
-      <div className="divide-y divide-[#eceee7] overflow-hidden rounded-2xl border border-[#e3e6dc] bg-white">
+      <div className="divide-y divide-linha overflow-hidden rounded-2xl border border-linha bg-white">
         {items.map((item) => {
           const open = openId === item.id
           const flash = savedId === item.id
@@ -65,7 +65,7 @@ export function ProfileAccordion({ items }: { items: AccordionItem[] }) {
                   onClick={() => setOpenId(open ? null : item.id)}
                   className="flex min-h-[68px] w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-fundo focus-visible:bg-fundo focus-visible:outline-none sm:px-5"
                 >
-                  <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#eef3ee] text-marca [&>svg]:size-[18px]">{item.icon}</span>
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-superficie-2 text-marca [&>svg]:size-[18px]">{item.icon}</span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-sm font-semibold text-texto">{item.title}</span>
                     <span className={`block truncate text-xs ${flash ? 'font-semibold text-marca' : 'text-texto-2'}`}>{flash ? 'Guardado' : item.summary}</span>
@@ -74,7 +74,7 @@ export function ProfileAccordion({ items }: { items: AccordionItem[] }) {
                     <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-marca text-white" role="img" aria-label="Completo"><Check size={12} strokeWidth={3} aria-hidden="true" /></span>
                   )}
                   {item.done === false && <span className="size-5 shrink-0 rounded-full border-[1.5px] border-dashed border-[#b9c0b4]" role="img" aria-label="Por completar" />}
-                  <ChevronDown size={18} aria-hidden="true" className={`shrink-0 text-[#9aa29c] transition-transform duration-200 motion-reduce:transition-none ${open ? 'rotate-180' : ''}`} />
+                  <ChevronDown size={18} aria-hidden="true" className={`shrink-0 text-texto-2 transition-transform duration-200 motion-reduce:transition-none ${open ? 'rotate-180' : ''}`} />
                 </button>
               </h2>
               <div

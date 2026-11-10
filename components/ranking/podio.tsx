@@ -21,13 +21,13 @@ function Lugar({ row, index }: { row?: RankingRow; index: 0 | 1 | 2 }) {
   return (
     <li className="flex min-w-0 flex-col items-center">
       <div className="relative flex flex-col items-center">
-        {primeiro && row && <Crown size={22} fill="#f2c14e" className="mb-1 text-[#b7791f]" aria-hidden="true" />}
+        {primeiro && row && <Crown size={22} fill="#f2c14e" className="mb-1 text-conquista-texto" aria-hidden="true" />}
         <span className="rounded-full p-[3px]" style={{ background: row ? t.aro : '#e3e6dc' }}>
           <span className="block rounded-full bg-white p-[2px]">
             {row ? (
               <Avatar name={row.name} image={row.image} size={tamanho} />
             ) : (
-              <span className="flex items-center justify-center rounded-full bg-[#f3f4ef] text-[#a3aaa4]" style={{ width: tamanho, height: tamanho }}><UserRound size={tamanho * 0.42} aria-hidden="true" /></span>
+              <span className="flex items-center justify-center rounded-full bg-superficie-2 text-[#a3aaa4]" style={{ width: tamanho, height: tamanho }}><UserRound size={tamanho * 0.42} aria-hidden="true" /></span>
             )}
           </span>
         </span>

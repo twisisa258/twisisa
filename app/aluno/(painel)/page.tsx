@@ -10,9 +10,9 @@ import { getAlunoOverview, type MaterialItem, type Part } from '@/lib/aluno-over
 import { isTrack, levelLabel, type Track } from '@/lib/percurso'
 import { relativeTime } from '@/lib/relative-time'
 import { cn } from '@/lib/utils'
-import { StudentSidebar } from '@/components/student-sidebar'
+import { AlunoAside } from '@/components/shell/aluno-aside'
+import { AppHeader } from '@/components/shell/app-header'
 import { UrlFeedback } from '@/components/url-feedback'
-import { AlunoMenuButton } from '@/components/aluno/aluno-menu-button'
 import { Ic } from '@/components/aluno/icons'
 import { DescobreCursoCard, ProgressoPorDisciplina } from '@/components/aluno/inicio-cards'
 import { getInicioAluno, type ResumeItem } from '@/lib/aluno-inicio'
@@ -58,7 +58,7 @@ function ListEmpty({ title, text }: { title: string; text: string }) {
 function MaterialCard({ tone, items, emptyTitle, emptyText }: { tone: 'white' | 'sand'; items: Part<MaterialItem[]>; emptyTitle: string; emptyText: string }) {
   const sand = tone === 'sand'
   return (
-    <div className={cn('overflow-hidden rounded-[18px]', soft, sand ? 'bg-gradient-to-br from-[#fbf8ee] to-[#f2ecd9]' : 'bg-gradient-to-br from-white to-[#f6f8f3]')}>
+    <div className={cn('overflow-hidden rounded-[18px]', soft, sand ? 'bg-gradient-to-br from-[#fbf8ee] to-[#f2ecd9]' : 'bg-gradient-to-br from-white to-marca-suave')}>
       {!items.ok ? (
         <ListEmpty title="Não foi possível carregar" text="Tenta outra vez mais tarde." />
       ) : items.value.length === 0 ? (
@@ -186,37 +186,15 @@ export default async function StudentPage({ searchParams }: { searchParams: Prom
   const activity = activityParts.join(' · ')
 
   return (
-    <main className="min-h-screen max-w-full overflow-x-hidden bg-fundo text-texto" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+    <main id="conteudo" className="min-h-screen max-w-full overflow-x-hidden bg-fundo text-texto" style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
       <UrlFeedback />
       <NotificacoesModal publicKey={process.env.VAPID_PUBLIC_KEY ?? ''} />
       <InstalarBarra />
       {track && <NovidadeModal />}
-      <div className="flex min-h-screen">
-        <StudentSidebar firstName={firstName} image={session.user.image ?? null} />
-        <div className="w-0 min-w-0 flex-1 overflow-x-clip leading-[normal]">
-          <header className="flex h-[60px] items-center justify-between border-b border-[#eceee7] px-[16px] lg:px-8">
-            <div className="flex items-center gap-[8px]">
-              <AlunoMenuButton firstName={firstName} image={session.user.image ?? null} />
-              <Link href="/aluno" className="text-[18px] font-semibold tracking-[-0.04em] lg:hidden">
-                Twisisa
-              </Link>
-            </div>
-            <div className="flex items-center gap-[4px]">
-              {staffRole && (
-                <Link href={staffRole === 'admin' ? '/admin' : '/admin/questoes'} className="inline-flex h-[32px] items-center rounded-[16px] bg-gradient-to-br from-[#eaf1ec] to-[#dbe9e0] px-[12px] text-[12px] font-semibold text-marca no-underline">
-                  {staffRole === 'admin' ? 'Administração' : 'Revisão'}
-                </Link>
-              )}
-              <Link
-                href="/aluno/notificacoes"
-                aria-label={unreadCount > 0 ? `Notificações, ${unreadCount} por ler` : 'Notificações'}
-                className="relative flex size-[44px] items-center justify-center text-[#4d5851]"
-              >
-                <Ic name="bell" />
-                {unreadCount > 0 && <span className="absolute right-[11px] top-[11px] size-[8px] rounded-[4px] bg-[#c27645]" />}
-              </Link>
-            </div>
-          </header>
+      <div className="sh-app">
+        <AlunoAside firstName={firstName} image={session.user.image ?? null} />
+        <div className="sh-main min-w-0 overflow-x-clip leading-[normal]">
+          <AppHeader aluno={{ firstName, image: session.user.image ?? null }} unread={unreadCount} staff={staffRole ? { href: staffRole === 'admin' ? '/admin' : '/admin/questoes', label: staffRole === 'admin' ? 'Administração' : 'Revisão' } : null} />
 
           <div className="mx-auto flex w-full max-w-[560px] flex-col gap-[16px] px-[16px] pb-[24px] pt-[12px] lg:px-8 lg:pb-12 lg:pt-8">
             <div className="flex min-w-0 flex-col gap-[16px]">
@@ -228,7 +206,7 @@ export default async function StudentPage({ searchParams }: { searchParams: Prom
                 <Link
                   href="/aluno/percurso"
                   aria-label={`Mudar percurso: ${chipLabel}`}
-                  className="inline-flex h-[32px] flex-none items-center gap-[2px] rounded-[16px] bg-gradient-to-br from-[#eaf1ec] to-[#d9e8de] pl-[12px] pr-[8px] text-[12px] font-semibold text-marca no-underline"
+                  className="inline-flex h-[32px] flex-none items-center gap-[2px] rounded-[16px] bg-gradient-to-br from-marca-suave to-marca-suave pl-[12px] pr-[8px] text-[12px] font-semibold text-marca no-underline"
                 >
                   {chipLabel}
                   <Ic name="chev" size={14} />

@@ -20,7 +20,7 @@ const SHORTCUTS: { action: Exclude<ExplainAction, 'passo' | 'pergunta' | 'porque
   { action: 'resumo', label: 'Resumo' },
 ]
 
-const chip = 'inline-flex h-9 shrink-0 items-center rounded-full bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] px-3.5 text-[13px] font-semibold text-marca shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_1px_4px_rgba(29,77,65,0.10)] ring-1 ring-marca/10 transition active:scale-[0.98] hover:from-[#e2eee7] hover:to-[#cbe0d3] disabled:opacity-50'
+const chip = 'inline-flex h-9 shrink-0 items-center rounded-full bg-gradient-to-br from-marca-suave to-marca-suave px-3.5 text-[13px] font-semibold text-marca shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_1px_4px_rgba(29,77,65,0.10)] ring-1 ring-marca/10 transition active:scale-[0.98] hover:from-marca-suave hover:to-[#cbe0d3] disabled:opacity-50'
 
 /**
  * Folha com a explicação do Jonas para UMA questão já respondida. Fica montada enquanto a questão está no ecrã:
@@ -143,9 +143,9 @@ export function JonasExplainSheet({ attemptId, position, open, onClose, official
           <JonasAvatar size={30} />
           <div className="min-w-0 flex-1">
             <p className="text-[15px] font-semibold leading-5">Jonas</p>
-            <p className="text-[12px] leading-4 text-[#7d887f]">{startWith === 'porque' ? 'Porque errei' : 'Explicação passo a passo'}</p>
+            <p className="text-[12px] leading-4 text-texto-2">{startWith === 'porque' ? 'Porque errei' : 'Explicação passo a passo'}</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="Fechar" autoFocus className="flex size-10 items-center justify-center rounded-full text-texto-2 hover:bg-[#eef0e9]"><X size={19} aria-hidden="true" /></button>
+          <button type="button" onClick={onClose} aria-label="Fechar" autoFocus className="flex size-10 items-center justify-center rounded-full text-texto-2 hover:bg-superficie-2"><X size={19} aria-hidden="true" /></button>
         </div>
 
         <div ref={body} onScroll={onScroll} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-3">
@@ -167,21 +167,21 @@ export function JonasExplainSheet({ attemptId, position, open, onClose, official
           </div>
 
           {showOfficial && (
-            <div className="mt-3 rounded-2xl bg-[#f6f8f3] p-4 text-[15px] leading-7 text-[#2b332d]">
+            <div className="mt-3 rounded-2xl bg-superficie-2 p-4 text-[15px] leading-7 text-texto">
               <p className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-marca"><Lightbulb size={13} aria-hidden="true" />Explicação da equipa</p>
               <MathText text={officialExplanation} />
             </div>
           )}
 
           {error && (
-            <div role="alert" className="mt-3 flex items-center gap-2 rounded-2xl bg-[#fcefee] py-2 pl-4 pr-2 text-[13.5px] text-[#8e3730]">
+            <div role="alert" className="mt-3 flex items-center gap-2 rounded-2xl bg-erro-suave py-2 pl-4 pr-2 text-[13.5px] text-erro-texto">
               <span className="min-w-0 flex-1">{error}</span>
               {!streaming && <button type="button" onClick={retry} className="inline-flex h-8 shrink-0 items-center gap-1 rounded-full bg-white px-3 text-[12.5px] font-semibold"><RotateCcw size={12} aria-hidden="true" />Tentar de novo</button>}
             </div>
           )}
         </div>
 
-        <div className="flex-none space-y-2.5 border-t border-[#eef0e9] px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
+        <div className="flex-none space-y-2.5 border-t border-linha px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
           {hasAnswer && (
             <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-0.5 [scrollbar-width:none]">
               {!passoDone && <button type="button" disabled={streaming} onClick={() => void ask('passo')} className={chip}>Passo a passo</button>}
@@ -190,10 +190,10 @@ export function JonasExplainSheet({ attemptId, position, open, onClose, official
               ))}
             </div>
           )}
-          <form onSubmit={submit} className="flex items-center gap-2 rounded-full bg-[#f4f6f1] p-1.5 pl-4 ring-1 ring-black/[0.04] focus-within:ring-2 focus-within:ring-marca/25">
+          <form onSubmit={submit} className="flex items-center gap-2 rounded-full bg-superficie-2 p-1.5 pl-4 ring-1 ring-black/[0.04] focus-within:ring-2 focus-within:ring-marca/25">
             <Sparkles size={15} className="shrink-0 text-marca" aria-hidden="true" />
             <label htmlFor={`jonas-q-${position}`} className="sr-only">Pergunta ao Jonas sobre esta questão</label>
-            <input id={`jonas-q-${position}`} value={input} maxLength={1000} onChange={(event) => setInput(event.target.value)} placeholder="Pergunta ao Jonas sobre esta questão…" className="h-9 min-w-0 flex-1 bg-transparent text-[14.5px] outline-none placeholder:text-[#98a19a]" />
+            <input id={`jonas-q-${position}`} value={input} maxLength={1000} onChange={(event) => setInput(event.target.value)} placeholder="Pergunta ao Jonas sobre esta questão…" className="h-9 min-w-0 flex-1 bg-transparent text-[14.5px] outline-none placeholder:text-texto-2" />
             <button type="submit" disabled={!input.trim() || streaming || loading} aria-label="Enviar pergunta" className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2f7260] to-marca text-white disabled:opacity-35"><ArrowUp size={17} aria-hidden="true" /></button>
           </form>
         </div>

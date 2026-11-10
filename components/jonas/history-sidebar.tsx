@@ -57,7 +57,7 @@ export function HistorySidebar({
   }
 
   return (
-    <div ref={root} className="flex h-full min-h-0 flex-col bg-[#f2f4ee]">
+    <div ref={root} className="flex h-full min-h-0 flex-col bg-superficie-2">
       <div className="flex items-center gap-2 px-3 pb-2 pt-3">
         <button
           type="button"
@@ -66,7 +66,7 @@ export function HistorySidebar({
         >
           <Plus size={17} aria-hidden="true" /> Nova conversa
         </button>
-        <button type="button" onClick={onClose} aria-label="Fechar o histórico" className="flex size-11 shrink-0 items-center justify-center rounded-full text-[#5d675f] hover:bg-[#e6eae0] lg:hidden">
+        <button type="button" onClick={onClose} aria-label="Fechar o histórico" className="flex size-11 shrink-0 items-center justify-center rounded-full text-texto-2 hover:bg-linha lg:hidden">
           <X size={19} aria-hidden="true" />
         </button>
       </div>
@@ -74,8 +74,8 @@ export function HistorySidebar({
       <div className="px-3 pb-2">
         <label className="relative block">
           <span className="sr-only">Pesquisar conversas</span>
-          <Search size={15} aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8a948c]" />
-          <input value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Pesquisar conversas" className="h-10 w-full rounded-full bg-white/80 pl-9 pr-3 text-[14px] outline-none ring-1 ring-black/[0.05] placeholder:text-[#98a19a] focus:ring-2 focus:ring-marca/25" />
+          <Search size={15} aria-hidden="true" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-texto-2" />
+          <input value={term} onChange={(event) => setTerm(event.target.value)} placeholder="Pesquisar conversas" className="h-10 w-full rounded-full bg-white/80 pl-9 pr-3 text-[14px] outline-none ring-1 ring-black/[0.05] placeholder:text-texto-2 focus:ring-2 focus:ring-marca/25" />
         </label>
       </div>
 
@@ -86,7 +86,7 @@ export function HistorySidebar({
 
         {groups.map((group) => (
           <section key={group.label} className="mt-3">
-            <h2 className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#7d887f]">{group.label}</h2>
+            <h2 className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-texto-2">{group.label}</h2>
             <ul className="space-y-0.5">
               {group.items.map((item) => {
                 const active = item.id === activeId
@@ -103,16 +103,16 @@ export function HistorySidebar({
                         <input autoFocus value={renameValue} maxLength={120} onChange={(event) => setRenameValue(event.target.value)} onBlur={() => void commitRename(item.id)} onKeyDown={(event) => event.key === 'Escape' && setRenamingId(null)} aria-label="Novo nome da conversa" className="h-10 w-full rounded-xl bg-white px-3 text-[14px] outline-none ring-2 ring-marca/30" />
                       </form>
                     ) : confirmId === item.id ? (
-                      <div className="flex items-center gap-2 rounded-xl bg-[#fbeceb] px-3 py-2">
-                        <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-[#8a3a33]">Eliminar esta conversa?</span>
+                      <div className="flex items-center gap-2 rounded-xl bg-erro-suave px-3 py-2">
+                        <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-erro-texto">Eliminar esta conversa?</span>
                         <button type="button" disabled={busyId === item.id} onClick={async () => { await onDelete(item.id); setConfirmId(null) }} className="h-8 rounded-full bg-[#b5473d] px-3 text-[12px] font-semibold text-white disabled:opacity-60">Eliminar</button>
                         <button type="button" onClick={() => setConfirmId(null)} className="h-8 rounded-full px-2 text-[12px] font-semibold text-texto-2 hover:bg-white/70">Não</button>
                       </div>
                     ) : (
-                      <div className={`group flex items-center rounded-xl transition-colors ${active ? 'bg-gradient-to-br from-[#e1ece5] to-[#d3e3d9]' : 'hover:bg-[#e8ece2]'}`}>
+                      <div className={`group flex items-center rounded-xl transition-colors ${active ? 'bg-gradient-to-br from-marca-suave to-marca-suave' : 'hover:bg-linha'}`}>
                         <button type="button" onClick={() => onOpen(item.id)} aria-current={active ? 'page' : undefined} className="min-w-0 flex-1 px-3 py-2.5 text-left">
-                          <span className={`block truncate text-[14px] leading-5 ${active ? 'font-semibold text-marca' : 'font-medium text-[#2b332d]'}`}>{item.title}</span>
-                          {item.subjectName && <span className="mt-0.5 block truncate text-[11.5px] text-[#7d887f]">{item.subjectName}</span>}
+                          <span className={`block truncate text-[14px] leading-5 ${active ? 'font-semibold text-marca' : 'font-medium text-texto'}`}>{item.title}</span>
+                          {item.subjectName && <span className="mt-0.5 block truncate text-[11.5px] text-texto-2">{item.subjectName}</span>}
                         </button>
                         <div data-row-menu className="relative shrink-0 pr-1">
                           <button type="button" onClick={() => setMenuId((current) => (current === item.id ? null : item.id))} aria-label={`Mais opções: ${item.title}`} aria-expanded={menuId === item.id} className="flex size-9 items-center justify-center rounded-full text-texto-2 opacity-100 hover:bg-white/70 lg:opacity-0 lg:group-hover:opacity-100 lg:focus-visible:opacity-100">
@@ -120,8 +120,8 @@ export function HistorySidebar({
                           </button>
                           {menuId === item.id && (
                             <div role="menu" className="absolute right-1 top-9 z-20 w-40 overflow-hidden rounded-xl bg-white py-1 shadow-[0_8px_24px_rgba(20,50,40,0.18)] ring-1 ring-black/[0.06]">
-                              <button role="menuitem" type="button" onClick={() => { setMenuId(null); setRenameValue(item.title); setRenamingId(item.id) }} className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-[13.5px] hover:bg-[#f3f6f0]"><Pencil size={15} aria-hidden="true" />Mudar o nome</button>
-                              <button role="menuitem" type="button" onClick={() => { setMenuId(null); setConfirmId(item.id) }} className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-[13.5px] text-[#a0443b] hover:bg-[#fbeceb]"><Trash2 size={15} aria-hidden="true" />Eliminar</button>
+                              <button role="menuitem" type="button" onClick={() => { setMenuId(null); setRenameValue(item.title); setRenamingId(item.id) }} className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-[13.5px] hover:bg-superficie-2"><Pencil size={15} aria-hidden="true" />Mudar o nome</button>
+                              <button role="menuitem" type="button" onClick={() => { setMenuId(null); setConfirmId(item.id) }} className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-[13.5px] text-erro-texto hover:bg-erro-suave"><Trash2 size={15} aria-hidden="true" />Eliminar</button>
                             </div>
                           )}
                         </div>

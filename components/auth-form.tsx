@@ -96,10 +96,10 @@ export function AuthForm({ mode, googleEnabled, next }: { mode: 'sign-in' | 'sig
             onChange={(event) => setEmail(event.target.value)}
             onBlur={() => setTouched((current) => ({ ...current, email: true }))}
             aria-invalid={touched.email && !!emailError}
-            className={`${inputClass} ${touched.email && emailError ? 'border-[#c9503c]' : 'border-[#dfe1d9]'}`}
+            className={`${inputClass} ${touched.email && emailError ? 'border-[#c9503c]' : 'border-linha'}`}
             placeholder="tu@email.com"
           />
-          {touched.email && emailError && <p className="text-[13px] text-[#b03a28]">{emailError}</p>}
+          {touched.email && emailError && <p className="text-[13px] text-erro-texto">{emailError}</p>}
           {suggestion && (
             <p className="text-[13px] text-texto-2">
               Querias dizer{' '}
@@ -119,7 +119,7 @@ export function AuthForm({ mode, googleEnabled, next }: { mode: 'sign-in' | 'sig
               onChange={(event) => setPassword(event.target.value)}
               onBlur={() => setTouched((current) => ({ ...current, password: true }))}
               aria-invalid={touched.password && !!passwordError}
-              className={`${inputClass} pr-12 ${touched.password && passwordError ? 'border-[#c9503c]' : 'border-[#dfe1d9]'}`}
+              className={`${inputClass} pr-12 ${touched.password && passwordError ? 'border-[#c9503c]' : 'border-linha'}`}
               placeholder={signUp ? 'Mínimo 8 caracteres' : 'A tua palavra-passe'}
             />
             <button
@@ -139,11 +139,11 @@ export function AuthForm({ mode, googleEnabled, next }: { mode: 'sign-in' | 'sig
               <span className="w-[62px] text-right text-[12px] text-texto-2">{STRENGTH_LABEL[strength]}</span>
             </div>
           )}
-          {signUp && touched.password && passwordError && <p className="text-[13px] text-[#b03a28]">{passwordError}</p>}
+          {signUp && touched.password && passwordError && <p className="text-[13px] text-erro-texto">{passwordError}</p>}
         </div>
 
         {signUp ? (
-          <label className="flex items-start gap-3 text-[13px] leading-5 text-[#4d5851]">
+          <label className="flex items-start gap-3 text-[13px] leading-5 text-texto-2">
             <input type="checkbox" checked={accepted} onChange={(event) => setAccepted(event.target.checked)} className="mt-0.5 size-5 shrink-0 accent-marca" />
             <span>
               Aceito os <Link href="/termos" target="_blank" className="font-semibold text-marca underline">Termos</Link> e a <Link href="/privacidade" target="_blank" className="font-semibold text-marca underline">Privacidade</Link>.
@@ -151,7 +151,7 @@ export function AuthForm({ mode, googleEnabled, next }: { mode: 'sign-in' | 'sig
           </label>
         ) : (
           <div className="flex items-center justify-between gap-3">
-            <label className="flex items-center gap-2.5 text-[13px] text-[#4d5851]">
+            <label className="flex items-center gap-2.5 text-[13px] text-texto-2">
               <input type="checkbox" checked={shared} onChange={(event) => setShared(event.target.checked)} className="size-5 shrink-0 accent-marca" />
               Computador partilhado
             </label>
@@ -173,11 +173,11 @@ export function AuthForm({ mode, googleEnabled, next }: { mode: 'sign-in' | 'sig
         disabled={!googleEnabled || busy || (signUp && !accepted)}
         aria-busy={googleLoading}
         title={googleEnabled ? undefined : 'Entrar com Google estará disponível em breve'}
-        className="inline-flex items-center justify-center gap-2.5 rounded-full border border-[#dfe1d9] bg-white px-5 py-3 text-sm font-semibold text-texto transition hover:bg-[#f6f7f2] disabled:cursor-not-allowed disabled:opacity-50"
+        className="inline-flex items-center justify-center gap-2.5 rounded-full border border-linha bg-white px-5 py-3 text-sm font-semibold text-texto transition hover:bg-superficie-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {googleLoading ? <Spinner /> : <GoogleMark />}
         Continuar com Google
-        {!googleEnabled && <span className="rounded-full bg-[#f1f2ec] px-2 py-0.5 text-[11px] font-semibold text-texto-2">Em breve</span>}
+        {!googleEnabled && <span className="rounded-full bg-superficie-2 px-2 py-0.5 text-[11px] font-semibold text-texto-2">Em breve</span>}
       </button>
     </div>
   )

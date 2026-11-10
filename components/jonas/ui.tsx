@@ -42,7 +42,7 @@ export function CopyButton({ text, className = '' }: { text: string; className?:
           // sem permissão da área de transferência: nada a fazer
         }
       }}
-      className={`inline-flex h-8 items-center gap-1.5 rounded-full px-2.5 text-xs font-semibold text-texto-2 transition-colors hover:bg-[#eef1e9] hover:text-marca ${className}`}
+      className={`inline-flex h-8 items-center gap-1.5 rounded-full px-2.5 text-xs font-semibold text-texto-2 transition-colors hover:bg-superficie-2 hover:text-marca ${className}`}
     >
       {copied ? <Check size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
       {copied ? 'Copiado' : 'Copiar'}

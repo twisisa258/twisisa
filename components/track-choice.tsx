@@ -7,7 +7,7 @@ import { isPresetLevel, OTHER_LEVEL_MAX, OTHER_LEVELS, TRACKS, type Track } from
 export type TrackValue = { track: Track | null; otherLevel: string | null }
 
 const option = (selected: boolean) =>
-  `flex h-[48px] w-full items-center justify-between rounded-2xl border px-4 text-left text-[15px] font-semibold transition ${selected ? 'border-2 border-marca bg-[#f3f7f4] text-marca' : 'border-linha bg-white text-texto hover:border-marca'}`
+  `flex h-[48px] w-full items-center justify-between rounded-2xl border px-4 text-left text-[15px] font-semibold transition ${selected ? 'border-2 border-marca bg-superficie-2 text-marca' : 'border-linha bg-white text-texto hover:border-marca'}`
 
 // Escolha do percurso. Principais: 10ª, 12ª, Admissão e Outra. Ao tocar em «Outra», as principais saem e entram a 8ª, a 9ª, a 11ª
 // e um campo para escrever outra classe. A seta no topo volta às principais. Usado no onboarding e em /aluno/percurso.
@@ -38,7 +38,7 @@ export function TrackChoice({ value, onChange, disabled = false }: { value: Trac
           maxLength={OTHER_LEVEL_MAX}
           placeholder="Outra: escreve aqui"
           aria-label="Outra classe, escreve qual"
-          className={`h-[48px] w-full rounded-2xl border px-4 text-[15px] font-semibold outline-none placeholder:font-normal placeholder:text-[#3f6357] focus:border-marca ${custom ? 'border-2 border-marca bg-[#f3f7f4]' : 'border-linha bg-white'}`}
+          className={`h-[48px] w-full rounded-2xl border px-4 text-[15px] font-semibold outline-none placeholder:font-normal placeholder:text-marca focus:border-marca ${custom ? 'border-2 border-marca bg-superficie-2' : 'border-linha bg-white'}`}
         />
       </div>
     )

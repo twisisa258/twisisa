@@ -13,7 +13,7 @@ export function QuestionImage({ image, priority = false, zoomable = true }: { im
 
   if (failed) {
     return (
-      <div className="rounded-2xl border border-dashed border-[#d5dacd] bg-fundo p-4 text-center text-sm text-texto-2">
+      <div className="rounded-2xl border border-dashed border-linha bg-fundo p-4 text-center text-sm text-texto-2">
         <p>{image.alt}</p>
         <button type="button" onClick={() => { setFailed(false); setAttempt((n) => n + 1) }} className="mt-2 font-semibold text-marca hover:underline">Tentar de novo</button>
       </div>

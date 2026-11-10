@@ -7,7 +7,7 @@ import { authClient } from '@/lib/auth-client'
 import { useFeedback } from '@/components/feedback-provider'
 import { Spinner } from '@/components/ui/spinner'
 
-const input = 'rounded-xl border border-[#dfe1d9] bg-white px-4 py-3 outline-none focus:border-marca'
+const input = 'rounded-xl border border-linha bg-white px-4 py-3 outline-none focus:border-marca'
 const button = 'inline-flex items-center justify-center gap-2 rounded-full bg-marca px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#153e34] disabled:opacity-60'
 
 // Passo 1: pedir a ligação. A resposta é sempre a mesma, exista a conta ou não.
@@ -35,8 +35,8 @@ export function RequestResetForm() {
   if (sentTo) {
     return (
       <div className="flex flex-col gap-5">
-        <p className="rounded-xl bg-[#eef5ef] px-4 py-3 text-sm leading-6 text-marca">Se existir uma conta com <strong className="break-all">{sentTo}</strong>, enviámos uma ligação para escolheres uma nova palavra-passe. Vale 1 hora. Se não a vires, procura na pasta de spam.</p>
-        <button type="button" onClick={() => setSentTo(null)} className="rounded-full border border-[#d7d9d0] bg-white px-5 py-3.5 text-sm font-semibold text-[#39433e] transition hover:border-marca">Usar outro e-mail</button>
+        <p className="rounded-xl bg-superficie-2 px-4 py-3 text-sm leading-6 text-marca">Se existir uma conta com <strong className="break-all">{sentTo}</strong>, enviámos uma ligação para escolheres uma nova palavra-passe. Vale 1 hora. Se não a vires, procura na pasta de spam.</p>
+        <button type="button" onClick={() => setSentTo(null)} className="rounded-full border border-linha bg-white px-5 py-3.5 text-sm font-semibold text-texto transition hover:border-marca">Usar outro e-mail</button>
       </div>
     )
   }

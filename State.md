@@ -39,6 +39,12 @@ Estados: FEITO E TESTADO · FEITO, FALTA TESTE · FICTÍCIO (dados inventados) �
 | `/planos` | FEITO | Mostra 197 MT/mês (`lib/plano.ts`). Sem Stripe. O pagamento por meios locais ainda não existe; nada na plataforma é reservado a quem paga. |
 | `/blog` | FEITO, FALTA TESTE | Artigos reais da base de dados (`blog_posts`, migração 0039), escritos em `/admin/blog`. Listagem em `/blog`, artigo em `/blog/[slug]`, pré-visualização em `/blog/pre-visualizar/[id]`, RSS em `/blog/feed.xml`. Sem artigos publicados mostra o estado vazio. |
 
+## Moldura (cabeçalho, menu, tema)
+- **FEITO, FALTA TESTE** (10/11/2026): cabeçalho fixo e mínimo, menu lateral do aluno e botão claro/escuro iguais em todas as áreas (aluno, exames, simulado, blog, planos, termos, privacidade; entrar e criar conta só com o botão do tema). Regras em `DESIGN.md`.
+- Modo escuro nas páginas do aluno: tokens novos e troca automática de cerca de 250 cores `#hex` por tokens. Ficam algumas cores fixas (degradês e fundos escuros): rever à vista no telemóvel, página a página.
+- Por testar: menu lateral em `/exames` com sessão (a pista `tw-shell` evita o salto), gaveta no telemóvel, notificações com ponto, contraste no escuro.
+- Fora da moldura de propósito: `/aluno/bem-vindo`, sessão do Treinar, Jonas, `/admin`, `/esqueci-a-senha` e `/redefinir-senha`.
+
 ## Administração (`/admin`)
 Instituições, Disciplinas, Temas, Classificação (categorias e níveis), Módulos, Materiais, Banco de questões, Variantes, Cursos, Equipa, Jonas (modelo), Blog (artigos). Todas FEITO, FALTA TESTE no telemóvel.
 - Formulários usam `FeedbackForm`: durante o envio os campos ficam desactivados e o botão de envio mostra um indicador (CSS em `app/globals.css`, marcador `Estado de processamento`).

@@ -149,7 +149,7 @@ export function SelectField({
         onKeyDown={onTriggerKeyDown}
         className={`flex w-full items-center justify-between gap-2 text-left ${triggerClassName}`}
       >
-        <span className={`min-w-0 flex-1 truncate ${selected ? '' : 'text-[#6f7871]'}`}>
+        <span className={`min-w-0 flex-1 truncate ${selected ? '' : 'text-texto-2'}`}>
           {selected ? selected.label : placeholder}
         </span>
         <svg
@@ -184,7 +184,7 @@ export function SelectField({
           aria-label={label}
           aria-activedescendant={`${id}-option-${active}`}
           onKeyDown={onListKeyDown}
-          className={`absolute inset-x-0 z-30 max-h-64 overflow-auto rounded-xl border border-[#dfe3d9] bg-white p-1 text-texto shadow-[0_8px_24px_-8px_rgba(35,54,44,0.2)] outline-none ${dropUp ? 'bottom-full mb-1' : 'top-full mt-1'}`}
+          className={`absolute inset-x-0 z-30 max-h-64 overflow-auto rounded-xl border border-linha bg-white p-1 text-texto shadow-[0_8px_24px_-8px_rgba(35,54,44,0.2)] outline-none ${dropUp ? 'bottom-full mb-1' : 'top-full mt-1'}`}
         >
           {options.map((option, index) => {
             const isSelected = option.value === value
@@ -196,7 +196,7 @@ export function SelectField({
                 aria-selected={isSelected}
                 onClick={() => choose(index)}
                 onPointerMove={() => setActive(index)}
-                className={`flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm ${index === active ? 'bg-[#f1f4ef]' : ''} ${isSelected ? 'font-semibold text-marca' : ''}`}
+                className={`flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm ${index === active ? 'bg-superficie-2' : ''} ${isSelected ? 'font-semibold text-marca' : ''}`}
               >
                 <span className="min-w-0">{option.label}</span>
                 {isSelected && <Check size={16} aria-hidden="true" />}

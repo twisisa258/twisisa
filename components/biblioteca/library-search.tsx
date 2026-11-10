@@ -106,7 +106,7 @@ export function LibrarySearch({ scope, initialQuery = '', placeholder = 'Pesquis
         }}
         className="flex h-12 items-center gap-3 rounded-2xl border border-linha bg-white px-3.5 transition-colors focus-within:border-[color:var(--ajuda)] focus-within:ring-4 focus-within:ring-[color:var(--ajuda)]/10"
       >
-        <Search size={18} className="shrink-0 text-[#5f6a63]" aria-hidden="true" />
+        <Search size={18} className="shrink-0 text-texto-2" aria-hidden="true" />
         <input
           value={value}
           onChange={(event) => {
@@ -125,7 +125,7 @@ export function LibrarySearch({ scope, initialQuery = '', placeholder = 'Pesquis
           autoComplete="off"
           enterKeyHint="search"
           maxLength={80}
-          className="h-full min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-[#6f7871]"
+          className="h-full min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-texto-2"
         />
         {value && (
           <button
@@ -135,7 +135,7 @@ export function LibrarySearch({ scope, initialQuery = '', placeholder = 'Pesquis
               setOpen(true)
             }}
             aria-label="Limpar pesquisa"
-            className="flex size-8 shrink-0 items-center justify-center rounded-full text-texto-2 hover:bg-[#f1f4ef]"
+            className="flex size-8 shrink-0 items-center justify-center rounded-full text-texto-2 hover:bg-superficie-2"
           >
             <X size={16} />
           </button>
@@ -171,7 +171,7 @@ export function LibrarySearch({ scope, initialQuery = '', placeholder = 'Pesquis
                   aria-selected={index === active}
                   onClick={() => run(row.term)}
                   onPointerMove={() => setActive(index)}
-                  className={`flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2 text-left ${index === active ? 'bg-[#f1f4ef]' : ''} ${row.kind === 'all' ? 'font-semibold text-marca' : 'text-texto'}`}
+                  className={`flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2 text-left ${index === active ? 'bg-superficie-2' : ''} ${row.kind === 'all' ? 'font-semibold text-marca' : 'text-texto'}`}
                 >
                   {row.kind === 'recent' && <Clock size={16} className="shrink-0 text-texto-2" />}
                   {row.kind === 'popular' && <TrendingUp size={16} className="shrink-0 text-texto-2" />}

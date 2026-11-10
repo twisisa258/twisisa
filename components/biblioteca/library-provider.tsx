@@ -146,18 +146,18 @@ function MaterialDialog({ item, onClose, onDownload, downloading }: { item: Libr
       <div className="relative flex max-h-[92dvh] w-full max-w-2xl flex-col overflow-hidden rounded-t-3xl bg-white sm:rounded-3xl">
         <div className="flex items-start justify-between gap-3 px-4 py-3">
           <div className="min-w-0">
-            <h2 className="truncate text-sm font-semibold text-[#202923]">{item.title}</h2>
+            <h2 className="truncate text-sm font-semibold text-texto">{item.title}</h2>
             {meta && <p className="mt-0.5 truncate text-xs text-texto-2">{meta}</p>}
           </div>
-          <button type="button" onClick={onClose} aria-label="Fechar" className="shrink-0 rounded-full p-2 text-[#526057] hover:bg-[#f3f5f1]"><X size={18} /></button>
+          <button type="button" onClick={onClose} aria-label="Fechar" className="shrink-0 rounded-full p-2 text-texto-2 hover:bg-superficie-2"><X size={18} /></button>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto bg-[#f3f5f1] p-3">
+        <div className="min-h-0 flex-1 overflow-y-auto bg-superficie-2 p-3">
           {!item.canPreview || failed ? (
             <p className="px-4 py-16 text-center text-sm text-texto-2">Não há pré-visualização para este documento. Podes baixá-lo.</p>
           ) : (
             <>
-              {loading && <div className="h-80 animate-pulse rounded-xl bg-[#e4e8e1]" aria-label="A carregar pré-visualização" />}
+              {loading && <div className="h-80 animate-pulse rounded-xl bg-linha" aria-label="A carregar pré-visualização" />}
               {src && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -176,9 +176,9 @@ function MaterialDialog({ item, onClose, onDownload, downloading }: { item: Libr
         <div className="flex items-center justify-between gap-3 px-4 py-3">
           {isPdf && item.canPreview && !failed ? (
             <div className="flex items-center gap-1 text-xs text-texto-2">
-              <button type="button" onClick={() => goTo(page - 1)} disabled={page <= 1} aria-label="Página anterior" className="rounded-full p-2 hover:bg-[#f3f5f1] disabled:opacity-30"><ChevronLeft size={18} /></button>
+              <button type="button" onClick={() => goTo(page - 1)} disabled={page <= 1} aria-label="Página anterior" className="rounded-full p-2 hover:bg-superficie-2 disabled:opacity-30"><ChevronLeft size={18} /></button>
               <span className="min-w-14 text-center">Página {page}</span>
-              <button type="button" onClick={() => goTo(page + 1)} disabled={lastPage !== null && page >= lastPage} aria-label="Página seguinte" className="rounded-full p-2 hover:bg-[#f3f5f1] disabled:opacity-30"><ChevronRight size={18} /></button>
+              <button type="button" onClick={() => goTo(page + 1)} disabled={lastPage !== null && page >= lastPage} aria-label="Página seguinte" className="rounded-full p-2 hover:bg-superficie-2 disabled:opacity-30"><ChevronRight size={18} /></button>
             </div>
           ) : <span />}
           <button

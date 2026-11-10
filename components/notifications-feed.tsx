@@ -71,7 +71,7 @@ export function NotificationsFeed({ initial }: { initial: Notification[] }) {
               <span className="text-xs text-texto-2">{relativeTime(item.createdAt)}</span>
               {!item.readAt && <span className="ml-auto text-xs font-medium text-ajuda">Nova</span>}
             </div>
-            <h2 className="mt-2 text-[15px] font-medium text-[#17231d]">{item.title}</h2>
+            <h2 className="mt-2 text-[15px] font-medium text-texto">{item.title}</h2>
             <p className="mt-1 text-sm text-texto-2">{item.body}</p>
             <div className="mt-3 flex items-center gap-3">
               {href && (

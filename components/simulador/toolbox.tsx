@@ -36,7 +36,7 @@ const TONES: Record<Tone, string> = {
   assistente: 'bg-assistente-suave text-assistente',
   aviso: 'bg-aviso-suave text-aviso',
   sucesso: 'bg-sucesso-suave text-sucesso-texto',
-  neutro: 'bg-[#f1efe8] text-[#444441]',
+  neutro: 'bg-conquista-suave text-texto',
 }
 
 function Tile({ icon: Icon, tone, label, note, disabled, onClick }: { icon: typeof Wrench; tone: Tone; label: string; note?: string; disabled?: boolean; onClick: () => void }) {
@@ -186,7 +186,7 @@ function HintView({ attemptId, item, left, onHints }: { attemptId: string; item:
           {busy ? 'A pensar…' : item.hints.length === 0 ? 'Pedir a primeira dica' : `Pedir a dica ${next}: ${HINT_TITLES[next - 1].toLowerCase()}`}
         </button>
       ) : (
-        <p className="mt-3 rounded-xl bg-[#f1efe8] px-3 py-2 text-[13px] text-texto-2">Usaste todas as dicas desta questão. Escolhe a tua resposta.</p>
+        <p className="mt-3 rounded-xl bg-conquista-suave px-3 py-2 text-[13px] text-texto-2">Usaste todas as dicas desta questão. Escolhe a tua resposta.</p>
       )}
     </div>
   )
@@ -349,7 +349,7 @@ function SimilarView({ attemptId, position }: { attemptId: string; position: num
           const tone = right ? 'border-sucesso bg-sucesso-suave' : wrong ? 'border-erro bg-erro-suave' : picked === i ? 'border-marca bg-marca-suave' : 'border-linha bg-white'
           return (
             <button key={i} type="button" role="radio" aria-checked={picked === i} disabled={!!result || busy} onClick={() => setPicked(i)} className={`flex min-h-[48px] items-center gap-3 rounded-xl border-2 px-3 py-2 text-left ${tone}`}>
-              <span className={`flex size-7 shrink-0 items-center justify-center rounded-lg text-[13px] font-bold ${right ? 'bg-sucesso text-white' : wrong ? 'bg-erro text-white' : 'bg-[#edf0e9] text-marca'}`}>{right ? <Check size={14} aria-hidden /> : wrong ? <X size={14} aria-hidden /> : LETTERS[i]}</span>
+              <span className={`flex size-7 shrink-0 items-center justify-center rounded-lg text-[13px] font-bold ${right ? 'bg-sucesso text-white' : wrong ? 'bg-erro text-white' : 'bg-superficie-2 text-marca'}`}>{right ? <Check size={14} aria-hidden /> : wrong ? <X size={14} aria-hidden /> : LETTERS[i]}</span>
               <span className="min-w-0 flex-1 text-[15px] leading-6"><MathText text={text} /></span>
               {right && <span className="text-[12px] font-semibold text-sucesso-texto">Certa</span>}
               {wrong && <span className="text-[12px] font-semibold text-erro-texto">A tua resposta</span>}

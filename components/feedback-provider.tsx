@@ -74,10 +74,10 @@ function FeedbackDialog({ feedback, onClose }: { feedback: Feedback; onClose: ()
         aria-describedby={messageId}
         className="relative w-full max-w-sm rounded-3xl bg-white p-6 text-center shadow-xl animate-in fade-in zoom-in-95 slide-in-from-bottom-4 motion-reduce:animate-none"
       >
-        <span className={`mx-auto flex size-12 items-center justify-center rounded-full ${isError ? 'bg-[#fbeeee] text-erro-texto' : 'bg-[#edf3ee] text-marca'}`}>
+        <span className={`mx-auto flex size-12 items-center justify-center rounded-full ${isError ? 'bg-erro-suave text-erro-texto' : 'bg-superficie-2 text-marca'}`}>
           {isError ? <CircleAlert size={26} /> : <CircleCheck size={26} />}
         </span>
-        <h2 id={titleId} className="mt-4 text-lg font-semibold text-[#202923]">{feedback.title}</h2>
+        <h2 id={titleId} className="mt-4 text-lg font-semibold text-texto">{feedback.title}</h2>
         <p id={messageId} className="mt-1.5 text-sm leading-6 text-texto-2">{feedback.message}</p>
         <button
           ref={buttonRef}

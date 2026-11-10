@@ -32,7 +32,7 @@ export function Pagination({ page, pages, hrefFor }: { page: number; pages: numb
             href={hrefFor(item)}
             aria-current={item === page ? 'page' : undefined}
             aria-label={`Página ${item}`}
-            className={`${base} ${item === page ? 'bg-marca text-white' : 'text-[#465249] hover:bg-white'}`}
+            className={`${base} ${item === page ? 'bg-marca text-white' : 'text-texto hover:bg-white'}`}
           >
             {item}
           </Link>

@@ -35,7 +35,7 @@ function Row({ row, lider }: { row: RankingData['rows'][number]; lider: number }
           {row.isMe && <span className="ml-1.5 text-[12px] font-medium text-marca">(tu)</span>}
         </span>
         <span className="block truncate text-[12px] leading-4 text-texto-2">{row.nickname ? `@${row.nickname}` : `${row.correct} ${row.correct === 1 ? 'certa' : 'certas'}`}</span>
-        <span aria-hidden="true" className="mt-1.5 block h-1 overflow-hidden rounded-full bg-[#e8ebe3]">
+        <span aria-hidden="true" className="mt-1.5 block h-1 overflow-hidden rounded-full bg-linha">
           <span className={cn('block h-full rounded-full', row.isMe ? 'bg-marca' : 'bg-[#b7c9bd]')} style={{ width: `${parte}%` }} />
         </span>
       </span>

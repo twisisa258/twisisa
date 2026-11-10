@@ -13,7 +13,7 @@ import { requireSimulatorScope } from '@/lib/simulator-scope'
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Os teus cursos | Twisisa' }
 
-const card = 'rounded-2xl bg-gradient-to-br from-white to-[#f4f6f1] shadow-[0_1px_2px_rgba(20,50,40,0.05)]'
+const card = 'rounded-2xl bg-gradient-to-br from-white to-marca-suave shadow-[0_1px_2px_rgba(20,50,40,0.05)]'
 
 const joinLabels = (list: string[]) => (list.length <= 1 ? (list[0] ?? '') : `${list.slice(0, -1).join(', ')} e ${list[list.length - 1]}`)
 
@@ -34,7 +34,7 @@ export default async function ResultadoPage() {
         <h1 className="text-[26px] font-semibold tracking-[-0.03em] text-texto">Os teus cursos</h1>
 
         {courses.length === 0 ? (
-          <p className="mt-3 text-[15px] leading-6 text-[#5f6962]">As tuas respostas não apontam para nenhum curso com clareza. Tenta de novo quando quiseres.</p>
+          <p className="mt-3 text-[15px] leading-6 text-texto-2">As tuas respostas não apontam para nenhum curso com clareza. Tenta de novo quando quiseres.</p>
         ) : (
           <>
             <p className="mt-3 text-[13px] leading-5 text-texto-2">A afinidade mostra o quanto o curso combina com o que disseste que gostas. Não garante a entrada.</p>
@@ -53,7 +53,7 @@ export default async function ResultadoPage() {
                       <p className="text-[11px] text-texto-2">afinidade</p>
                     </div>
                   </div>
-                  {course.reasons.length > 0 && <p className="mt-3 text-[13px] text-[#39433e]">Porque gostas de {joinLabels(course.reasons.map((d) => DIMENSION_LABEL[d]))}.</p>}
+                  {course.reasons.length > 0 && <p className="mt-3 text-[13px] text-texto">Porque gostas de {joinLabels(course.reasons.map((d) => DIMENSION_LABEL[d]))}.</p>}
                   <div className="mt-3"><ChooseCourseButton courseId={course.courseId} chosen={profile?.targetCourseId === course.courseId} /></div>
                 </li>
               ))}

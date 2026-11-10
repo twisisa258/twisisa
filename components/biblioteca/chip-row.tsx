@@ -16,7 +16,7 @@ export function ChipRow({ label, chips }: { label: string; chips: Chip[] }) {
               className={`inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 text-[13px] font-semibold ${
                 chip.active
                   ? 'bg-marca text-white'
-                  : 'border border-linha bg-white text-[#465249] transition-colors hover:border-marca hover:text-marca'
+                  : 'border border-linha bg-white text-texto transition-colors hover:border-marca hover:text-marca'
               }`}
             >
               {chip.label}

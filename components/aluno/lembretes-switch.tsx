@@ -37,7 +37,7 @@ export function LembretesSwitch({ initialOn, publicKey }: { initialOn: boolean; 
           <p className="text-sm font-medium text-texto">Lembretes de estudo</p>
           <p className="text-xs text-texto-2">Um aviso curto, no máximo um por dia. No e-mail e, se permitires, no telemóvel.</p>
         </div>
-        <button type="button" role="switch" aria-checked={ligado} aria-label="Lembretes de estudo" disabled={ocupado} onClick={mudar} className={`relative h-7 w-12 shrink-0 rounded-full transition-colors disabled:opacity-60 ${ligado ? 'bg-marca' : 'bg-[#cfd6cb]'}`}>
+        <button type="button" role="switch" aria-checked={ligado} aria-label="Lembretes de estudo" disabled={ocupado} onClick={mudar} className={`relative h-7 w-12 shrink-0 rounded-full transition-colors disabled:opacity-60 ${ligado ? 'bg-marca' : 'bg-linha'}`}>
           <span className={`absolute top-0.5 size-6 rounded-full bg-white shadow transition-[left] ${ligado ? 'left-[22px]' : 'left-0.5'}`} />
         </button>
       </div>

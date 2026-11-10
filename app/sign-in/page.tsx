@@ -5,6 +5,7 @@ import { auth, googleEnabled } from '@/lib/auth'
 import { safeNext } from '@/lib/identity'
 import { AuthForm } from '@/components/auth-form'
 import { Brand } from '@/components/brand'
+import { ThemeToggle } from '@/components/site/theme-toggle'
 
 export default async function SignInPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const { next } = await searchParams
@@ -13,8 +14,9 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
 
   return (
     <main className="flex min-h-screen flex-col bg-fundo px-6 text-texto">
-      <header className="pt-8 sm:pt-12">
+      <header className="flex items-center justify-between pt-8 sm:pt-12">
         <Brand />
+        <ThemeToggle />
       </header>
 
       <section className="mx-auto flex w-full max-w-[360px] flex-1 flex-col justify-center py-12">

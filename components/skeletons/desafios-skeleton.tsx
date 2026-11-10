@@ -8,7 +8,7 @@ function MissionsSkeleton({ rows }: { rows: number }) {
         <Skeleton className="h-5 w-24" />
         <Skeleton className="h-3 w-32" />
       </div>
-      <div className="divide-y divide-[#eceee7] overflow-hidden rounded-2xl border border-[#e3e6dc] bg-white">
+      <div className="divide-y divide-linha overflow-hidden rounded-2xl border border-linha bg-white">
         {Array.from({ length: rows }).map((_, index) => (
           <div key={index} className="flex items-start gap-3 px-4 py-3.5 sm:px-5">
             <Skeleton className="mt-0.5 size-6 shrink-0 rounded-full" />

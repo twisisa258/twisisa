@@ -1,6 +1,6 @@
 // Estilos e campo comuns às secções do perfil.
 export const fieldClass =
-  'h-11 w-full rounded-xl border border-[#dfe3d9] bg-white px-3.5 text-sm font-normal text-texto outline-none transition-colors placeholder:text-[#9aa29c] focus:border-marca focus:ring-2 focus:ring-marca/10 disabled:opacity-60 read-only:bg-[#f3f4ef] read-only:text-texto-2'
+  'h-11 w-full rounded-xl border border-linha bg-white px-3.5 text-sm font-normal text-texto outline-none transition-colors placeholder:text-texto-2 focus:border-marca focus:ring-2 focus:ring-marca/10 disabled:opacity-60 read-only:bg-superficie-2 read-only:text-texto-2'
 
 // `custom`: para selectores personalizados (botões dentro de <label> repetiriam o clique), usa <div> em vez de <label>.
 export function Field({ label, hint, custom = false, children }: { label: React.ReactNode; hint?: string; custom?: boolean; children: React.ReactNode }) {

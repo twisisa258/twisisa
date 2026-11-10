@@ -26,7 +26,7 @@ export function RestartButton({ mode, subjectId, variant = null, topicId = null,
           }
         })
       }
-      className={`inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition-colors disabled:opacity-60 ${primary ? 'bg-marca text-white hover:bg-marca-escura' : 'bg-white text-marca shadow-[0_1px_2px_rgba(20,50,40,0.05),0_8px_20px_-12px_rgba(20,50,40,0.25)] hover:bg-[#f3f8f4]'}`}
+      className={`inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition-colors disabled:opacity-60 ${primary ? 'bg-marca text-white hover:bg-marca-escura' : 'bg-white text-marca shadow-[0_1px_2px_rgba(20,50,40,0.05),0_8px_20px_-12px_rgba(20,50,40,0.25)] hover:bg-superficie-2'}`}
     >
       {pending ? <><Spinner />A preparar…</> : label}
     </button>

@@ -181,7 +181,7 @@ export function SessionPlayer({ data, cues }: { data: PlayData; cues: { sound: b
             {timed && <span className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[13px] font-bold tabular-nums ${danger ? 'bg-aviso-suave text-aviso' : 'bg-marca/[0.08] text-marca'}`}><Clock size={13} aria-hidden />{clock(secs)}</span>}
             <span className="shrink-0 text-[13px] tabular-nums text-texto-2">{index + 1}/{items.length}</span>
           </div>
-          <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-[#e3e8de]" role="progressbar" aria-valuemin={0} aria-valuemax={items.length} aria-valuenow={done}>
+          <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-linha" role="progressbar" aria-valuemin={0} aria-valuemax={items.length} aria-valuenow={done}>
             <div className="h-full rounded-full bg-marca transition-[width] duration-300" style={{ width: `${percent(done, items.length)}%` }} />
           </div>
         </div>
@@ -215,13 +215,13 @@ export function SessionPlayer({ data, cues }: { data: PlayData; cues: { sound: b
               const isOut = eliminated === option.id
               const isRight = !!fb && fb.correctOptionId === option.id
               const isWrong = !!fb && item.selectedOptionId === option.id && !isRight
-              const tone = isRight ? 'bg-sucesso-suave' : isWrong ? 'bg-erro-suave' : isPicked ? 'bg-[#e3efe8] ring-1 ring-marca/40' : 'bg-white hover:bg-[#f4f7f2]'
+              const tone = isRight ? 'bg-sucesso-suave' : isWrong ? 'bg-erro-suave' : isPicked ? 'bg-marca-suave ring-1 ring-marca/40' : 'bg-white hover:bg-superficie-2'
               return (
                 <button key={option.id} id={`opt-${option.id}`} type="button" role="radio" aria-checked={isPicked} disabled={!!fb || busy || finishing || timeout || isOut} tabIndex={isPicked || (!chosen && i === 0) ? 0 : -1} aria-label={isOut ? `${LETTERS[i]}: eliminada pela dica` : undefined} onClick={() => setPicked(option.id)} className={`flex min-h-[48px] w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors disabled:cursor-default ${tone} ${fb && !isRight && !isWrong ? 'opacity-50' : ''} ${isOut ? 'opacity-40 [&_span]:line-through' : ''}`}>
                   <span className={`flex size-7 shrink-0 items-center justify-center rounded-full text-[13px] font-bold ${isRight ? 'bg-sucesso text-white' : isWrong ? 'bg-erro text-white' : isPicked ? 'bg-marca text-white' : 'bg-marca/[0.08] text-marca'}`}>
                     {isRight ? <Check size={14} aria-hidden /> : isWrong ? <X size={14} aria-hidden /> : LETTERS[i]}
                   </span>
-                  <span className="min-w-0 flex-1 space-y-1.5 text-[15px] leading-6 text-[#2b332d]">
+                  <span className="min-w-0 flex-1 space-y-1.5 text-[15px] leading-6 text-texto">
                     {option.image && <QuestionImage image={option.image} zoomable={false} />}
                     {option.body && <span className="block"><MathText text={option.body} /></span>}
                   </span>
@@ -237,7 +237,7 @@ export function SessionPlayer({ data, cues }: { data: PlayData; cues: { sound: b
                   <span className={`block text-[14px] font-semibold leading-5 ${fb.isCorrect ? 'text-sucesso-texto' : 'text-erro-texto'}`}>
                     {fb.isCorrect ? (streak >= 3 ? `Acertaste! ${streak} seguidas` : 'Acertaste!') : 'Errado'}{fb.points > 0 && <span className="ml-1.5 text-[12px] font-bold">+{formatPoints(fb.points)} pts</span>}
                   </span>
-                  <span className="block truncate text-[12px] leading-4 text-[#5d675f]">{fb.isCorrect ? 'Continua assim.' : `A certa é a ${correctLetter}. Vê «Porque errei» nas ferramentas.`}</span>
+                  <span className="block truncate text-[12px] leading-4 text-texto-2">{fb.isCorrect ? 'Continua assim.' : `A certa é a ${correctLetter}. Vê «Porque errei» nas ferramentas.`}</span>
                 </span>
                 <button type="button" onClick={() => openJonas(null)} className="btn btn-secundario shrink-0"><Sparkles size={14} aria-hidden />Ver explicação</button>
               </div>

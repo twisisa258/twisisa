@@ -16,7 +16,7 @@ const TOTAL = 64
 const TARGET = TOTAL - 2
 
 const primary = 'inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-marca px-6 text-sm font-semibold text-white transition-colors hover:bg-marca-escura disabled:opacity-60'
-const field = 'h-12 w-full rounded-xl border border-[#dfe3d9] bg-white px-4 text-[15px] outline-none transition-colors focus:border-marca'
+const field = 'h-12 w-full rounded-xl border border-linha bg-white px-4 text-[15px] outline-none transition-colors focus:border-marca'
 
 function Paper({ children, className = '', onAnimationEnd }: { children: React.ReactNode; className?: string; onAnimationEnd?: () => void }) {
   return (
@@ -71,7 +71,7 @@ function Roulette({ label, instant, onLanded }: { label: string; instant: boolea
         style={{ transform: `translateY(-${go ? (TARGET - 1) * ROW : 0}px)`, transition: go && !instant ? 'transform 4800ms cubic-bezier(0.12, 0.6, 0.08, 1)' : 'none', filter: blur ? 'blur(1.6px)' : 'none' }}
       >
         {strip.map((area, i) => (
-          <div key={i} className={`flex items-center justify-center px-4 text-center text-lg font-semibold ${i === TARGET ? 'text-marca' : 'text-[#48534b]'}`} style={{ height: ROW }}>{area}</div>
+          <div key={i} className={`flex items-center justify-center px-4 text-center text-lg font-semibold ${i === TARGET ? 'text-marca' : 'text-texto-2'}`} style={{ height: ROW }}>{area}</div>
         ))}
       </div>
     </div>
@@ -80,7 +80,7 @@ function Roulette({ label, instant, onLanded }: { label: string; instant: boolea
 
 function Ended({ message, hint }: { message: string; hint?: string }) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#f3f4ef] px-5 text-texto">
+    <main className="flex min-h-screen items-center justify-center bg-superficie-2 px-5 text-texto">
       <div className="max-w-xs text-center">
         <p className="text-lg font-semibold">{message}</p>
         {hint && <p className="mt-2 text-sm leading-6 text-texto-2">{hint}</p>}
@@ -160,7 +160,7 @@ export function InviteFlow({ token, view }: { token: string; view: InviteView })
   if (view.state === 'locked') return <Ended message="Esta carta está bloqueada." hint="Houve demasiadas tentativas com o código. Pede a quem te convidou que envie uma nova carta." />
   if (phase === 'gone') return <Ended message="Esta carta já não existe." hint="Foi aberta e destruída, ou foi retirada. Se achas que é engano, fala com quem te convidou." />
 
-  const stage = 'flex min-h-screen items-center justify-center bg-[#f3f4ef] px-5 py-10 text-texto'
+  const stage = 'flex min-h-screen items-center justify-center bg-superficie-2 px-5 py-10 text-texto'
 
   if (phase === 'sealed' || phase === 'opening') {
     return (
@@ -213,8 +213,8 @@ export function InviteFlow({ token, view }: { token: string; view: InviteView })
             <h1 className="mt-5 text-3xl font-semibold tracking-[-0.04em]">Olá, {ctx.name}.</h1>
             <p className="mt-4 text-[17px] font-medium leading-7">Se estás a ver este convite, é porque aceitaste participar na administração do twisisa.</p>
             <p className="mt-3 text-sm leading-6 text-texto-2">Lê com atenção e segue as instruções. Depois de finalizares, esta carta será destruída e não poderá ser aberta outra vez.</p>
-            <div className="my-6 h-px bg-[#edf0e9]" />
-            <p className="text-sm leading-6 text-[#48534b]">Clica no botão abaixo para saberes a tua tarefa.</p>
+            <div className="my-6 h-px bg-superficie-2" />
+            <p className="text-sm leading-6 text-texto-2">Clica no botão abaixo para saberes a tua tarefa.</p>
             <button type="button" onClick={() => void toTask()} disabled={busy} className={`${primary} mt-4`}>{busy ? 'A abrir…' : <>Descobrir a minha tarefa<ArrowRight size={18} aria-hidden /></>}</button>
             <p role="alert" className="mt-3 min-h-5 text-center text-sm text-erro-texto">{error}</p>
           </>
@@ -226,7 +226,7 @@ export function InviteFlow({ token, view }: { token: string; view: InviteView })
             <Roulette label={ctx.roleLabel} instant={!fresh} onLanded={() => setLanded(true)} />
             {landed && (
               <div className="fade-up">
-                <p className="mt-5 text-sm leading-6 text-[#48534b]">Vais rever exercícios: confirmar enunciados, opções e explicações antes de chegarem aos alunos. Só terás acesso a essa área.</p>
+                <p className="mt-5 text-sm leading-6 text-texto-2">Vais rever exercícios: confirmar enunciados, opções e explicações antes de chegarem aos alunos. Só terás acesso a essa área.</p>
                 <button type="button" onClick={() => void toAccount()} disabled={busy} className={`${primary} mt-5`}>{busy ? 'A continuar…' : <>Continuar<ArrowRight size={18} aria-hidden /></>}</button>
                 <p className="mt-2 text-center text-xs text-texto-2">Daqui não se volta atrás.</p>
                 <p role="alert" className="mt-2 min-h-5 text-center text-sm text-erro-texto">{error}</p>
@@ -241,7 +241,7 @@ export function InviteFlow({ token, view }: { token: string; view: InviteView })
             <p className="mt-2 text-sm leading-6 text-texto-2">O teu nome e o resto defines depois, no painel.</p>
             <label className="mt-5 block text-xs font-medium text-texto-2" htmlFor="email">E-mail do convite</label>
             <div className="relative mt-1.5">
-              <input id="email" value={ctx.email} readOnly className={`${field} bg-[#f3f4ef] pr-10 text-texto-2`} />
+              <input id="email" value={ctx.email} readOnly className={`${field} bg-superficie-2 pr-10 text-texto-2`} />
               <Lock size={15} className="absolute right-4 top-1/2 -translate-y-1/2 text-texto-2" aria-hidden />
             </div>
             <label className="mt-4 block text-xs font-medium text-texto-2" htmlFor="password">Palavra-passe</label>
@@ -252,7 +252,7 @@ export function InviteFlow({ token, view }: { token: string; view: InviteView })
             <label className="mt-4 block text-xs font-medium text-texto-2" htmlFor="confirm">Repete a palavra-passe</label>
             <input id="confirm" type={show ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} autoComplete="new-password" minLength={8} maxLength={128} required className={`${field} mt-1.5`} />
             {needSignIn && (
-              <p role="status" className="mt-4 rounded-xl bg-[#f4eddb] p-3 text-sm leading-6 text-aviso-texto">Já existe uma conta com este e-mail. <Link href="/sign-in" className="font-semibold underline">Entra com ela</Link> e volta a abrir esta carta (link e código): conclui-se sozinha.</p>
+              <p role="status" className="mt-4 rounded-xl bg-conquista-suave p-3 text-sm leading-6 text-aviso-texto">Já existe uma conta com este e-mail. <Link href="/sign-in" className="font-semibold underline">Entra com ela</Link> e volta a abrir esta carta (link e código): conclui-se sozinha.</p>
             )}
             <button type="submit" disabled={busy || needSignIn} className={`${primary} mt-5`}>{busy ? 'A criar…' : 'Criar conta'}</button>
             <p role="alert" className="mt-3 min-h-5 text-center text-sm text-erro-texto">{error}</p>
@@ -261,7 +261,7 @@ export function InviteFlow({ token, view }: { token: string; view: InviteView })
 
         {phase === 'aguardar' && (
           <div className="text-center">
-            <div className="mx-auto mt-8 size-14 animate-spin rounded-full border-[3px] border-[#dfe8e1] border-t-[#1d4d41]" role="status" aria-label="A aguardar verificação" />
+            <div className="mx-auto mt-8 size-14 animate-spin rounded-full border-[3px] border-linha border-t-[#1d4d41]" role="status" aria-label="A aguardar verificação" />
             <h1 className="mt-6 text-2xl font-semibold tracking-[-0.03em]">A aguardar a verificação dos dados</h1>
             <p className="mt-3 text-sm leading-6 text-texto-2">Enviámos uma mensagem para <span className="font-semibold text-texto">{maskEmail(ctx.email)}</span>. Abre-a e confirma o e-mail. Esta página atualiza sozinha.</p>
             <button type="button" onClick={() => void resend()} disabled={busy || cooldown > 0} className="mt-6 text-sm font-semibold text-marca hover:underline disabled:text-texto-2 disabled:no-underline">

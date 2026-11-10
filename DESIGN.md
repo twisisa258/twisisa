@@ -41,3 +41,11 @@ Regra: a cor da marca só aparece em coisas que se tocam.
 
 ## Tipografia
 - Corpo: DM Sans. Títulos: Manrope.
+
+## Moldura única (cabeçalho, menu lateral, tema)
+- Um só cabeçalho em toda a plataforma: fixo, opaco e mínimo (52 px), `components/shell/app-header.tsx`. Sem sessão: logo, quatro ligações, tema e conta. Com sessão: menu (telemóvel), tema, notificações e foto.
+- Um só menu lateral do aluno (232 px, a partir de 900 px): `components/shell/aluno-aside.tsx`. A lista de ligações está em `components/student-nav.tsx` e serve também a gaveta do telemóvel. Nas páginas públicas aparece quando há sessão (`PublicAsideGate`).
+- Sem barra de navegação em baixo (decidido).
+- Modo claro/escuro: botão no cabeçalho, escolha guardada em `localStorage` (`tw-tema`), por omissão segue o sistema. O script do `<head>` (`components/shell/theme-script.tsx`) aplica-o antes de pintar. Os tokens escuros estão em `app/globals.css` (secção «twisisa-shell-7»).
+- Em páginas novas: usar tokens (`bg-superficie`, `bg-superficie-2`, `border-linha`, `text-texto-2`, `text-on-marca`), nunca `#hex`. Um `#hex` não muda no modo escuro.
+- Ecrãs de foco sem menu: onboarding, sessão do Treinar e Jonas.

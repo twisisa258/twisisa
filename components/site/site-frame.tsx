@@ -1,16 +1,20 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { SiteHeader } from '@/components/site/site-header'
+import { AppHeader } from '@/components/shell/app-header'
+import { PublicAsideGate } from '@/components/shell/aluno-aside'
 import { listPublicInstitutions } from '@/lib/exames'
 
-// Moldura de todas as páginas públicas secundárias (exames, simulado, blog, planos): o mesmo cabeçalho e rodapé da página inicial.
-// Sem sessão no servidor: o botão de conta resolve-se no navegador, por isso as páginas podem ser estáticas (rápidas e indexáveis).
-export async function SiteFrame({ children, themed = false }: { children: React.ReactNode; themed?: boolean }) {
+// Moldura de todas as páginas públicas (exames, simulado, blog, planos): o mesmo cabeçalho fixo e mínimo de toda a plataforma,
+// com modo claro/escuro, e o mesmo rodapé. Quem tem sessão vê também o menu lateral do aluno.
+// Sem sessão no servidor: o cabeçalho e o menu resolvem-se no navegador, por isso as páginas podem ser estáticas (rápidas e indexáveis).
+// `themed` fica aceite por compatibilidade: agora todas as páginas públicas são «themed».
+export async function SiteFrame({ children }: { children: React.ReactNode; themed?: boolean }) {
   const institutions = await listPublicInstitutions().catch(() => [])
   return (
-    <div className={`tw min-h-screen${themed ? ' tw-th' : ''}`}>
+    <div className="tw tw-th min-h-screen">
       <a href="#conteudo" className="tw5-skip">Saltar para o conteúdo</a>
-      <SiteHeader themed={themed} />
+      <AppHeader />
+      <PublicAsideGate />
       {children}
       <footer className="tw-foot"><div className="tw-w">
         <div className="tw-ft">

@@ -66,18 +66,18 @@ export function OrientacaoPlayer({ attemptId, questions, initial }: { attemptId:
             onClick={() => setIndex(index - 1)}
             disabled={index === 0 || busy}
             aria-label="Pergunta anterior"
-            className={cn('flex size-11 flex-none items-center justify-center rounded-full text-[#39433e] disabled:opacity-30', focusRing)}
+            className={cn('flex size-11 flex-none items-center justify-center rounded-full text-texto disabled:opacity-30', focusRing)}
           >
             <ArrowLeft size={20} aria-hidden />
           </button>
-          <p className="flex-1 text-center text-[13px] font-medium text-[#5f6962]" aria-live="polite">
+          <p className="flex-1 text-center text-[13px] font-medium text-texto-2" aria-live="polite">
             {index < total ? `${index + 1} de ${total}` : 'Terminaste'}
           </p>
-          <Link href="/aluno" aria-label="Sair. Podes continuar mais tarde" className={cn('flex size-11 flex-none items-center justify-center rounded-full text-[#39433e]', focusRing)}>
+          <Link href="/aluno" aria-label="Sair. Podes continuar mais tarde" className={cn('flex size-11 flex-none items-center justify-center rounded-full text-texto', focusRing)}>
             <X size={20} aria-hidden />
           </Link>
         </div>
-        <div role="progressbar" aria-label="Respondidas" aria-valuemin={0} aria-valuemax={total} aria-valuenow={answered} className="mx-auto mt-1 h-[6px] w-full max-w-[560px] overflow-hidden rounded-[3px] bg-[#e3e9df]">
+        <div role="progressbar" aria-label="Respondidas" aria-valuemin={0} aria-valuemax={total} aria-valuenow={answered} className="mx-auto mt-1 h-[6px] w-full max-w-[560px] overflow-hidden rounded-[3px] bg-linha">
           <div className="h-full rounded-[3px] bg-marca transition-[width]" style={{ width: `${total > 0 ? (answered / total) * 100 : 0}%` }} />
         </div>
       </header>
@@ -113,11 +113,11 @@ export function OrientacaoPlayer({ attemptId, questions, initial }: { attemptId:
             </>
           ) : (
             <div className="text-center">
-              <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-[#d6e6dc] text-marca">
+              <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-marca-suave text-marca">
                 <Check size={26} aria-hidden />
               </span>
               <h1 className="mt-5 text-[24px] font-semibold tracking-[-0.02em]">Terminaste</h1>
-              <p className="mt-2 text-[15px] text-[#5f6962]">Vê os cursos que combinam contigo.</p>
+              <p className="mt-2 text-[15px] text-texto-2">Vê os cursos que combinam contigo.</p>
               <button
                 type="button"
                 onClick={finish}

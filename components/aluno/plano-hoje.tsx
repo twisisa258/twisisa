@@ -33,7 +33,7 @@ export function ParaHoje({ items }: { items: PlanItem[] }) {
           const Icon = item.id === 'erros' ? RotateCcw : Bookmark
           return (
             <li key={item.id} className="shrink-0">
-              <Link href={item.href} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-linha bg-white px-4 text-[13px] font-semibold text-texto no-underline hover:bg-[#f4f7f2]">
+              <Link href={item.href} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-linha bg-white px-4 text-[13px] font-semibold text-texto no-underline hover:bg-superficie-2">
                 <Icon size={15} className={item.id === 'erros' ? 'text-erro' : 'text-aviso'} aria-hidden />
                 {item.label}
                 {item.id === 'erros' && item.detail && <span className="font-normal text-texto-2">· {item.detail}</span>}

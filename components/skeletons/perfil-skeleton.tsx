@@ -15,7 +15,7 @@ export function PerfilSkeleton() {
             <Skeleton className="mt-2 h-3 w-1/2" />
           </div>
         </div>
-        <div className="divide-y divide-[#eceee7] overflow-hidden rounded-2xl border border-[#e3e6dc] bg-white">
+        <div className="divide-y divide-linha overflow-hidden rounded-2xl border border-linha bg-white">
           {['w-3/5', 'w-2/5', 'w-4/5', 'w-1/3', 'w-1/4'].map((width, index) => (
             <div key={index} className="flex min-h-[68px] items-center gap-3 px-4 py-3 sm:px-5">
               <Skeleton className="size-9 shrink-0 rounded-xl" />

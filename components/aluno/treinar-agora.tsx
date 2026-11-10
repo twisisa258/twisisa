@@ -18,7 +18,7 @@ export function TreinarAgora({ modes, errorCount }: { modes: AttemptMode[]; erro
           const { icon: Icon, tom } = MODO_UI[mode]
           return (
             <li key={mode}>
-              <Link href={`/aluno/simulador?m=${mode}`} className={cn('flex items-center gap-3 px-3.5 py-3 no-underline transition-colors active:bg-[#f4f6f1]', `tom-${tom}`)}>
+              <Link href={`/aluno/simulador?m=${mode}`} className={cn('flex items-center gap-3 px-3.5 py-3 no-underline transition-colors active:bg-superficie-2', `tom-${tom}`)}>
                 <span className="ic-tom"><Icon size={19} aria-hidden="true" /></span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-[15px] font-semibold leading-5 text-texto">{meta.label}</span>

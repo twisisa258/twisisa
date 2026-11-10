@@ -27,10 +27,10 @@ export default async function DescobrirCursoPage() {
       <div className="max-w-[520px]">
         <h1 className="text-[26px] font-semibold tracking-[-0.03em] text-texto">{entry.label}</h1>
         {total === 0 ? (
-          <p className="mt-3 text-[15px] leading-6 text-[#5f6962]">O teste ainda não tem perguntas. Volta mais tarde.</p>
+          <p className="mt-3 text-[15px] leading-6 text-texto-2">O teste ainda não tem perguntas. Volta mais tarde.</p>
         ) : (
           <>
-            <p className="mt-3 text-[15px] leading-6 text-[#5f6962]">Diz do que gostas e vê cursos que combinam contigo.</p>
+            <p className="mt-3 text-[15px] leading-6 text-texto-2">Diz do que gostas e vê cursos que combinam contigo.</p>
             <p className="mt-3 text-[13px] text-texto-2">
               {total} perguntas · cerca de {MINUTES_ESTIMATE} minutos
             </p>

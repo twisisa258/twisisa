@@ -7,10 +7,10 @@ import { cn } from '@/lib/utils'
 // Cartões do Início (/aluno). Só mostram o que existe: sem dados, dizem que ainda não há (nunca um zero ou um exemplo inventado).
 
 const soft = 'shadow-[0_1px_2px_rgba(20,50,40,0.04),0_10px_26px_-14px_rgba(20,50,40,0.18)]'
-const card = cn('overflow-hidden rounded-[18px] bg-gradient-to-br from-white to-[#f6f8f3]', soft)
+const card = cn('overflow-hidden rounded-[18px] bg-gradient-to-br from-white to-marca-suave', soft)
 const sectionLabel = 'mb-[8px] ml-[4px] text-[11px] font-bold uppercase tracking-[0.12em] text-texto'
 const secondaryButton =
-  'inline-flex h-[44px] items-center justify-center gap-[8px] rounded-[22px] bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] px-[18px] text-[14px] font-semibold text-marca no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca'
+  'inline-flex h-[44px] items-center justify-center gap-[8px] rounded-[22px] bg-gradient-to-br from-marca-suave to-marca-suave px-[18px] text-[14px] font-semibold text-marca no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca'
 
 function Empty({ title, text }: { title: string; text: string }) {
   return (
@@ -39,7 +39,7 @@ export function ProgressoPorDisciplina({ subjects }: { subjects: SubjectProgress
                     <p className="min-w-0 truncate text-[14px] font-medium text-texto">{subject.name}</p>
                     <p className="flex-none text-[14px] font-semibold text-marca">{pct}%</p>
                   </div>
-                  <div aria-hidden="true" className="mt-[8px] h-[6px] overflow-hidden rounded-[3px] bg-[#e3e9df]">
+                  <div aria-hidden="true" className="mt-[8px] h-[6px] overflow-hidden rounded-[3px] bg-linha">
                     <div className="h-full rounded-[3px] bg-gradient-to-r from-[#4a8a76] to-marca" style={{ width: `${pct}%` }} />
                   </div>
                   <p className="mt-[6px] text-[12px] text-texto-2">
@@ -68,14 +68,14 @@ export function DescobreCursoCard({ data }: { data: OrientacaoCardData }) {
     <section aria-label={data.label}>
       <div className={cn(card, 'p-[16px]')}>
         <div className="flex items-start gap-[12px]">
-          <span className="flex size-[40px] flex-none items-center justify-center rounded-[12px] bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] text-marca">
+          <span className="flex size-[40px] flex-none items-center justify-center rounded-[12px] bg-gradient-to-br from-marca-suave to-marca-suave text-marca">
             <Compass size={20} aria-hidden />
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-[8px]">
               <h2 className="text-[16px] font-semibold text-texto">{data.label}</h2>
               {!done && data.status === 'soon' && (
-                <span className="rounded-full bg-[#f4eddb] px-[8px] py-[2px] text-[10px] font-semibold text-aviso-texto">Em breve</span>
+                <span className="rounded-full bg-conquista-suave px-[8px] py-[2px] text-[10px] font-semibold text-aviso-texto">Em breve</span>
               )}
             </div>
             {!done && <p className="mt-[2px] text-[13px] leading-[18px] text-texto-2">{data.description}</p>}

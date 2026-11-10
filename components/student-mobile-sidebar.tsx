@@ -6,8 +6,10 @@ import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { SignOutButton } from '@/components/sign-out-button'
 import { Avatar } from '@/components/aluno/avatar'
+import { ShellLogo } from '@/components/shell/logo'
 import { StudentNavGroups } from '@/components/student-nav'
 
+// Gaveta do aluno no telemóvel: a mesma lista do menu lateral do computador.
 export function StudentMobileSidebar({ firstName, image = null, open, onClose }: { firstName: string; image?: string | null; open: boolean; onClose: () => void }) {
   useEffect(() => {
     if (!open) return
@@ -31,20 +33,18 @@ export function StudentMobileSidebar({ firstName, image = null, open, onClose }:
   if (!open) return null
 
   return createPortal(
-    <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu do estudante">
-      <button type="button" aria-label="Fechar menu" onClick={onClose} className="absolute inset-0 bg-[#10231e]/45 backdrop-blur-[2px]" />
-      <aside className="relative flex h-full w-[min(86vw,360px)] min-w-0 max-w-full flex-col overflow-y-auto overflow-x-hidden bg-[#f3f4ef] px-4 py-5 shadow-2xl">
-        <div className="flex items-center justify-between px-3">
-          <Link href="/aluno" onClick={onClose} className="text-lg font-semibold tracking-[-0.04em]">Twisisa</Link>
-          <button type="button" aria-label="Fechar menu" onClick={onClose} className="flex size-9 items-center justify-center rounded-full text-texto-2 transition-colors hover:bg-white hover:text-marca"><X /></button>
+    <div className="sh-drawer" role="dialog" aria-modal="true" aria-label="Menu do aluno">
+      <button type="button" aria-label="Fechar menu" onClick={onClose} className="sh-scrim" />
+      <aside className="sh-panel">
+        <div className="sh-panel-top">
+          <ShellLogo href="/aluno" className="" />
+          <button type="button" aria-label="Fechar menu" onClick={onClose} className="sh-ic"><X size={18} aria-hidden /></button>
         </div>
-        <div className="mt-10 flex flex-1 flex-col">
-          <StudentNavGroups onNavigate={onClose} />
-        </div>
-        <div className="mt-5 flex items-center justify-between border-t border-[#e3e6dc] pt-4">
-          <Link href="/aluno" onClick={onClose} className="flex min-w-0 items-center gap-2">
+        <StudentNavGroups onNavigate={onClose} />
+        <div className="sh-aside-foot">
+          <Link href="/aluno/perfil" onClick={onClose} className="sh-who">
             <Avatar name={firstName} image={image} size={32} />
-            <span className="truncate text-xs font-medium text-[#48534b]">{firstName}</span>
+            <span>{firstName}</span>
           </Link>
           <SignOutButton />
         </div>

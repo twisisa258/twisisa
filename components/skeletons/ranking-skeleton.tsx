@@ -11,7 +11,7 @@ export function RankingSkeleton() {
           <Skeleton className="h-11 w-52 rounded-full" />
         </div>
         <Skeleton className="h-[116px] rounded-2xl" />
-        <div className="divide-y divide-[#eceee7] overflow-hidden rounded-2xl border border-[#e3e6dc] bg-white">
+        <div className="divide-y divide-linha overflow-hidden rounded-2xl border border-linha bg-white">
           {Array.from({ length: 8 }).map((_, index) => (
             <div key={index} className="flex items-center gap-3 px-4 py-3 sm:px-5">
               <Skeleton className="size-8 shrink-0 rounded-full" />

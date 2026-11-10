@@ -8,7 +8,7 @@ export function AlunoSkeleton() {
       <div className="flex min-h-screen">
         <StudentSidebarSkeleton />
         <div className="w-0 min-w-0 flex-1 overflow-x-clip">
-          <div aria-hidden="true" className="flex h-[60px] items-center justify-between border-b border-[#eceee7] px-[16px] lg:px-8">
+          <div aria-hidden="true" className="flex h-[60px] items-center justify-between border-b border-linha px-[16px] lg:px-8">
             <div className="flex items-center gap-[8px] lg:hidden">
               <Skeleton className="size-[44px] rounded-full" />
               <Skeleton className="h-5 w-24" />

@@ -35,11 +35,11 @@ function Inlines({ nodes }: { nodes: Inline[] }) {
           case 'br':
             return <br key={index} />
           case 'bold':
-            return <strong key={index} className="font-semibold text-[#17231d]"><Inlines nodes={node.c} /></strong>
+            return <strong key={index} className="font-semibold text-texto"><Inlines nodes={node.c} /></strong>
           case 'italic':
             return <em key={index}><Inlines nodes={node.c} /></em>
           case 'code':
-            return <code key={index} className="rounded-md bg-[#eef0ea] px-1.5 py-0.5 font-mono text-[0.88em]">{node.v}</code>
+            return <code key={index} className="rounded-md bg-superficie-2 px-1.5 py-0.5 font-mono text-[0.88em]">{node.v}</code>
           case 'math':
             return node.display ? (
               <span key={index} className="my-1 block max-w-full overflow-x-auto overflow-y-hidden" dangerouslySetInnerHTML={{ __html: renderMath(node.v, true) }} />
@@ -75,7 +75,7 @@ function Blocks({ blocks, nested = false }: { blocks: Block[]; nested?: boolean 
             return <p key={index} className={space}><Inlines nodes={block.c} /></p>
           case 'h':
             return (
-              <p key={index} role="heading" aria-level={block.level + 2} className={`${index === 0 ? '' : 'mt-4'} font-semibold tracking-[-0.01em] text-[#17231d] ${block.level === 3 ? 'text-[15.5px]' : 'text-[17px]'}`}>
+              <p key={index} role="heading" aria-level={block.level + 2} className={`${index === 0 ? '' : 'mt-4'} font-semibold tracking-[-0.01em] text-texto ${block.level === 3 ? 'text-[15.5px]' : 'text-[17px]'}`}>
                 <Inlines nodes={block.c} />
               </p>
             )
@@ -84,9 +84,9 @@ function Blocks({ blocks, nested = false }: { blocks: Block[]; nested?: boolean 
           case 'ol':
             return <ol key={index} start={block.start} className={`${space} list-decimal space-y-1.5 pl-5`}><Items items={block.items} /></ol>
           case 'quote':
-            return <blockquote key={index} className={`${space} border-l-[3px] border-[#cfdacf] pl-3 text-[#4b574f]`}><Blocks blocks={block.c} nested /></blockquote>
+            return <blockquote key={index} className={`${space} border-l-[3px] border-linha pl-3 text-texto-2`}><Blocks blocks={block.c} nested /></blockquote>
           case 'code':
-            return <pre key={index} className={`${space} overflow-x-auto rounded-xl bg-[#f1f3ee] p-3 font-mono text-[13px] leading-6`}><code>{block.v}</code></pre>
+            return <pre key={index} className={`${space} overflow-x-auto rounded-xl bg-superficie-2 p-3 font-mono text-[13px] leading-6`}><code>{block.v}</code></pre>
           case 'math':
             return <div key={index} className={`${space} max-w-full overflow-x-auto overflow-y-hidden py-1`} dangerouslySetInnerHTML={{ __html: renderMath(block.v, true) }} />
           case 'hr':
@@ -95,11 +95,11 @@ function Blocks({ blocks, nested = false }: { blocks: Block[]; nested?: boolean 
             return (
               <div key={index} className={`${space} max-w-full overflow-x-auto rounded-xl border border-linha`}>
                 <table className="w-full border-collapse text-left text-[14px]">
-                  <thead className="bg-[#f4f6f1]">
+                  <thead className="bg-superficie-2">
                     <tr>{block.head.map((cell, i) => <th key={i} className="px-3 py-2 font-semibold"><Inlines nodes={cell} /></th>)}</tr>
                   </thead>
                   <tbody>
-                    {block.rows.map((row, r) => <tr key={r} className="border-t border-[#edf0e9]">{row.map((cell, c) => <td key={c} className="px-3 py-2 align-top"><Inlines nodes={cell} /></td>)}</tr>)}
+                    {block.rows.map((row, r) => <tr key={r} className="border-t border-linha">{row.map((cell, c) => <td key={c} className="px-3 py-2 align-top"><Inlines nodes={cell} /></td>)}</tr>)}
                   </tbody>
                 </table>
               </div>
@@ -113,7 +113,7 @@ function Blocks({ blocks, nested = false }: { blocks: Block[]; nested?: boolean 
 export const RichText = memo(function RichText({ text, className = '' }: { text: string; className?: string }) {
   const blocks = useMemo(() => parseMarkdown(text), [text])
   return (
-    <div className={`break-words text-[15.5px] leading-[1.75] text-[#26332d] ${className}`}>
+    <div className={`break-words text-[15.5px] leading-[1.75] text-texto ${className}`}>
       <Blocks blocks={blocks} />
     </div>
   )

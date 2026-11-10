@@ -92,7 +92,7 @@ export function AvatarUploader({ name, image }: { name: string; image: string | 
   return (
     <div className="flex shrink-0 flex-col items-center gap-1.5">
       <label className="relative block size-20 cursor-pointer rounded-full sm:size-24" aria-label="Alterar foto de perfil">
-        <span className={`relative flex size-full items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[#e1ece5] to-[#cfe0d5] text-2xl font-semibold text-marca ${src && !loaded && !preview ? 'animate-pulse motion-reduce:animate-none' : ''}`}>
+        <span className={`relative flex size-full items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-marca-suave to-[#cfe0d5] text-2xl font-semibold text-marca ${src && !loaded && !preview ? 'animate-pulse motion-reduce:animate-none' : ''}`}>
           {src ? (
             <img src={src} alt="" onLoad={() => setLoaded(true)} className={`size-full object-cover transition-opacity duration-300 ${loaded || preview ? 'opacity-100' : 'opacity-0'}`} />
           ) : (

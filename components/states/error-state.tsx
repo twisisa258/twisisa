@@ -24,8 +24,8 @@ export function ErrorState({
   return (
     <div role="alert" className="sf px-5 py-10 text-center" style={{ borderColor: '#f0d6d6' }}>
       <span aria-hidden="true" className="relative mx-auto flex size-[88px] items-center justify-center">
-        <span className="absolute inset-0 rounded-full border border-[#f0d6d6] opacity-50" />
-        <span className="absolute inset-[10px] rounded-full border border-[#f0d6d6]" />
+        <span className="absolute inset-0 rounded-full border border-erro-suave opacity-50" />
+        <span className="absolute inset-[10px] rounded-full border border-erro-suave" />
         <span className="flex size-[52px] items-center justify-center rounded-full bg-erro-suave text-erro-texto" style={{ boxShadow: 'inset 0 0 0 1px #f0d6d6' }}><CircleAlert size={24} /></span>
       </span>
       <h2 className="mt-5 text-[17px] font-semibold leading-6 tracking-[-0.01em] text-texto">{title}</h2>

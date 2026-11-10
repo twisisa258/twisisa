@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 const base = 'inline-flex h-[48px] w-full items-center justify-center gap-2 rounded-full px-6 text-[15px] font-semibold no-underline disabled:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca sm:w-auto'
 const styles = {
   primary: 'bg-marca text-white',
-  secondary: 'bg-gradient-to-br from-[#eaf2ed] to-[#d6e6dc] text-marca',
+  secondary: 'bg-gradient-to-br from-marca-suave to-marca-suave text-marca',
 }
 
 /** «Começar» (primeira vez) e «Refazer»: abrem uma tentativa nova no servidor e levam ao teste. */
