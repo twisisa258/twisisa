@@ -6,11 +6,12 @@ import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { SignOutButton } from '@/components/sign-out-button'
 import { Avatar } from '@/components/aluno/avatar'
+import { SeloPlus } from '@/components/plano/selo-plus'
 import { ShellLogo } from '@/components/shell/logo'
 import { StudentNavGroups } from '@/components/student-nav'
 
 // Gaveta do aluno no telemóvel: a mesma lista do menu lateral do computador.
-export function StudentMobileSidebar({ firstName, image = null, open, onClose }: { firstName: string; image?: string | null; open: boolean; onClose: () => void }) {
+export function StudentMobileSidebar({ firstName, image = null, plus = false, open, onClose }: { firstName: string; image?: string | null; plus?: boolean; open: boolean; onClose: () => void }) {
   useEffect(() => {
     if (!open) return
     const previousBodyOverflow = document.body.style.overflow
@@ -45,6 +46,7 @@ export function StudentMobileSidebar({ firstName, image = null, open, onClose }:
           <Link href="/aluno/perfil" onClick={onClose} className="sh-who">
             <Avatar name={firstName} image={image} size={32} />
             <span>{firstName}</span>
+            {plus && <SeloPlus />}
           </Link>
           <SignOutButton />
         </div>

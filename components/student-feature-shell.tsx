@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { AlunoAside } from '@/components/shell/aluno-aside'
 import { AppHeader } from '@/components/shell/app-header'
 import { auth } from '@/lib/auth'
+import { hasPlus } from '@/lib/subscription'
 
 // Estrutura comum das páginas do estudante: menu lateral, cabeçalho fixo e botão de voltar.
 // `backHref`/`backLabel`: para onde volta o botão (por omissão, a visão geral).
@@ -38,12 +39,13 @@ export async function StudentFeatureShell({
   // A foto vem da sessão: assim todas as páginas do estudante mostram-na sem cada uma a ter de a passar.
   const session = await auth.api.getSession({ headers: await headers() }).catch(() => null)
   const image = session?.user.image ?? null
+  const plus = session ? await hasPlus(session.user.id) : false
   return (
     <div className="sh-app">
       <a href="#conteudo" className="sh-skip">Saltar para o conteúdo</a>
-      <AlunoAside firstName={firstName} image={image} />
+      <AlunoAside firstName={firstName} image={image} plus={plus} />
       <div className="sh-main min-w-0 overflow-x-clip">
-        <AppHeader aluno={{ firstName, image }} />
+        <AppHeader aluno={{ firstName, image, plus }} />
         <main id="conteudo" className="mx-auto max-w-[1050px] px-5 py-6 text-texto sm:px-8 sm:py-10">
           {!hideBackLink && <Link href={backHref} className="inline-flex items-center gap-2 text-xs font-semibold text-texto-2 hover:text-marca min-[900px]:hidden"><ArrowLeft />{backLabel}</Link>}
           {!hideTitle && (

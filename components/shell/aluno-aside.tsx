@@ -2,13 +2,14 @@
 
 import { useEffect } from 'react'
 import { Avatar } from '@/components/aluno/avatar'
+import { SeloPlus } from '@/components/plano/selo-plus'
 import { SignOutButton } from '@/components/sign-out-button'
 import { ShellLogo } from '@/components/shell/logo'
 import { StudentNavGroups } from '@/components/student-nav'
 import { useSession } from '@/lib/auth-client'
 
 // Menu lateral do aluno (computador, a partir de 900 px). Um só, em todas as páginas.
-export function AlunoAside({ firstName, image = null }: { firstName: string; image?: string | null }) {
+export function AlunoAside({ firstName, image = null, plus = false }: { firstName: string; image?: string | null; plus?: boolean }) {
   return (
     <aside className="sh-aside" aria-label="Menu do aluno">
       <ShellLogo href="/aluno" className="sh-aside-brand" />
@@ -17,6 +18,7 @@ export function AlunoAside({ firstName, image = null }: { firstName: string; ima
         <span className="sh-who">
           <Avatar name={firstName} image={image} size={32} />
           <span>{firstName}</span>
+          {plus && <SeloPlus />}
         </span>
         <SignOutButton />
       </div>

@@ -1101,3 +1101,82 @@ html:has(.sh-app){scroll-padding-top:calc(60px + env(safe-area-inset-top,0px))}
   html[data-shell="aluno"] .tw{margin-left:232px}
 }
 @media (prefers-reduced-motion:reduce){.sh-ic,.sh-l,.sh-btn{transition:none!important}}
+
+/* [twisisa-plano-8] Plano Plus: selo, cartão de membro, logos das operadoras e pagamento. Cores por tokens; o cartão e os logos têm cores de marca fixas. */
+:root{--selo:#3fbf75;--selo-visto:#fff}
+@media (prefers-color-scheme:dark){html:not([data-theme="light"]){--selo:#5fd994;--selo-visto:#0b2a1b}}
+html[data-theme="dark"]{--selo:#5fd994;--selo-visto:#0b2a1b}
+.selo-plus{display:inline-block;width:1em;height:1em;flex:none;vertical-align:-.15em}
+.selo-plus-forma{fill:var(--selo)}
+.selo-plus-visto{fill:none;stroke:var(--selo-visto);stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+.sh-av{position:relative}
+.sh-selo{position:absolute;right:-5px;bottom:-4px;width:17px;height:17px;border-radius:50%;box-shadow:0 0 0 2px var(--k-bg)}
+.sh-who .selo-plus{width:16px;height:16px}
+
+/* logos das operadoras (provisórios: ver components/plano/operadoras.tsx) */
+.op-logo{display:inline-grid;place-items:center;height:26px;padding:0 9px;border-radius:6px;color:#fff;font:800 .7rem/1 'Manrope',system-ui,sans-serif;letter-spacing:.01em;white-space:nowrap;vertical-align:middle}
+.op-p{height:20px;padding:0 7px;border-radius:5px;font-size:.62rem}
+.op-g{height:38px;padding:0 14px;border-radius:8px;font-size:.88rem}
+.op-mpesa{background:#008a43}
+.op-emola{background:#c65a0a}
+.op-mkesh{background:#0b5fa5}
+
+/* cartão Plus */
+.pc-pal{--rx:0deg;--ry:0deg;--mx:30%;--my:20%;perspective:900px}
+.pc{position:relative;container-type:inline-size;display:flex;flex-direction:column;justify-content:space-between;width:100%;max-width:440px;aspect-ratio:1.586;padding:18px;border-radius:18px;overflow:hidden;color:#fff;
+  background:radial-gradient(120% 90% at 85% 0%,#3b8a74 0,transparent 55%),linear-gradient(145deg,#0f2f27 0,#1d4d41 55%,#2a6b5a 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22);transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .15s ease-out;will-change:transform}
+.pc::before{content:"";position:absolute;inset:0;background:repeating-radial-gradient(circle at 100% 100%,rgba(255,255,255,.07) 0 1px,transparent 1px 11px);pointer-events:none}
+.pc::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at var(--mx) var(--my),rgba(255,255,255,.22),transparent 45%);mix-blend-mode:soft-light;pointer-events:none}
+.pc>*{position:relative;z-index:1}
+.pc>.pc-agua{position:absolute;right:-26px;bottom:-30px;width:170px;height:170px;opacity:.16;z-index:0}
+.pc-topo{display:flex;align-items:center;justify-content:space-between}
+.pc-logo{display:inline-flex;align-items:center;gap:8px;font:800 1.05rem 'Manrope',system-ui,sans-serif;letter-spacing:-.03em;white-space:nowrap}
+.pc-logo i{width:20px;height:20px;border-radius:5px;background:#fff}
+.pc-plus{padding:3px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.16);font:800 .72rem 'Manrope',system-ui,sans-serif;letter-spacing:.14em}
+.pc-chip{position:relative;width:40px;height:30px;border-radius:6px;background:linear-gradient(135deg,#d8f3e4,#8fd6ae);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.pc-chip::before{content:"";position:absolute;inset:6px 10px;border:1px solid rgba(8,60,38,.35);border-radius:3px}
+.pc-pe{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.pc-pe small{display:block;font-size:.7rem;font-weight:600;opacity:.75;white-space:nowrap}
+.pc-nome{min-width:0}
+.pc-nome b{display:flex;align-items:center;gap:6px;font:800 clamp(.95rem,5.2cqw,1.15rem)/1.2 'Manrope',system-ui,sans-serif;letter-spacing:-.01em}
+.pc-nome b span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pc-selo{width:1.15em;height:1.15em}
+.pc-val{text-align:right;font:700 .92rem 'Manrope',system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pc-bloq{background:linear-gradient(145deg,#26332d,#3a4a42);filter:saturate(.5)}
+.pc-bloq .pc-pe{filter:blur(5px)}
+.pc-tranca{position:absolute!important;inset:0;z-index:3!important;display:grid;place-content:center;justify-items:center;gap:4px;background:rgba(10,20,15,.35);text-align:center}
+.pc-tranca b{font:800 1.05rem 'Manrope',system-ui,sans-serif;white-space:nowrap}
+.pc-tranca span{font-size:.85rem;opacity:.85;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.pc{transform:none!important;transition:none}}
+
+/* página do plano */
+.pl-caixa{padding:16px;border:1px solid var(--linha);border-radius:16px;background:var(--superficie)}
+.pl-estado{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.pl-titulo{margin:8px 0 0;font:800 1.05rem/1.25 'Manrope',system-ui,sans-serif;letter-spacing:-.02em}
+.pl-apoio{margin:2px 0 0;color:var(--texto-2);font-size:.88rem;line-height:1.5}
+.pl-estado .pl-apoio,.pl-selo-caixa .pl-apoio{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-anel{--p:60;display:grid;place-items:center;flex:none;width:56px;height:56px;border-radius:50%;background:conic-gradient(var(--sucesso) calc(var(--p)*1%),var(--sucesso-suave) 0)}
+.pl-anel i{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--superficie);font:800 .95rem 'Manrope',system-ui,sans-serif;font-style:normal;font-variant-numeric:tabular-nums}
+.pl-selo-caixa{display:flex;align-items:center;gap:14px}
+.pl-selo-caixa .pl-titulo{margin-top:0}
+.pl-selo-g{width:48px;height:48px;flex:none}
+.pl-preco{margin:10px 0 0;font:800 2.2rem/1 'Manrope',system-ui,sans-serif;letter-spacing:-.05em}
+.pl-preco span{margin-left:6px;color:var(--texto-2);font-size:.95rem;font-weight:700;letter-spacing:0}
+.pl-lista{display:grid;gap:8px;margin:14px 0 0;padding:0;list-style:none;font-size:.93rem;font-weight:500}
+.pl-lista li{display:flex;align-items:center;gap:10px;white-space:nowrap}
+.pl-lista svg{flex:none;color:var(--sucesso)}
+.pl-campo{margin:0 0 16px;padding:0;border:0;min-width:0}
+.pl-campo legend,.pl-campo>label{display:block;margin:0 0 8px;padding:0;font-size:.92rem;font-weight:700}
+.pl-meios{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pl-meio{position:relative;display:grid;gap:8px;justify-items:center;padding:14px 6px 10px;border:1px solid var(--linha);border-radius:12px;background:var(--superficie-2);cursor:pointer;text-align:center}
+.pl-meio input{position:absolute;opacity:0;pointer-events:none}
+.pl-meio:has(input:checked){border-color:var(--marca);background:var(--marca-suave);box-shadow:0 0 0 1px var(--marca)}
+.pl-meio:has(input:focus-visible){outline:2px solid var(--marca);outline-offset:2px}
+.pl-meio small{color:var(--texto-2);font-size:.72rem;font-weight:600;white-space:nowrap}
+.pl-tel{display:flex;align-items:center;height:48px;border:1px solid var(--linha);border-radius:12px;background:var(--superficie-2);overflow:hidden}
+.pl-tel:focus-within{border-color:var(--marca);box-shadow:0 0 0 3px var(--marca-suave)}
+.pl-tel span{padding:0 10px 0 14px;color:var(--texto-2);font-weight:700}
+.pl-tel input{flex:1;min-width:0;height:100%;border:0;background:transparent;color:var(--texto);font:600 1.05rem 'DM Sans',system-ui,sans-serif;letter-spacing:.02em;outline:none}
+.pl-aviso{min-height:1.4em;margin:8px 2px 0;color:var(--texto-2);font-size:.85rem}
+.pl-nota{margin:10px 0 0;color:var(--texto-2);font-size:.82rem;text-align:center}

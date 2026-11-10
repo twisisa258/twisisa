@@ -49,3 +49,8 @@ Regra: a cor da marca só aparece em coisas que se tocam.
 - Modo claro/escuro: botão no cabeçalho, escolha guardada em `localStorage` (`tw-tema`), por omissão segue o sistema. O script do `<head>` (`components/shell/theme-script.tsx`) aplica-o antes de pintar. Os tokens escuros estão em `app/globals.css` (secção «twisisa-shell-7»).
 - Em páginas novas: usar tokens (`bg-superficie`, `bg-superficie-2`, `border-linha`, `text-texto-2`, `text-on-marca`), nunca `#hex`. Um `#hex` não muda no modo escuro.
 - Ecrãs de foco sem menu: onboarding, sessão do Treinar e Jonas.
+
+## Selo Plus e cartão de membro
+- Selo Plus: círculo ondulado em verde-claro com visto (`--selo`, `--selo-visto`), desenhado só por `components/plano/selo-plus.tsx`. É uma marca de identidade, não um botão: não usa a cor da marca. Só aparece com Plus ativo, ao lado da foto ou do nome.
+- Cartão Plus (`components/plano/cartao-plus.tsx`): só mostra dados reais (nome, mês de início, fim do período). Sem número de membro inventado. Sem sombra exterior (só um brilho interior).
+- Logos das operadoras num só sítio (`components/plano/operadoras.tsx`).

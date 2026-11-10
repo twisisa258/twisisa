@@ -11,6 +11,7 @@ import { isTrack, levelLabel, type Track } from '@/lib/percurso'
 import { relativeTime } from '@/lib/relative-time'
 import { cn } from '@/lib/utils'
 import { AlunoAside } from '@/components/shell/aluno-aside'
+import { hasPlus } from '@/lib/subscription'
 import { AppHeader } from '@/components/shell/app-header'
 import { UrlFeedback } from '@/components/url-feedback'
 import { Ic } from '@/components/aluno/icons'
@@ -98,6 +99,7 @@ export default async function StudentPage({ searchParams }: { searchParams: Prom
     .limit(1)
 
   const firstName = session.user.name.split(' ')[0]
+  const plus = await hasPlus(session.user.id)
   const isAdmin = isAdminEmail(session.user.email)
   // Entrada na administração para quem tem papel na equipa (admin ou revisor). Se a consulta falhar, a página continua sem o botão.
   const staffRole = isAdmin ? ('admin' as const) : await getStaffRole(session.user).catch(() => null)
@@ -192,9 +194,9 @@ export default async function StudentPage({ searchParams }: { searchParams: Prom
       <InstalarBarra />
       {track && <NovidadeModal />}
       <div className="sh-app">
-        <AlunoAside firstName={firstName} image={session.user.image ?? null} />
+        <AlunoAside firstName={firstName} image={session.user.image ?? null} plus={plus} />
         <div className="sh-main min-w-0 overflow-x-clip leading-[normal]">
-          <AppHeader aluno={{ firstName, image: session.user.image ?? null }} unread={unreadCount} staff={staffRole ? { href: staffRole === 'admin' ? '/admin' : '/admin/questoes', label: staffRole === 'admin' ? 'Administração' : 'Revisão' } : null} />
+          <AppHeader aluno={{ firstName, image: session.user.image ?? null, plus }} unread={unreadCount} staff={staffRole ? { href: staffRole === 'admin' ? '/admin' : '/admin/questoes', label: staffRole === 'admin' ? 'Administração' : 'Revisão' } : null} />
 
           <div className="mx-auto flex w-full max-w-[560px] flex-col gap-[16px] px-[16px] pb-[24px] pt-[12px] lg:px-8 lg:pb-12 lg:pt-8">
             <div className="flex min-w-0 flex-col gap-[16px]">

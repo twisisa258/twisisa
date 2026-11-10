@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { Bell, Menu } from 'lucide-react'
 import { useState } from 'react'
 import { Avatar } from '@/components/aluno/avatar'
+import { SeloPlus } from '@/components/plano/selo-plus'
 import { ShellLogo } from '@/components/shell/logo'
 import { ThemeToggle } from '@/components/site/theme-toggle'
 import { StudentMobileSidebar } from '@/components/student-mobile-sidebar'
@@ -19,7 +20,7 @@ const NAV = [
   { href: '/blog', label: 'Blog' },
 ] as const
 
-type Aluno = { firstName: string; image: string | null }
+type Aluno = { firstName: string; image: string | null; plus?: boolean }
 type StaffLink = { href: string; label: string }
 
 export function AppHeader({ aluno, unread = 0, staff = null }: { aluno?: Aluno; unread?: number; staff?: StaffLink | null }) {
@@ -43,9 +44,12 @@ function AlunoBar({ aluno, unread, staff }: { aluno: Aluno; unread: number; staf
           <Bell size={18} aria-hidden />
           {unread > 0 && <i aria-hidden="true" />}
         </Link>
-        <Link href="/aluno/perfil" className="sh-av" aria-label="O meu perfil"><Avatar name={aluno.firstName} image={aluno.image} size={32} /></Link>
+        <Link href="/aluno/perfil" className="sh-av" aria-label={aluno.plus ? 'O meu perfil, assinante Plus' : 'O meu perfil'}>
+          <Avatar name={aluno.firstName} image={aluno.image} size={32} />
+          {aluno.plus && <SeloPlus decorativo className="sh-selo" />}
+        </Link>
       </div>
-      <StudentMobileSidebar firstName={aluno.firstName} image={aluno.image} open={open} onClose={() => setOpen(false)} />
+      <StudentMobileSidebar firstName={aluno.firstName} image={aluno.image} plus={aluno.plus} open={open} onClose={() => setOpen(false)} />
     </header>
   )
 }

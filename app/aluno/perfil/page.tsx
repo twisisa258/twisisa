@@ -184,7 +184,7 @@ export default async function PerfilPage() {
         <div className="grid gap-4">
           <p className="text-sm text-texto-2">{plus ? 'Tens o Twisisa Plus ativo.' : 'Estás no plano gratuito.'}</p>
           <div>
-            <Link href="/planos" className={linkButton}><BookOpen className="mr-2 size-4" aria-hidden="true" />{plus ? 'Ver o meu plano' : 'Ver planos'}</Link>
+            <Link href="/aluno/plano" className={linkButton}><BookOpen className="mr-2 size-4" aria-hidden="true" />{plus ? 'Ver o meu plano' : 'Ver o plano Plus'}</Link>
           </div>
         </div>
       ),

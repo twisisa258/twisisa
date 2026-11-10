@@ -6,7 +6,7 @@ import { BookOpen, Bookmark, ClipboardCheck, Flame, LayoutDashboard, Library, Sp
 
 // Menu único do estudante: o lateral do computador (AlunoAside) e a gaveta do telemóvel (StudentMobileSidebar) usam esta mesma lista,
 // por isso todas as páginas têm as mesmas ligações, na mesma ordem e com a página atual marcada.
-const MAIN = [
+export const MAIN = [
   { href: '/aluno', label: 'Hoje', icon: LayoutDashboard, exact: true },
   { href: '/aluno/simulador', label: 'Treinar', icon: ClipboardCheck },
   { href: '/exames', label: 'Exames', icon: BookOpen },
@@ -16,20 +16,20 @@ const MAIN = [
 ] as const
 
 // O que o aluno guardou: questões para rever e materiais da Biblioteca.
-const SAVED = [
+export const SAVED = [
   { href: '/aluno/estudar-depois', label: 'Estudar depois', icon: Bookmark },
   { href: '/aluno/favoritos', label: 'Materiais guardados', icon: Library },
 ] as const
 
-const PERSONAL = [
-  { href: '/aluno/perfil', label: 'Eu', icon: UserRound },
+export const PERSONAL = [
+  { href: '/aluno/perfil', label: 'Eu', icon: UserRound, also: ['/aluno/plano'] },
 ] as const
 
-type Item = { href: string; label: string; icon: typeof BookOpen; exact?: boolean }
+type Item = { href: string; label: string; icon: typeof BookOpen; exact?: boolean; also?: readonly string[] }
 
 function isActive(pathname: string, item: Item) {
   if (item.exact) return pathname === item.href
-  return pathname === item.href || pathname.startsWith(`${item.href}/`)
+  return pathname === item.href || pathname.startsWith(`${item.href}/`) || (item.also ?? []).some((extra) => pathname === extra || pathname.startsWith(`${extra}/`))
 }
 
 function Group({ label, items, onNavigate }: { label: string; items: readonly Item[]; onNavigate?: () => void }) {
