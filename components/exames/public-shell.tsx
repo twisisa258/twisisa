@@ -1,16 +1,23 @@
 import Link from 'next/link'
+import { AlunoChrome } from '@/components/exames/aluno-chrome'
 import { SiteFrame } from '@/components/site/site-frame'
 
-// Aplica o modo guardado antes de a página aparecer (evita o «piscar» de claro para escuro).
-const THEME_SCRIPT = "try{var t=localStorage.getItem('tw-tema');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}"
+// Corre antes de a página aparecer: aplica o modo claro/escuro guardado e, se este aparelho já tem um aluno com sessão, a moldura do aluno (evita o «piscar»).
+const SHELL_SCRIPT = "try{var d=document.documentElement,t=localStorage.getItem('tw-tema');if(t==='dark'||t==='light')d.dataset.theme=t;if(localStorage.getItem('tw-aluno')==='1')d.dataset.shell='aluno'}catch(e){}"
 
-// Moldura das páginas de exames: cabeçalho fixo e rodapé da página inicial, com modo claro/escuro, e o conteúdo ao centro.
+// Moldura das páginas de exames. Antes do login: cabeçalho e rodapé públicos. Depois do login: o menu do aluno (barra lateral no computador, gaveta no telemóvel).
+// As duas versões vêm no mesmo HTML e o CSS escolhe uma, por isso a página continua estática e indexável.
 export function PublicShell({ children }: { children: React.ReactNode }) {
   return (
-    <SiteFrame themed>
-      <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
-      <main id="conteudo" className="tw5">{children}</main>
-    </SiteFrame>
+    <>
+      <script dangerouslySetInnerHTML={{ __html: SHELL_SCRIPT }} />
+      <SiteFrame themed>
+        <AlunoChrome />
+        <div className="ex2-wrap">
+          <main id="conteudo" className="tw5">{children}</main>
+        </div>
+      </SiteFrame>
+    </>
   )
 }
 

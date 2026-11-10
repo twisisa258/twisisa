@@ -115,6 +115,10 @@ Páginas públicas `/exames` (Google), temas principais (`/admin/temas-principai
 - **Texto que não quebra:** `.btn` passou a `white-space: nowrap` (antes `text-wrap: balance`). Os dois rótulos longos encontrados foram encurtados («Não sei: teste vocacional»). Cards ainda por auditar. Regras novas em `DESIGN.md` e `PRODUTO.md`.
 - `components/feature-card.tsx` não é usado em nenhuma página (a pesquisa dizia que era igual com e sem ligação, mas está morto): apagar quando houver aval.
 
+## Exames v2 (10/11/2026), FEITO, FALTA TESTE
+- Página da disciplina (`/exames/<universidade>/<disciplina>`): título com cor da disciplina, separadores com números (Exames, Temas, Cursos; só aparecem os que têm conteúdo, `#temas` e `#cursos` abrem o separador), exame mais recente em destaque, pesquisa de cursos com barras por faculdade e «Outras disciplinas». Perguntas frequentes mantidas (os dados estruturados exigem o texto visível). Regras puras em `lib/exames-ui.ts` (teste em `tests/exames-ui.test.ts`).
+- Antes e depois do login nas páginas públicas de exames e no simulado público (`components/exames/public-shell.tsx`): o servidor envia as duas versões e o CSS escolhe por `html[data-shell]`. Sem sessão: cabeçalho e rodapé públicos. Com sessão: barra lateral no computador (a partir de 900 px) e gaveta no telemóvel, com as mesmas ligações do menu do aluno (`components/exames/aluno-chrome.tsx`). As páginas continuam estáticas (sem ler a sessão no servidor); o aparelho guarda um aviso (`tw-aluno`) para abrir já na versão certa e a sessão confirma. Por confirmar num telemóvel: o primeiro acesso depois de entrar (sem aviso guardado) mostra por instantes a versão pública.
+
 ## Pendentes, por prioridade
 P0 (antes de receber estudantes)
 1. Ensaio completo com 3 a 5 estudantes reais num telemóvel (conta, e-mail, percurso, simulado, ranking, Jonas, Biblioteca).

@@ -6,7 +6,7 @@ import { BookOpen, Bookmark, ClipboardCheck, Flame, LayoutDashboard, Library, Sp
 
 // Menu único do estudante: o computador (StudentSidebar) e o telemóvel (StudentMobileSidebar) usam esta mesma lista,
 // por isso todas as páginas do estudante têm as mesmas ligações, na mesma ordem e com a página atual marcada.
-const MAIN = [
+export const MAIN = [
   { href: '/aluno', label: 'Hoje', icon: LayoutDashboard, exact: true },
   { href: '/aluno/simulador', label: 'Treinar', icon: ClipboardCheck },
   { href: '/exames', label: 'Exames', icon: BookOpen },
@@ -16,12 +16,12 @@ const MAIN = [
 ] as const
 
 // O que o aluno guardou: questões para rever e materiais da Biblioteca.
-const SAVED = [
+export const SAVED = [
   { href: '/aluno/estudar-depois', label: 'Estudar depois', icon: Bookmark },
   { href: '/aluno/favoritos', label: 'Materiais guardados', icon: Library },
 ] as const
 
-const PERSONAL = [
+export const PERSONAL = [
   { href: '/aluno/perfil', label: 'Eu', icon: UserRound },
 ] as const
 

@@ -899,3 +899,131 @@ html:has(.tw-th){scroll-padding-top:calc(60px + env(safe-area-inset-top,0px))}
 .tw6-pg{position:sticky;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:5;padding:6px 12px;border-radius:99px;background:var(--ink);color:var(--bg);font-size:.8rem;font-weight:700;font-variant-numeric:tabular-nums;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .tw6-msg{gap:14px;padding:24px 16px;text-align:center}
 .tw6-msg p{margin:0;color:var(--mu);font-weight:600}
+
+/* [twisisa-exames-v2] disciplina: título com identidade, separadores com números, exame em destaque. Antes do login (cabeçalho público) e depois (menu do aluno). */
+.ex2-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* antes / depois do login: o servidor envia as duas versões e o CSS escolhe (html[data-shell] vem do aparelho e da sessão) */
+.tw-th .ex2-side,.tw-th .ex2-hd{display:none}
+html[data-shell="aluno"] .tw-th .ex2-pub{display:none!important}
+html:not([data-shell="aluno"]) .tw-th .ex2-al{display:none!important}
+html[data-shell="aluno"] .tw-th .tw-head,html[data-shell="aluno"] .tw-th .tw-foot{display:none}
+html[data-shell="aluno"] .tw-th .ex2-hd{display:block}
+.tw-th .ex2-hd{position:fixed;top:0;left:0;right:0;z-index:40;padding-top:env(safe-area-inset-top,0px);background:var(--hd);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--ln)}
+.ex2-bar{max-width:880px;height:52px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:8px}
+.ex2-sp{flex:1}
+.ex2-av{display:inline-flex;margin-left:2px}
+.ex2-wrap{min-width:0}
+.tw-th .ex2-side{position:fixed;top:0;bottom:0;left:0;z-index:45;width:232px;flex-direction:column;padding:calc(18px + env(safe-area-inset-top,0px)) 14px 14px;background:var(--sf);border-right:1px solid var(--ln);overflow-y:auto}
+.ex2-sb{padding:4px 8px 16px}
+.ex2-nav{display:flex;flex-direction:column;gap:2px;flex:1}
+.ex2-nav p{margin:14px 10px 4px;font-size:.78rem;font-weight:700;color:var(--mu)}
+.ex2-nav p:first-child{margin-top:0}
+.ex2-nav a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-weight:600;font-size:.92rem;color:var(--mu)}
+.ex2-nav a[aria-current=page]{background:var(--g);color:var(--on)}
+@media (hover:hover) and (pointer:fine){.ex2-nav a:not([aria-current=page]):hover{background:var(--gs);color:var(--g)}}
+.ex2-me{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--ln)}
+.ex2-who{display:flex;align-items:center;gap:8px;min-width:0;font-weight:600;font-size:.85rem}
+.ex2-who span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (min-width:900px){
+  html[data-shell="aluno"] .tw-th .ex2-side{display:flex}
+  html[data-shell="aluno"] .tw-th .ex2-hd{left:232px}
+  html[data-shell="aluno"] .tw-th .ex2-wrap{margin-left:232px}
+  html[data-shell="aluno"] .tw-th .ex2-menu,html[data-shell="aluno"] .tw-th .ex2-brand{display:none}
+}
+/* gaveta do telemóvel */
+.ex2-dr{position:fixed;inset:0;z-index:60}
+.ex2-ov{position:absolute;inset:0;border:0;background:rgba(8,16,12,.5)}
+.ex2-pn{position:relative;display:flex;flex-direction:column;width:min(86vw,320px);height:100%;padding:calc(14px + env(safe-area-inset-top,0px)) 14px calc(14px + env(safe-area-inset-bottom,0px));background:var(--sf);border-right:1px solid var(--ln);overflow-y:auto}
+.ex2-pt{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;padding:0 4px 0 8px}
+@media (min-width:900px){.ex2-dr{display:none}}
+
+/* voltar e título com identidade */
+.tw-th .ex2-back{display:inline-flex;align-items:center;gap:6px;padding:6px 0;color:var(--mu);font-weight:600;font-size:.9rem}
+@media (hover:hover) and (pointer:fine){.tw-th .ex2-back:hover{color:var(--g)}}
+.ex2-ti{display:flex;align-items:center;gap:14px;margin-top:8px}
+.ex2-tile{--tb:hsl(var(--hue) 70% 93%);--tt:hsl(var(--hue) 60% 34%);flex:none;width:52px;height:52px;border-radius:12px;background:var(--tb);color:var(--tt);display:grid;place-items:center;font:800 1.5rem 'Manrope',system-ui,sans-serif}
+@media (prefers-color-scheme:dark){html:not([data-theme="light"]) .ex2-tile{--tb:hsl(var(--hue) 35% 20%);--tt:hsl(var(--hue) 70% 76%)}}
+html[data-theme="dark"] .ex2-tile{--tb:hsl(var(--hue) 35% 20%);--tt:hsl(var(--hue) 70% 76%)}
+.tw-th .ex2-h1{margin:0;font:800 clamp(1.7rem,6vw,2.2rem)/1.05 'Manrope',system-ui,sans-serif;letter-spacing:-.045em}
+.tw-th .ex2-sub{margin:3px 0 0;color:var(--mu);font-weight:600;font-size:.9rem}
+.ex2-acts{display:flex;gap:8px;margin-top:16px}
+.ex2-acts .tw-btn{white-space:nowrap}
+.ex2-acts .ex2-main{flex:1;min-width:0}
+
+/* separadores = números + navegação */
+.ex2-tabs{position:sticky;top:calc(52px + env(safe-area-inset-top,0px));z-index:20;margin-top:6px;padding:14px 0 10px;background:var(--bg)}
+.ex2-tl{display:grid;grid-template-columns:repeat(var(--n,3),1fr);gap:6px;padding:4px;border:1px solid var(--ln);border-radius:10px;background:var(--sf)}
+.ex2-tl button{display:grid;justify-items:center;padding:8px 4px;border:0;border-radius:7px;background:transparent;color:var(--mu);cursor:pointer}
+.ex2-tl b{font:800 1.3rem/1.1 'Manrope',system-ui,sans-serif;letter-spacing:-.03em;color:var(--ink);font-variant-numeric:tabular-nums}
+.ex2-tl span{font-size:.78rem;font-weight:600}
+.ex2-tl button[aria-selected="true"]{background:var(--g)}
+.ex2-tl button[aria-selected="true"] b,.ex2-tl button[aria-selected="true"] span{color:var(--on)}
+.ex2-panel[hidden]{display:none}
+.ex2-acts+.ex2-panel{margin-top:18px}
+
+/* exames: o mais recente em destaque, o resto em lista compacta */
+.ex2-feat{display:flex;align-items:center;gap:14px;padding:16px;border:1px solid var(--g);border-radius:10px;background:var(--gs)}
+.ex2-feat .t{flex:1;min-width:0}
+.ex2-tag{display:inline-block;padding:2px 8px;border-radius:5px;background:var(--g);color:var(--on);font-size:.75rem;font-weight:700}
+.ex2-year{margin:6px 0 0;font:800 1.6rem/1 'Manrope',system-ui,sans-serif;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.ex2-fs{margin:4px 0 10px;color:var(--mu);font-size:.88rem;font-weight:500}
+.ex2-paper{flex:none;width:64px;aspect-ratio:1/1.35;display:grid;align-content:start;gap:5px;padding:9px 8px;border-radius:3px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.ex2-paper i{height:3px;border-radius:2px;background:#d3d7d2}
+.ex2-paper i:nth-child(3n){width:70%}
+.ex2-yl{list-style:none;margin:8px 0 0;padding:0;border:1px solid var(--ln);border-radius:10px;background:var(--sf);overflow:hidden}
+.ex2-yl li+li{border-top:1px solid var(--ln)}
+.ex2-yr{display:flex;align-items:center;gap:14px;padding:13px 14px;color:var(--ink)}
+.ex2-yr b{width:78px;flex:none;font:800 1.05rem 'Manrope',system-ui,sans-serif;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ex2-yr span{flex:1;min-width:0;color:var(--mu);font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ex2-yr svg{flex:none;color:var(--mu)}
+@media (hover:hover) and (pointer:fine){.ex2-yr:hover{background:var(--gs)}}
+.ex2-more{margin-top:10px}
+.ex2-more>summary{display:flex;align-items:center;justify-content:center;height:42px;border:1px solid var(--ln);border-radius:8px;font-weight:700;font-size:.92rem;cursor:pointer;list-style:none}
+.ex2-more>summary::-webkit-details-marker{display:none}
+.ex2-more[open]>summary{display:none}
+.ex2-more[open]>.ex2-yl{margin-top:0}
+
+/* temas */
+.ex2-tm{border:1px solid var(--ln);border-radius:10px;background:var(--sf);overflow:hidden}
+.ex2-tm details+details{border-top:1px solid var(--ln)}
+.ex2-tm summary{display:flex;align-items:center;gap:12px;padding:13px 14px;font-weight:600;cursor:pointer;list-style:none}
+.ex2-tm summary::-webkit-details-marker{display:none}
+.ex2-tm summary::after{content:"+";margin-left:auto;color:var(--mu);font-size:1.25rem;line-height:1;transition:rotate .2s}
+.ex2-tm details[open]>summary::after{rotate:45deg}
+.ex2-tm .nn{flex:none;width:26px;height:26px;display:grid;place-items:center;border-radius:7px;background:var(--gs);color:var(--g);font-weight:800;font-size:.82rem}
+.ex2-tm p{margin:0;padding:0 14px 14px 52px;max-width:62ch;color:var(--mu);font-size:.93rem;line-height:1.55;white-space:pre-line}
+.ex2-tm .dc{margin:-4px 14px 14px 52px;padding:8px 10px;border-radius:6px;background:var(--gs);color:var(--ink);font-weight:600;font-size:.88rem}
+
+/* cursos */
+.ex2-q{position:relative}
+.ex2-q svg{position:absolute;left:12px;top:50%;translate:0 -50%;color:var(--mu);pointer-events:none}
+.ex2-q input{width:100%;height:46px;padding:0 14px 0 40px;border:1px solid var(--ln);border-radius:8px;background:var(--sf);color:var(--ink);font:500 1rem 'DM Sans',system-ui,sans-serif;outline:none}
+.ex2-q input:focus{border-color:var(--g);box-shadow:0 0 0 3px var(--gs)}
+.ex2-hint{margin:10px 2px 6px;color:var(--mu);font-size:.88rem;min-height:1.3em}
+.ex2-fu{border:1px solid var(--ln);border-radius:10px;background:var(--sf);overflow:hidden}
+.ex2-fu details+details{border-top:1px solid var(--ln)}
+.ex2-fu summary{display:grid;grid-template-columns:1fr auto;gap:7px 10px;padding:12px 14px;cursor:pointer;list-style:none}
+.ex2-fu summary::-webkit-details-marker{display:none}
+.ex2-fu .nm{font-weight:600;font-size:.94rem;line-height:1.3}
+.ex2-fu .ct{font-weight:800;color:var(--g);font-variant-numeric:tabular-nums}
+.ex2-fu .br{grid-column:1/-1;height:5px;border-radius:3px;background:var(--gs)}
+.ex2-fu .br i{display:block;height:100%;border-radius:3px;background:var(--g);width:var(--w)}
+.ex2-cl{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 14px}
+.ex2-cl span{padding:5px 10px;border-radius:6px;background:var(--bg);border:1px solid var(--ln);font-size:.86rem;font-weight:600}
+.ex2-solo{padding:0}
+.ex2-res{border:1px solid var(--ln);border-radius:10px;background:var(--sf)}
+.ex2-res div{display:flex;justify-content:space-between;gap:10px;padding:12px 14px;font-weight:600}
+.ex2-res div+div{border-top:1px solid var(--ln)}
+.ex2-res small{color:var(--mu);font-weight:500;text-align:right}
+.ex2-vz{padding:18px;border:1px dashed var(--ln);border-radius:10px;color:var(--mu);font-weight:600}
+
+/* outras disciplinas */
+.ex2-oth{margin-top:26px}
+.ex2-oth h2{margin:0 0 8px;font-size:.9rem;font-weight:700;color:var(--mu);letter-spacing:0}
+.ex2-chips{list-style:none;display:flex;gap:8px;margin:0 -16px;padding:0 16px 2px;overflow-x:auto;scrollbar-width:none}
+.ex2-chips::-webkit-scrollbar{display:none}
+.ex2-chips li{flex:none}
+.ex2-chips a{display:inline-flex;align-items:center;height:34px;padding:0 12px;border:1px solid var(--ln);border-radius:6px;background:var(--sf);font-weight:700;font-size:.9rem;white-space:nowrap}
+@media (hover:hover) and (pointer:fine){.ex2-chips a:hover{border-color:var(--g);color:var(--g)}}
+@media (prefers-reduced-motion:reduce){.ex2-tm summary::after{transition:none}}
