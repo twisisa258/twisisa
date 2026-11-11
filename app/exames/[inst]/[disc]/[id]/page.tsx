@@ -8,7 +8,7 @@ import { PdfPreview } from '@/components/exames/pdf-preview'
 import { FaqList } from '@/components/exames/faq'
 import { Crumbs, PublicShell } from '@/components/exames/public-shell'
 import { examPath, faqExam, faqJsonLd } from '@/lib/exames-pure'
-import { findExams, getPublicExam } from '@/lib/exames'
+import { findExams, getExamText, getPublicExam } from '@/lib/exames'
 import { OG_IMAGE, SITE_LOCALE, SITE_NAME, SITE_URL, breadcrumbJsonLd } from '@/lib/seo'
 
 export const revalidate = 3600
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const exam = await load(params)
   if (!exam) return { title: 'Página não encontrada | Twisisa', robots: { index: false, follow: false } }
   const path = `/exames/${exam.institution.slug}/${exam.subject.slug}/${exam.id}`
-  const description = `${exam.heading}: lê o exame em PDF, sem conta. Estuda os temas principais e pratica com questões reais da ${exam.institution.shortName} no Twisisa.`
+  const description = `${exam.heading}: lê o exame sem conta, estuda os temas principais e treina com questões reais no Twisisa.`
   return {
     title: `${exam.heading} | ${SITE_NAME}`,
     description,
@@ -46,6 +46,7 @@ export default async function ExamPage({ params }: Props) {
   const path = `${subjectPath}/${exam.id}`
   // Outros anos da mesma disciplina e universidade (inclui este): liga as páginas entre si e ajuda quem procura outro ano.
   const sameSubject = (await findExams({ institutionId: exam.institution.id, subjectId: exam.subject.id, limit: 12 }).catch(() => ({ items: [], total: 0 }))).items
+  const examText = await getExamText(exam.id)
   const faq = faqExam({ heading: exam.heading, subject: exam.subject.name, institution: exam.institution.shortName })
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -58,7 +59,8 @@ export default async function ExamPage({ params }: Props) {
         learningResourceType: 'Exame de admissão',
         about: { '@type': 'Thing', name: exam.subject.name },
         provider: { '@type': 'CollegeOrUniversity', name: exam.institution.name },
-        ...(exam.year ? { datePublished: String(exam.year) } : {}),
+        ...(exam.year ? { temporalCoverage: String(exam.year) } : {}),
+        ...(exam.updatedAt ? { dateModified: new Date(exam.updatedAt).toISOString() } : {}),
         isAccessibleForFree: true,
       },
       breadcrumbJsonLd([{ name: 'Início', path: '/' }, { name: 'Exames', path: '/exames' }, { name: exam.institution.shortName, path: `/exames/${exam.institution.slug}` }, { name: exam.subject.name, path: subjectPath }, { name: exam.heading, path }]),
@@ -80,6 +82,17 @@ export default async function ExamPage({ params }: Props) {
 
       {/* O exame aparece aqui, folha a folha, sem tocar em nenhum botão. */}
       <PdfPreview src={viewer} title={exam.heading} downloadHref={download} />
+
+      {/* O mesmo texto do PDF, no HTML do servidor: é o que o Google lê. Mesmo estilo das perguntas (sem desenho novo). */}
+      {examText.length > 0 && (
+        <section className="tw5-sec tw5-faq" aria-labelledby="texto">
+          <h2 id="texto" className="tw5-h2">Texto do exame</h2>
+          <details>
+            <summary>Ler o texto do exame<b aria-hidden="true">+</b></summary>
+            {examText.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+          </details>
+        </section>
+      )}
 
       {sameSubject.length > 1 && (
         <section className="tw5-sec" aria-labelledby="outros">

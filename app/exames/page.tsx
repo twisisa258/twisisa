@@ -11,8 +11,8 @@ import { SITE_URL, breadcrumbJsonLd, pageMetadata } from '@/lib/seo'
 export const revalidate = 3600
 
 export const metadata = pageMetadata({
-  title: 'Exames de admissão em Moçambique: ler, baixar e praticar | Twisisa',
-  description: 'Exames de admissão anteriores da UEM, UP e de outras universidades moçambicanas. Lê sem conta, descarrega o PDF, vê os temas a estudar e treina com questões reais.',
+  title: 'Exames de admissão em Moçambique: ler e baixar | Twisisa',
+  description: 'Exames de admissão anteriores da UEM, UP e de outras universidades moçambicanas. Lê sem conta, descarrega o PDF e treina com questões reais.',
   path: '/exames',
 })
 
@@ -46,7 +46,7 @@ export default async function ExamesPage() {
       <Crumbs items={[{ name: 'Início', href: '/' }, { name: 'Exames' }]} />
 
       <section className="tw5-top">
-        <h1 className="tw5-h1">Exames</h1>
+        <h1 className="tw5-h1">Exames<span className="ex2-sr"> de admissão em Moçambique</span></h1>
         <form role="search" action="/exames/pesquisa" method="get" className="tw5-search">
           <div>
             <label htmlFor="exames-q" className="sr-only">Pesquisar exames</label>

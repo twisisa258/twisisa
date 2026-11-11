@@ -48,7 +48,7 @@ export default async function YearExamsPage({ params }: Props) {
       <JsonLd data={jsonLd} />
       <Crumbs items={[{ name: 'Início', href: '/' }, { name: 'Exames', href: '/exames' }, { name: institution.shortName, href: `/exames/${institution.slug}` }, { name: String(year) }]} />
       <section className="tw5-top">
-        <h1 className="tw5-h1">{institution.shortName} <em>{year}.</em></h1>
+        <h1 className="tw5-h1"><span className="ex2-sr">Exames de admissão </span>{institution.shortName} <em>{year}.</em></h1>
         <p className="tw5-sub">{exams.length} {exams.length === 1 ? 'exame' : 'exames'}</p>
       </section>
 

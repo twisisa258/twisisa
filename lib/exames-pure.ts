@@ -163,6 +163,40 @@ export function faqSimulado(): Faq[] {
   ]
 }
 
+/**
+ * Texto de um exame lido do PDF, em parágrafos, para o HTML da página (o Google não lê o PDF desenhado no ecrã).
+ * Une as linhas partidas pelo PDF e abre novo parágrafo em «1.», «a)», «Questão», «Grupo»… Devolve [] se o texto for curto demais.
+ */
+export function examTextParagraphs(raw: string, maxChars = 14000, minChars = 400): string[] {
+  const text = raw.replace(/\r\n?/g, '\n').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\uFFFD]/g, ' ')
+  const startsItem = /^(\d{1,3}\s*[.)]|\(?[a-e]\)|quest[ãa]o\b|grupo\b|parte\b|problema\b|exerc[ií]cio\b|pergunta\b)/i
+  const paragraphs: string[] = []
+  let current = ''
+  const flush = () => {
+    const clean = current.replace(/\s+/g, ' ').trim()
+    if (clean.length >= 3) paragraphs.push(clean)
+    current = ''
+  }
+  for (const line of text.split('\n')) {
+    const trimmed = line.trim()
+    if (!trimmed) {
+      flush()
+      continue
+    }
+    if (startsItem.test(trimmed)) flush()
+    current += `${current ? ' ' : ''}${trimmed}`
+  }
+  flush()
+  const out: string[] = []
+  let total = 0
+  for (const paragraph of paragraphs) {
+    if (total + paragraph.length > maxChars) break
+    out.push(paragraph)
+    total += paragraph.length
+  }
+  return total >= minChars ? out : []
+}
+
 /** Dados estruturados FAQPage: o texto tem de ser o mesmo que aparece na página. */
 export function faqJsonLd(items: Faq[]) {
   return {

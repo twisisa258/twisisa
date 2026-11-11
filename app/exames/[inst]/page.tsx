@@ -49,7 +49,7 @@ export default async function InstitutionExamsPage({ params }: Props) {
       <JsonLd data={jsonLd} />
       <Crumbs items={[{ name: 'Início', href: '/' }, { name: 'Exames', href: '/exames' }, { name: institution.shortName }]} />
       <section className="tw5-top">
-        <h1 className="tw5-h1">Exames <em>{institution.shortName}.</em></h1>
+        <h1 className="tw5-h1">Exames<span className="ex2-sr"> de admissão</span> <em>{institution.shortName}.</em></h1>
         <p className="tw5-sub">{institution.name}</p>
         <div className="tw5-actions">
           <Link href="/sign-up" className="tw-btn lg"><ArrowRight size={18} aria-hidden /> Praticar</Link>

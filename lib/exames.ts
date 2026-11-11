@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { pool } from '@/lib/db'
 import { AppError } from '@/lib/action-result'
 import { askAi } from '@/lib/kit-ai'
-import { examHeading, isYear, likePattern, parseKeyTopics, searchTokens, slugify } from '@/lib/exames-pure'
+import { examHeading, examTextParagraphs, isYear, likePattern, parseKeyTopics, searchTokens, slugify } from '@/lib/exames-pure'
 
 // Páginas públicas de exames (para o Google) e temas principais (só servidor).
 // Tudo vem da base de dados: instituições, disciplinas, exames da Biblioteca e temas publicados no admin.
@@ -91,6 +91,16 @@ export async function getPublicExam(id: string) {
     heading: examHeading({ subject: row.subject_name, institution: institution.shortName, year: row.academic_year, title: row.title }),
     updatedAt: (row.updated_at as Date) ?? null,
   }
+}
+
+/**
+ * Texto do exame lido do PDF (existe nos exames importados com o Jonas, em material_imports).
+ * Vai no HTML da página: o Google não lê o PDF que o ecrã desenha. Sem texto aproveitável devolve [] e a página não mostra nada.
+ */
+export async function getExamText(id: string): Promise<string[]> {
+  const result = await pool.query(`SELECT left(extracted_text, 40000) AS texto FROM material_imports WHERE material_id = $1 LIMIT 1`, [id]).catch(() => null)
+  const raw = result?.rows[0]?.texto
+  return typeof raw === 'string' ? examTextParagraphs(raw) : []
 }
 
 // ---------------------------------------------------------------- listas de exames (hub, pesquisa, anos, sitemap)

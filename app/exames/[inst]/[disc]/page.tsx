@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!page) return { title: 'Página não encontrada | Twisisa', robots: { index: false, follow: false } }
   const { institution, subject, topics, exams } = page
   return pageMetadata({
-    title: `Exame de admissão de ${subject.name} ${institution.shortName}: temas e exames anteriores | Twisisa`,
+    title: `Exame de admissão de ${subject.name} ${institution.shortName}: temas e exames | Twisisa`,
     description: `Exame de admissão de ${subject.name} na ${institution.shortName}: ${topics.length > 0 ? `os ${topics.length} temas principais a estudar` : 'o que estudar'}${exams.length > 0 ? `, ${exams.length} ${exams.length === 1 ? 'exame anterior' : 'exames anteriores'} para ler` : ''} e prática com questões reais.`,
     path: `/exames/${institution.slug}/${subject.slug}`,
   })
@@ -141,7 +141,7 @@ export default async function SubjectExamPage({ params }: Props) {
       <header className="ex2-ti">
         <div className="ex2-tile" style={{ '--hue': subjectHue(subject.slug) } as CSSProperties} aria-hidden="true">{subject.name.trim().slice(0, 1).toUpperCase()}</div>
         <div>
-          <h1 className="ex2-h1">{subject.name}</h1>
+          <h1 className="ex2-h1"><span className="ex2-sr">Exame de admissão de </span>{subject.name}<span className="ex2-sr"> {institution.shortName}</span></h1>
           <p className="ex2-sub">{institution.shortName} · Exame de admissão</p>
         </div>
       </header>
@@ -149,7 +149,7 @@ export default async function SubjectExamPage({ params }: Props) {
       <div className="ex2-acts">
         <Link href="/sign-up" className="tw-btn ex2-main ex2-pub">{practiceLabel(subject.name)}</Link>
         <Link href="/aluno/simulador" className="tw-btn ex2-main ex2-al">{practiceLabel(subject.name)}</Link>
-        {topics.length > 0 && <a href={`${base}/temas.pdf`} className="tw-btn ol" aria-label="Temas em PDF"><Download size={17} aria-hidden />PDF</a>}
+        {topics.length > 0 && <a href={`${base}/temas.pdf`} rel="nofollow" className="tw-btn ol" aria-label="Temas em PDF"><Download size={17} aria-hidden />PDF</a>}
       </div>
 
       <DisciplinaTabs tabs={tabs} label={`${subject.name} ${institution.shortName}`} />
