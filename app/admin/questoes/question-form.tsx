@@ -8,6 +8,8 @@ import { SelectField } from '@/components/ui/select-field'
 import { MathText } from '@/lib/math-text'
 import type { ActionResult } from '@/lib/action-result'
 import { newDraftId, type DraftPayload } from '@/lib/question-draft-shared'
+import { etapaEmFalta, type EtapaConfig } from '@/lib/regras'
+import { ConfiguracaoGuiada } from './configuracao-guiada'
 
 export type EditorSubject = { id: string; name: string; scopes: string[] }
 export type EditorTopic = { id: string; name: string; subjectId: string }
@@ -32,7 +34,7 @@ export type EditorValue = {
 }
 
 const field = 'mt-1 w-full rounded-xl border border-[#dfe3d9] bg-white px-3 py-2.5 text-sm outline-none focus:border-marca focus:ring-2 focus:ring-marca/10'
-const STEPS = ['Enunciado', 'Opções', 'Classificação']
+const STEPS = ['Enunciado', 'Opções', 'Detalhes']
 const LETTERS = ['A', 'B', 'C', 'D', 'E']
 const TRACKS: Choice[] = [
   { value: '10', label: '10ª classe' },
@@ -75,6 +77,7 @@ export function QuestionForm({
   topics,
   variants,
   institutions,
+  variantInstitutionIds,
   years,
   difficulties,
   origins,
@@ -87,6 +90,7 @@ export function QuestionForm({
   topics: EditorTopic[]
   variants: EditorVariant[]
   institutions: Choice[]
+  variantInstitutionIds: string[]
   years: Choice[]
   difficulties: Choice[]
   origins: Choice[]
@@ -116,6 +120,7 @@ export function QuestionForm({
   const [year, setYear] = useState(base?.year ?? '')
   const [originLabel, setOriginLabel] = useState(base?.originLabel ?? '')
   const [variant, setVariant] = useState(base?.variant ?? '')
+  const [forcarConfig, setForcarConfig] = useState<EtapaConfig | null>(null)
   const [error, setError] = useState('')
   const intentRef = useRef<HTMLInputElement>(null)
 
@@ -219,6 +224,23 @@ export function QuestionForm({
   // Variantes da disciplina escolhida (as arquivadas só aparecem se a questão já as usa).
   const variantOptions = variants.filter((item) => item.subjectId === subjectId && (item.active || item.name === base?.variant))
   const filled = options.filter((option) => option.body.trim())
+  // Configuração guiada: enquanto faltar uma escolha (ou se o utilizador tocar em «Alterar»), vê-se só ela.
+  const faltaConfig = etapaEmFalta({ track, institutionId, subjectId, topicId, variant }, variantInstitutionIds, variantOptions.length > 0)
+  const mostrarConfig = faltaConfig !== null || forcarConfig !== null
+  const variantEnviada = track === 'admissao' && variantInstitutionIds.includes(institutionId) && variantOptions.length > 0 ? variant : ''
+  const resumoConfig = [
+    track === 'admissao' ? (institutions.find((item) => item.value === institutionId)?.label ?? '').split(' · ')[0] : track ? `${track}ª classe` : '',
+    subjects.find((item) => item.id === subjectId)?.name ?? '',
+    variantEnviada ? `Variante ${variantEnviada}` : '',
+    topics.find((item) => item.id === topicId)?.name ?? '',
+  ].filter(Boolean).join(' · ')
+  function mudarConfig(parcial: Partial<{ track: string; institutionId: string; subjectId: string; topicId: string; variant: string }>) {
+    if (parcial.track !== undefined) setTrack(parcial.track)
+    if (parcial.institutionId !== undefined) setInstitutionId(parcial.institutionId)
+    if (parcial.subjectId !== undefined) setSubjectId(parcial.subjectId)
+    if (parcial.topicId !== undefined) setTopicId(parcial.topicId)
+    if (parcial.variant !== undefined) setVariant(parcial.variant)
+  }
 
   function problemBefore(target: number) {
     if (target >= 1 && statement.trim().length < 3) return 'Escreve o enunciado antes de continuar.'
@@ -257,6 +279,13 @@ export function QuestionForm({
       {editing && <input type="hidden" name="id" value={editing.id} />}
       {isNew && <input type="hidden" name="draftId" value={draftId} />}
       <input ref={intentRef} type="hidden" name="intent" defaultValue="draft" />
+      <input type="hidden" name="track" value={track} />
+      <input type="hidden" name="institutionId" value={track === 'admissao' ? institutionId : ''} />
+      <input type="hidden" name="subjectId" value={subjectId} />
+      <input type="hidden" name="topicId" value={topicId} />
+      <input type="hidden" name="variant" value={variantEnviada} />
+
+      <div className={mostrarConfig ? 'hidden' : 'grid gap-5'}>
 
       <div className="flex items-end gap-3">
         <ol aria-label="Passos" className="grid min-w-0 flex-1 grid-cols-3 gap-2">
@@ -370,42 +399,11 @@ Qual das alternativas é verdadeira?`}</pre>
         </label>
       </div>
 
-      {/* 3. Classificação */}
+      {/* 3. Detalhes */}
       <div className={step === 2 ? 'grid gap-4' : 'hidden'}>
-        <div className="text-sm font-medium">
-          <span>Para quem *</span>
-          <SelectField name="track" label="Para quem" placeholder="Classe ou admissão" triggerClassName={field} defaultValue={track} onValueChange={setTrack} options={TRACKS} />
-        </div>
-        {track === 'admissao' && (
-          <div className="text-sm font-medium">
-            <span>Instituição *</span>
-            <SelectField name="institutionId" label="Instituição" placeholder="Seleccionar instituição" triggerClassName={field} defaultValue={institutionId} onValueChange={setInstitutionId} options={institutions} />
-          </div>
-        )}
-        <div className="text-sm font-medium">
-          <span>Disciplina *</span>
-          <SelectField
-            key={`subject-${scopeKey}`}
-            name="subjectId"
-            label="Disciplina"
-            placeholder={scopeKey ? 'Seleccionar disciplina' : track === 'admissao' ? 'Escolhe primeiro a instituição' : 'Escolhe primeiro para quem é'}
-            triggerClassName={field}
-            defaultValue={subjectOptions.some((subject) => subject.id === subjectId) ? subjectId : ''}
-            onValueChange={setSubjectId}
-            options={subjectOptions.map((subject) => ({ value: subject.id, label: subject.name }))}
-          />
-        </div>
-        <div className="text-sm font-medium">
-          <span>Tema</span>
-          <SelectField
-            key={`topic-${subjectId}`}
-            name="topicId"
-            label="Tema"
-            triggerClassName={field}
-            defaultValue={topicOptions.some((topic) => topic.id === base?.topicId) ? (base?.topicId ?? '') : ''}
-            onValueChange={setTopicId}
-            options={[{ value: '', label: 'Sem tema (questão auxiliar)' }, ...topicOptions.map((topic) => ({ value: topic.id, label: topic.name }))]}
-          />
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-linha bg-[#fafbf8] px-3.5 py-3">
+          <p className="min-w-0 text-sm font-medium">{resumoConfig}</p>
+          <button type="button" onClick={() => setForcarConfig('onde')} className="shrink-0 text-sm font-semibold text-marca">Alterar</button>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="text-sm font-medium"><span>Dificuldade</span><SelectField name="difficulty" label="Dificuldade" triggerClassName={field} defaultValue={base?.difficulty ?? 'media'} onValueChange={setDifficulty} options={difficulties} /></div>
@@ -415,22 +413,6 @@ Qual das alternativas é verdadeira?`}</pre>
           <div className="text-sm font-medium"><span>Ano</span><SelectField name="year" label="Ano" triggerClassName={field} defaultValue={base?.year ?? ''} onValueChange={setYear} options={years} /></div>
           <label className="text-sm font-medium">Exame de origem<input name="originLabel" maxLength={160} value={originLabel} onChange={(event) => setOriginLabel(event.target.value)} className={field} placeholder="Ex.: Exame UEM 2024" /></label>
         </div>
-        {variantOptions.length > 0 && (
-          <div className="text-sm font-medium">
-            <span>Variante</span>
-            <SelectField
-              key={`variant-${subjectId}`}
-              name="variant"
-              label="Variante"
-              placeholder="Escolher variante"
-              triggerClassName={field}
-              defaultValue={variantOptions.some((item) => item.name === variant) ? variant : ''}
-              onValueChange={setVariant}
-              options={[{ value: '', label: 'Sem variante (só completa misturas)' }, ...variantOptions.map((item) => ({ value: item.name, label: item.name }))]}
-            />
-            <span className="mt-1 block text-xs font-normal text-texto-2">Esta disciplina tem variantes: para publicar, a questão tem de ter uma. Sem variante, nunca aparece quando o aluno escolhe uma variante.</span>
-          </div>
-        )}
       </div>
 
       {isNew && saveState !== 'idle' && (
@@ -456,6 +438,21 @@ Qual das alternativas é verdadeira?`}</pre>
           </>
         )}
       </div>
+      </div>
+
+      {mostrarConfig && (
+        <ConfiguracaoGuiada
+          valor={{ track, institutionId, subjectId, topicId, variant }}
+          subjects={subjects}
+          topics={topics}
+          variants={variants}
+          institutions={institutions}
+          variantInstitutionIds={variantInstitutionIds}
+          forcar={forcarConfig}
+          onChange={mudarConfig}
+          onForcar={setForcarConfig}
+        />
+      )}
     </FeedbackForm>
   )
 }

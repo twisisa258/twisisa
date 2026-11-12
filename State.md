@@ -193,3 +193,10 @@ Por fazer:
 ## Documentos
 - `docs/IDENTIDADE-ONBOARDING-RETENCAO.md`: desenho final de identidade, onboarding, actividade e retenção (fases A a H).
 - `SIMULADOR.md`, `JONAS.md`, `CONVITES.md`, `ADMIN-MATERIAIS.md`, `docs/EMAIL.md`, `docs/CURSOS-UEM-2026.md`, `docs/prompt-csv-questoes.md`: mantidos; ainda não foram revistos contra o código.
+
+## Disciplinas, Variantes e Questões (11/11/2026), FEITO, FALTA TESTE
+- **10 disciplinas gerais** (`lib/regras.ts`, migração 0040): Matemática, Física, Química, Biologia, Português, Inglês, Francês, Filosofia, Geografia, História. Obrigatórias em todas as instituições e classes. As outras (Música, Teatro, Desenho, etc.) ficam **arquivadas**, não apagadas. Cursos sem nenhuma combinação só de disciplinas gerais (provas escritas) ficam arquivados. Em `/admin/disciplinas` já não se criam disciplinas.
+- **Variantes** só I, II e III e só em instituições com `institutions.has_variants` (hoje a UEM). Noutra instituição a questão não leva variante; na UEM, uma disciplina com variantes exige variante para publicar.
+- **Tema obrigatório** para publicar uma questão (rascunho pode ficar sem).
+- **Criar questão** abre uma configuração guiada (`app/admin/questoes/configuracao-guiada.tsx`): Instituição ou classe → Disciplina → Variante (só UEM) → Tema, um passo por ecrã. Depois vêm Enunciado, Opções e Detalhes.
+- Por testar num telemóvel; falta ver o efeito dos cursos arquivados no onboarding e no Simulador.

@@ -82,12 +82,7 @@ export default async function AdminDisciplinasPage({ searchParams }: { searchPar
       <AdminPageHeader
         icon={Layers}
         title="Disciplinas"
-        description="Em que classes e instituições cada disciplina existe."
-        action={
-          <FormModal label="Adicionar" title="Adicionar disciplina" description="Escolhe as classes e instituições em que existe.">
-            <SubjectForm editing={null} institutions={institutions} />
-          </FormModal>
-        }
+        description="As 10 disciplinas gerais. Todas as instituições e cursos seguem estas."
       />
       {editing && (
         <RouteModal title={`Editar ${editing.name}`} closeHref="/admin/disciplinas">
@@ -100,7 +95,7 @@ export default async function AdminDisciplinasPage({ searchParams }: { searchPar
         {subjects === null ? (
           <AdminLoadError href="/admin/disciplinas" />
         ) : subjects.length === 0 ? (
-          <div className="m-4"><EmptyState title="Ainda sem disciplinas" description="Usa o botão Adicionar para criar a primeira." /></div>
+          <div className="m-4"><EmptyState title="Ainda sem disciplinas" description="Corre a migração das disciplinas gerais (npm run migrate)." /></div>
         ) : visible.length === 0 ? (
           <div className="m-4"><EmptyState title="Sem resultados" description={`Nenhuma disciplina corresponde a “${q}”.`} actionLabel="Limpar pesquisa" actionHref="/admin/disciplinas" /></div>
         ) : (

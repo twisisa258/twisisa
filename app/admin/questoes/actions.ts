@@ -12,6 +12,7 @@ import { parseCsv } from '@/lib/csv'
 import { CSV_EXAMPLE_MARK } from '@/lib/question-csv-template'
 import { finishDraft } from '@/lib/question-drafts'
 import { ANSWER_SOURCES, DIFFICULTIES, ORIGINS, listDraftIdsByReview, optionsProblem, subjectHasScope, type OptionInput } from '@/lib/questions'
+import { normalizarVariante } from '@/lib/regras'
 
 async function requireAdmin() {
   const admin = await getAdminUser()
@@ -42,10 +43,12 @@ function refresh() {
 async function assertClassification(client: Pick<PoolClient, 'query'>, c: { subjectId: string; track: string; institutionId: string | null; topicId: string | null; variant: string | null; publishing: boolean; currentVariant?: string | null }) {
   const subject = await client.query('SELECT 1 FROM library_subjects WHERE id = $1 AND active = true', [c.subjectId])
   if (!subject.rowCount) throw new AppError('A disciplina não existe ou está arquivada.')
+  let comVariantes = false
   if (c.track === 'admissao') {
     if (!c.institutionId) throw new AppError('Escolhe a instituição da admissão.')
-    const institution = await client.query('SELECT 1 FROM institutions WHERE id = $1 AND active = true', [c.institutionId])
+    const institution = await client.query('SELECT has_variants FROM institutions WHERE id = $1 AND active = true', [c.institutionId])
     if (!institution.rowCount) throw new AppError('A instituição não existe ou está inativa.')
+    comVariantes = institution.rows[0].has_variants === true
   } else if (c.track !== '10' && c.track !== '12') {
     throw new AppError('Escolhe para quem é a questão.')
   } else if (c.institutionId) {
@@ -57,12 +60,16 @@ async function assertClassification(client: Pick<PoolClient, 'query'>, c: { subj
   if (c.topicId) {
     const topic = await client.query('SELECT 1 FROM topics WHERE id = $1 AND subject_id = $2 AND active = true', [c.topicId, c.subjectId])
     if (!topic.rowCount) throw new AppError('O tema não pertence à disciplina ou está arquivado.')
+  } else if (c.publishing) {
+    throw new AppError('Escolhe o tema da questão.')
   }
   if (c.variant) {
+    if (!comVariantes) throw new AppError('Só a UEM tem variantes. Tira a variante desta questão.')
+    if (!normalizarVariante(c.variant)) throw new AppError('Variante inválida: só existem I, II e III.')
     const variant = await client.query('SELECT active FROM subject_variants WHERE subject_id = $1 AND name = $2', [c.subjectId, c.variant])
     if (!variant.rowCount) throw new AppError('A variante não existe nesta disciplina. Cria-a em Variantes.')
     if (!variant.rows[0].active && c.variant !== c.currentVariant) throw new AppError('A variante está arquivada.')
-  } else if (c.publishing) {
+  } else if (c.publishing && comVariantes) {
     const has = await client.query('SELECT 1 FROM subject_variants WHERE subject_id = $1 AND active LIMIT 1', [c.subjectId])
     if (has.rowCount) throw new AppError('Esta disciplina tem variantes: escolhe a variante da questão antes de publicar.')
   }
@@ -381,6 +388,8 @@ export async function importQuestionsCsv(formData: FormData): Promise<ActionResu
         }
         let variant: string | null = null
         if (record.variant) {
+          const comVariantes = institutionId ? await client.query('SELECT 1 FROM institutions WHERE id = $1 AND has_variants = true', [institutionId]) : null
+          if (!comVariantes?.rowCount) { fail(line, 'só a UEM tem variantes.'); continue }
           const found = await client.query('SELECT name FROM subject_variants WHERE subject_id = $1 AND lower(name) = lower($2) AND active LIMIT 1', [subjectId, record.variant])
           if (!found.rowCount) { fail(line, `variante “${record.variant}” não encontrada nesta disciplina (cria-a em Variantes).`); continue }
           variant = found.rows[0].name as string

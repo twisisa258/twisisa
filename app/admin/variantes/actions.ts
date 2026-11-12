@@ -9,6 +9,7 @@ import { AppError, runAction, type ActionResult } from '@/lib/action-result'
 import { isUniqueViolation } from '@/lib/pg-errors'
 import { moveWithin, nextOrder } from '@/lib/reorder'
 import { VARIANT_DIFFICULTIES } from '@/lib/variants'
+import { normalizarVariante } from '@/lib/regras'
 
 async function requireAdmin() {
   const admin = await getAdminUser()
@@ -30,9 +31,9 @@ export async function saveVariant(formData: FormData): Promise<ActionResult> {
     const admin = await requireAdmin()
     const id = text(formData, 'id')
     const subjectId = text(formData, 'subject_id')
-    const name = text(formData, 'name').replace(/\s+/g, ' ')
+    const name = normalizarVariante(text(formData, 'name')) ?? ''
     const difficulty = text(formData, 'difficulty') || 'media'
-    if (name.length < 1 || name.length > 60) throw new AppError('O nome da variante deve ter entre 1 e 60 caracteres.')
+    if (!name) throw new AppError('Só existem as variantes I, II e III (e só na UEM).')
     if (!subjectId) throw new AppError('Escolhe a disciplina da variante.')
     if (!VARIANT_DIFFICULTIES.some((item) => item.value === difficulty)) throw new AppError('Dificuldade inválida.')
     const subject = await pool.query('SELECT id FROM library_subjects WHERE id = $1', [subjectId])

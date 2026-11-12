@@ -7,6 +7,7 @@ import { listInstitutions, type InstitutionRow } from '@/lib/institutions'
 import { listSubjects, type SubjectRow } from '@/lib/subjects'
 import { listTopics, type TopicRow } from '@/lib/classification'
 import { listVariants, type VariantRow } from '@/lib/variants'
+import { idsInstituicoesComVariantes } from '@/lib/regras-db'
 import { ANSWER_SOURCES, answerSourceLabel, countByStatus, countDraftReview, DIFFICULTIES, difficultyLabel, getQuestion, listQuestions, ORIGINS, originLabel, STATUSES, type QuestionDetail, type QuestionListItem, type QuestionStatus, type ReviewCounts } from '@/lib/questions'
 import { examYearOptions } from '@/lib/years'
 import { MathText, plainExcerpt } from '@/lib/math-text'
@@ -89,6 +90,7 @@ export default async function AdminQuestoesPage({ searchParams }: { searchParams
   let topics: TopicRow[] = []
   let variants: VariantRow[] = []
   let institutions: InstitutionRow[] = []
+  let variantInstitutionIds: string[] = []
   let editing: QuestionDetail | null = null
   let preview: QuestionDetail | null = null
   let drafts: OpenDraft[] = []
@@ -105,6 +107,7 @@ export default async function AdminQuestoesPage({ searchParams }: { searchParams
     ])
     if (params.editar) editing = await getQuestion(params.editar)
     if (params.ver) preview = await getQuestion(params.ver)
+    variantInstitutionIds = await idsInstituicoesComVariantes()
   } catch (error) {
     console.error('[ADMIN QUESTOES]', error)
   }
@@ -121,6 +124,7 @@ export default async function AdminQuestoesPage({ searchParams }: { searchParams
     topics: topics.filter((topic) => topic.active || topic.id === editing?.topicId).map((topic) => ({ id: topic.id, name: topic.name, subjectId: topic.subjectId })),
     variants: variants.map((item) => ({ name: item.name, subjectId: item.subjectId, active: item.active })),
     institutions: institutions.filter((item) => item.active || item.id === editing?.institutionId).map((item) => ({ value: item.id, label: `${item.shortName} · ${item.name}` })),
+    variantInstitutionIds,
     years: examYearOptions('Sem ano'),
     difficulties: DIFFICULTIES.map((item) => ({ value: item.value, label: item.label })),
     origins: ORIGINS.map((item) => ({ value: item.value, label: item.label })),

@@ -31,6 +31,7 @@ export async function saveSubject(formData: FormData): Promise<ActionResult> {
     const id = text(formData, 'id')
     const name = text(formData, 'name').replace(/\s+/g, ' ')
     if (name.length < 2 || name.length > 100) throw new AppError('O nome da disciplina deve ter entre 2 e 100 caracteres.')
+    if (!id) throw new AppError('Só existem as 10 disciplinas gerais do Twisisa. Não se criam outras.')
 
     const tracks: string[] = []
     const institutionIds: string[] = []
@@ -83,6 +84,9 @@ export async function setSubjectActive(formData: FormData): Promise<ActionResult
     const id = text(formData, 'id')
     const active = text(formData, 'active') === 'true'
     if (!id) throw new AppError('Disciplina inválida.')
+    const flag = await pool.query('SELECT core FROM library_subjects WHERE id = $1', [id])
+    if (flag.rows[0]?.core && !active) throw new AppError('As 10 disciplinas gerais não se arquivam.')
+    if (flag.rows[0] && !flag.rows[0].core && active) throw new AppError('Só as 10 disciplinas gerais podem estar ativas.')
     const updated = await pool.query('UPDATE library_subjects SET active = $2 WHERE id = $1 RETURNING name', [id, active])
     if (!updated.rowCount) throw new AppError('Essa disciplina já não existe.')
     await logAdminAction(admin, active ? 'subject.activate' : 'subject.archive', 'subject', id, { name: updated.rows[0].name })
@@ -106,6 +110,8 @@ export async function deleteSubject(formData: FormData): Promise<ActionResult> {
     )
     if (!found.rowCount) throw new AppError('Essa disciplina já não existe.')
     const { name, materials, topics, papers } = found.rows[0]
+    const core = await pool.query('SELECT 1 FROM library_subjects WHERE id = $1 AND core = true', [id])
+    if (core.rowCount) throw new AppError(`${name} é uma das 10 disciplinas gerais e não se elimina.`)
     if (materials > 0 || topics > 0 || papers > 0) throw new AppError(`${name} está em uso (${materials} materiais, ${topics} temas, ${papers} provas de cursos). Arquiva-a em vez de a eliminar.`)
     await pool.query('DELETE FROM library_subjects WHERE id = $1', [id])
     await logAdminAction(admin, 'subject.delete', 'subject', id, { name })
