@@ -6,12 +6,14 @@ import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { SignOutButton } from '@/components/sign-out-button'
 import { Avatar } from '@/components/aluno/avatar'
+import { BlocoPlus } from '@/components/plano/bloco-plus'
 import { SeloPlus } from '@/components/plano/selo-plus'
+import type { BlocoMenu } from '@/lib/plano'
 import { ShellLogo } from '@/components/shell/logo'
 import { StudentNavGroups } from '@/components/student-nav'
 
 // Gaveta do aluno no telemóvel: a mesma lista do menu lateral do computador.
-export function StudentMobileSidebar({ firstName, image = null, plus = false, open, onClose }: { firstName: string; image?: string | null; plus?: boolean; open: boolean; onClose: () => void }) {
+export function StudentMobileSidebar({ firstName, image = null, plus = false, bloco = null, open, onClose }: { firstName: string; image?: string | null; plus?: boolean; bloco?: BlocoMenu | null; open: boolean; onClose: () => void }) {
   useEffect(() => {
     if (!open) return
     const previousBodyOverflow = document.body.style.overflow
@@ -41,6 +43,7 @@ export function StudentMobileSidebar({ firstName, image = null, plus = false, op
           <ShellLogo href="/aluno" className="" />
           <button type="button" aria-label="Fechar menu" onClick={onClose} className="sh-ic"><X size={18} aria-hidden /></button>
         </div>
+        {bloco && <BlocoPlus bloco={bloco} onNavigate={onClose} />}
         <StudentNavGroups onNavigate={onClose} />
         <div className="sh-aside-foot">
           <Link href="/aluno/perfil" onClick={onClose} className="sh-who">

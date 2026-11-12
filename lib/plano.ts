@@ -83,3 +83,48 @@ export function mesAno(data: Date): string {
   const { mes, ano } = partes(data)
   return `${MESES[mes - 1]} ${ano}`
 }
+
+// ---- Oferta do primeiro mês, bloco do menu e eliminar conta ----
+
+/** Só passa a `true` quando a cobrança por M-Pesa, e-Mola e mKesh funcionar. Até lá nenhuma oferta aparece (State.md, «Plano Plus»). */
+export const PAGAMENTO_ATIVO = false
+/** Primeiro mês: 197 MT com 70% de desconto (59,10 arredondado para 60). */
+export const PRECO_PROMO_MT = 60
+export const DESCONTO_PROMO_PCT = 70
+export const POUPA_PROMO_MT = PLANO.precoMt - PRECO_PROMO_MT
+
+export type VarianteBloco = 'a' | 'b' | 'ativo'
+/** O que o menu recebe do servidor (já só texto): a variante e, com Plus, a data de fim já formatada. */
+export type BlocoMenu = { variante: VarianteBloco; ate?: string }
+
+const DIA_MS = 86_400_000
+const SEMANA_NOVA_DIAS = 7
+
+/**
+ * Bloco do topo do menu. Com Plus: «ativo». Sem Plus: A (cartão) na primeira semana da conta, B (faixa) depois.
+ * Enquanto o pagamento não existir, quem não tem Plus não vê nada.
+ */
+export function varianteDoBloco({ plus, criadaEm, agora = new Date(), pagamentoAtivo = PAGAMENTO_ATIVO }: { plus: boolean; criadaEm: Date | number | string; agora?: Date; pagamentoAtivo?: boolean }): VarianteBloco | null {
+  if (plus) return 'ativo'
+  if (!pagamentoAtivo) return null
+  const idade = agora.getTime() - new Date(criadaEm).getTime()
+  return idade <= SEMANA_NOVA_DIAS * DIA_MS ? 'a' : 'b'
+}
+
+/** Cartão grande de oferta no painel: ao entrar, antes de qualquer atividade do dia. */
+export function mostrarCartaoOferta({ plus, sugestoes, respondidasHoje, pagamentoAtivo = PAGAMENTO_ATIVO }: { plus: boolean; sugestoes: boolean; respondidasHoje: number; pagamentoAtivo?: boolean }): boolean {
+  return pagamentoAtivo && !plus && sugestoes && respondidasHoje === 0
+}
+
+/** Faixa fina de oferta no painel (depois de fechar o cartão, ou quando já houve atividade hoje). */
+export function mostrarFaixaOferta({ plus, sugestoes, pagamentoAtivo = PAGAMENTO_ATIVO }: { plus: boolean; sugestoes: boolean; pagamentoAtivo?: boolean }): boolean {
+  return pagamentoAtivo && !plus && sugestoes
+}
+
+/** A frase que se escreve para confirmar a eliminação da conta. */
+export const FRASE_ELIMINAR = 'eliminar minha conta'
+
+/** Confere a frase sem ligar a maiúsculas nem a espaços a mais (mas tem de ser a frase toda). */
+export function fraseConfere(texto: string): boolean {
+  return texto.trim().replace(/\s+/g, ' ').toLowerCase() === FRASE_ELIMINAR
+}

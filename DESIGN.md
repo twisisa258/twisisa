@@ -54,3 +54,8 @@ Regra: a cor da marca só aparece em coisas que se tocam.
 - Selo Plus: círculo ondulado em verde-claro com visto (`--selo`, `--selo-visto`), desenhado só por `components/plano/selo-plus.tsx`. É uma marca de identidade, não um botão: não usa a cor da marca. Só aparece com Plus ativo, ao lado da foto ou do nome.
 - Cartão Plus (`components/plano/cartao-plus.tsx`): só mostra dados reais (nome, mês de início, fim do período). Sem número de membro inventado. Sem sombra exterior (só um brilho interior).
 - Logos das operadoras num só sítio (`components/plano/operadoras.tsx`).
+
+## Ações destrutivas
+- Terminar sessão e eliminar a conta nunca ficam juntas: sessão tem o seu grupo; a eliminação vive na «Zona de perigo», fechada, com a cor de erro.
+- Eliminar a conta exige abrir a zona, ler o que se perde e escrever «eliminar minha conta». O botão só ativa com a frase exata, e o servidor volta a conferir.
+- Ofertas do Plus (bloco do menu, cartão e faixa no painel): sempre fecháveis, nunca bloqueiam nada, e desligam-se em Definições.

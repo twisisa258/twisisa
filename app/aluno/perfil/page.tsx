@@ -1,14 +1,13 @@
 import Link from 'next/link'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { Bell, BookOpen, GraduationCap, Lock, School, Sparkles, UserRound, Check } from 'lucide-react'
+import { GraduationCap, School, UserRound, Check } from 'lucide-react'
 import { eq } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
-import { db, pool } from '@/lib/db'
+import { db } from '@/lib/db'
 import { institutions, studentProfiles } from '@/lib/db/schema'
 import { levelLabel } from '@/lib/percurso'
 import { PROVINCES, profileSteps } from '@/lib/perfil'
-import { getSubscription, isSubscriptionActive } from '@/lib/subscription'
 import { getRanking } from '@/lib/ranking'
 import { ORIENTACAO_HREF } from '@/lib/orientacao'
 import { listInstitutionCourses } from '@/lib/target-course'
@@ -18,11 +17,9 @@ import { StudentFeatureShell } from '@/components/student-feature-shell'
 import { EscolhaBotoes } from '@/components/ui/escolha-botoes'
 import { AvatarUploader } from '@/components/aluno/perfil/avatar-uploader'
 import { Field, fieldClass } from '@/components/aluno/perfil/fields'
-import { PasswordForm } from '@/components/aluno/perfil/password-form'
 import { ProfileAccordion, type AccordionItem } from '@/components/aluno/perfil/profile-accordion'
 import { SectionForm } from '@/components/aluno/perfil/section-form'
 import { CursoCombinacao } from '@/components/aluno/perfil/curso-combinacao'
-import { LembretesSwitch } from '@/components/aluno/lembretes-switch'
 import { saveCandidate, savePersonal, saveSchool } from './actions'
 
 export const metadata = { title: 'O meu perfil | Twisisa', description: 'Gere as tuas informações pessoais e preferências.' }
@@ -32,10 +29,7 @@ const linkButton = 'inline-flex h-10 items-center rounded-xl border border-linha
 export default async function PerfilPage() {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session?.user) redirect('/sign-in')
-  const [[current], subscription] = await Promise.all([
-    db.select().from(studentProfiles).where(eq(studentProfiles.userId, session.user.id)),
-    getSubscription(session.user.id),
-  ])
+  const [current] = await db.select().from(studentProfiles).where(eq(studentProfiles.userId, session.user.id))
   // Posição desta semana (só se pontuou e está visível). Se falhar, o cabeçalho segue sem ela.
   const rank = current?.track && current.showInRanking
     ? await getRanking({ userId: session.user.id, track: current.track, period: 'semana', limit: 0 }).then((data) => data.me, () => null)
@@ -50,14 +44,11 @@ export default async function PerfilPage() {
   const courseSubjects = current?.targetCourseId ? await getStudentCourseSubjects(session.user.id, current.targetCourseId).catch(() => []) : []
   const optionId = current?.targetCourseId ? await getStudentOptionId(session.user.id).catch(() => null) : null
 
-  const prefs = (await pool.query(`SELECT email_enabled, push_enabled FROM notification_prefs WHERE user_id = $1`, [session.user.id]).catch(() => ({ rows: [] }))).rows[0]
-  const remindersOn = prefs ? prefs.email_enabled === true || prefs.push_enabled === true : false
 
   const name = session.user.name
   const firstName = name.split(' ')[0]
   const track = current?.track ?? null
   const isAdmission = track === 'admissao'
-  const plus = isSubscriptionActive(subscription?.status, subscription?.currentPeriodEnd)
 
   const steps = profileSteps({
     image: session.user.image ?? null,
@@ -158,34 +149,6 @@ export default async function PerfilPage() {
               <p className="text-sm text-texto-2">Não sabes o curso? <Link href={ORIENTACAO_HREF} className="font-semibold text-marca hover:underline">Faz o teste vocacional</Link> e escolhe entre 5 sugestões.</p>
             </div>
           )}
-        </div>
-      ),
-    },
-    {
-      id: 'lembretes',
-      icon: <Bell />,
-      title: 'Lembretes',
-      summary: remindersOn ? 'Ligados' : 'Desligados',
-      content: <LembretesSwitch initialOn={remindersOn} publicKey={process.env.VAPID_PUBLIC_KEY ?? ''} />,
-    },
-    {
-      id: 'seguranca',
-      icon: <Lock />,
-      title: 'Segurança',
-      summary: 'Palavra-passe',
-      content: <PasswordForm />,
-    },
-    {
-      id: 'plano',
-      icon: <Sparkles />,
-      title: 'Plano',
-      summary: plus ? 'Plus ativo' : 'Gratuito',
-      content: (
-        <div className="grid gap-4">
-          <p className="text-sm text-texto-2">{plus ? 'Tens o Twisisa Plus ativo.' : 'Estás no plano gratuito.'}</p>
-          <div>
-            <Link href="/aluno/plano" className={linkButton}><BookOpen className="mr-2 size-4" aria-hidden="true" />{plus ? 'Ver o meu plano' : 'Ver o plano Plus'}</Link>
-          </div>
         </div>
       ),
     },

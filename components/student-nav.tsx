@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { BookOpen, Bookmark, ClipboardCheck, Flame, LayoutDashboard, Library, Sparkles, Trophy, UserRound } from 'lucide-react'
+import { BookOpen, Bookmark, ClipboardCheck, Flame, LayoutDashboard, Library, Settings, Sparkles, Trophy, UserRound } from 'lucide-react'
 
 // Menu único do estudante: o lateral do computador (AlunoAside) e a gaveta do telemóvel (StudentMobileSidebar) usam esta mesma lista,
 // por isso todas as páginas têm as mesmas ligações, na mesma ordem e com a página atual marcada.
@@ -22,7 +22,8 @@ export const SAVED = [
 ] as const
 
 export const PERSONAL = [
-  { href: '/aluno/perfil', label: 'Eu', icon: UserRound, also: ['/aluno/plano'] },
+  { href: '/aluno/perfil', label: 'Eu', icon: UserRound },
+  { href: '/aluno/definicoes', label: 'Definições', icon: Settings, also: ['/aluno/plano'] },
 ] as const
 
 type Item = { href: string; label: string; icon: typeof BookOpen; exact?: boolean; also?: readonly string[] }

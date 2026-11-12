@@ -6,6 +6,7 @@ import { Bell, Menu } from 'lucide-react'
 import { useState } from 'react'
 import { Avatar } from '@/components/aluno/avatar'
 import { SeloPlus } from '@/components/plano/selo-plus'
+import type { BlocoMenu } from '@/lib/plano'
 import { ShellLogo } from '@/components/shell/logo'
 import { ThemeToggle } from '@/components/site/theme-toggle'
 import { StudentMobileSidebar } from '@/components/student-mobile-sidebar'
@@ -20,7 +21,7 @@ const NAV = [
   { href: '/blog', label: 'Blog' },
 ] as const
 
-type Aluno = { firstName: string; image: string | null; plus?: boolean }
+type Aluno = { firstName: string; image: string | null; plus?: boolean; bloco?: BlocoMenu | null }
 type StaffLink = { href: string; label: string }
 
 export function AppHeader({ aluno, unread = 0, staff = null }: { aluno?: Aluno; unread?: number; staff?: StaffLink | null }) {
@@ -49,7 +50,7 @@ function AlunoBar({ aluno, unread, staff }: { aluno: Aluno; unread: number; staf
           {aluno.plus && <SeloPlus decorativo className="sh-selo" />}
         </Link>
       </div>
-      <StudentMobileSidebar firstName={aluno.firstName} image={aluno.image} plus={aluno.plus} open={open} onClose={() => setOpen(false)} />
+      <StudentMobileSidebar firstName={aluno.firstName} image={aluno.image} plus={aluno.plus} bloco={aluno.bloco} open={open} onClose={() => setOpen(false)} />
     </header>
   )
 }

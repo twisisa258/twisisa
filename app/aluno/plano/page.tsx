@@ -24,7 +24,7 @@ export default async function PlanoPage() {
 
   if (subscription === null) {
     return (
-      <StudentFeatureShell firstName={firstName} eyebrow="Perfil" title="Plano" icon={CreditCard} backHref="/aluno/perfil" backLabel="Voltar ao perfil">
+      <StudentFeatureShell firstName={firstName} eyebrow="Definições" title="Plano" icon={CreditCard} backHref="/aluno/definicoes" backLabel="Voltar às definições">
         <div className="max-w-xl rounded-2xl border border-linha bg-white p-6">
           <p className="text-[15px] font-medium">Não foi possível carregar o teu plano</p>
           <p className="mt-1 text-sm text-texto-2">Tenta outra vez daqui a pouco.</p>
@@ -38,7 +38,7 @@ export default async function PlanoPage() {
   const dias = estado === 'ativo' ? diasRestantes(fim) : null
 
   return (
-    <StudentFeatureShell firstName={firstName} eyebrow="Perfil" title="Plano" icon={CreditCard} backHref="/aluno/perfil" backLabel="Voltar ao perfil">
+    <StudentFeatureShell firstName={firstName} eyebrow="Definições" title="Plano" icon={CreditCard} backHref="/aluno/definicoes" backLabel="Voltar às definições">
       <div className="flex max-w-xl flex-col gap-4">
         {estado === 'ativo' ? (
           <>
