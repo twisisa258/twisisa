@@ -1,4 +1,4 @@
-import { BookOpen, BookOpenCheck, Copy, FileSearch, Flag, ListOrdered, GraduationCap, Landmark, Layers, LayoutDashboard, LayoutGrid, ListTree, Megaphone, PenLine, Sparkles, Tags, Users, type LucideIcon } from 'lucide-react'
+import { Bell, ClipboardCheck, BookOpen, BookOpenCheck, Copy, FileSearch, Flag, ListOrdered, GraduationCap, Landmark, Layers, LayoutDashboard, LayoutGrid, ListTree, Megaphone, PenLine, Sparkles, Tags, Users, type LucideIcon } from 'lucide-react'
 
 export type AdminSection = {
   href: string
@@ -7,11 +7,23 @@ export type AdminSection = {
   icon: LucideIcon
 }
 
-export const adminOverview = { href: '/admin', label: 'Visão geral', icon: LayoutDashboard }
+export const adminOverview = { href: '/admin', label: 'Painel', icon: LayoutDashboard }
 
 // Áreas de gestão que existem. Para acrescentar uma, cria a página em app/admin/<área>/ e junta-a aqui:
 // aparece sozinha na navegação e na visão geral.
 export const adminSections: AdminSection[] = [
+  {
+    href: '/admin/notificacoes',
+    label: 'Notificações',
+    description: 'Tudo o que acontece na administração, como importações e alterações.',
+    icon: Bell,
+  },
+  {
+    href: '/admin/revisao',
+    label: 'Revisão',
+    description: 'Questões a que falta ano, tema ou variante.',
+    icon: ClipboardCheck,
+  },
   {
     href: '/admin/questoes',
     label: 'Banco de questões',

@@ -89,8 +89,8 @@ export async function getCatalog(): Promise<CatalogRow[]> {
       SELECT
         (SELECT count(*) FROM academic_materials WHERE status = 'approved')::int AS materials_on,
         (SELECT count(*) FROM academic_materials)::int AS materials_total,
-        (SELECT count(*) FROM library_subjects WHERE active)::int AS subjects_on,
-        (SELECT count(*) FROM library_subjects)::int AS subjects_total,
+        (SELECT count(*) FROM library_subjects WHERE core AND active)::int AS subjects_on,
+        (SELECT count(*) FROM library_subjects WHERE core)::int AS subjects_total,
         (SELECT count(*) FROM topics WHERE active)::int AS topics_on,
         (SELECT count(*) FROM topics)::int AS topics_total,
         (SELECT count(*) FROM library_categories WHERE active)::int AS categories_on,

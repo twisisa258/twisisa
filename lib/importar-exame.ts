@@ -4,6 +4,7 @@ import { AppError } from '@/lib/action-result'
 import { askAi } from '@/lib/kit-ai'
 import { fetchMaterialFile } from '@/lib/cloudinary-server'
 import { subjectHasScope } from '@/lib/questions'
+import type { Razao } from '@/lib/revisao'
 import { decideAnswer, matchByName, matchVariant, parseExtraction, parseSolutions, windowFor, type Confidence, type Skipped } from '@/lib/importar-exame-pure'
 
 // Importação de exames com o Jonas (só servidor). O PDF já está na Biblioteca; o Jonas lê 10 questões de cada vez,
@@ -128,7 +129,7 @@ ${input.text}
 """`
 }
 
-export type BatchResult = { saved: number; low: number; skipped: Skipped[]; nextNumber: number; done: boolean; notes: string[] }
+export type BatchResult = { saved: number; low: number; skipped: Skipped[]; nextNumber: number; done: boolean; notes: string[]; review: number; porRazao: Partial<Record<Razao, number>> }
 
 export async function runImportBatch(materialId: string, adminId: string): Promise<BatchResult> {
   const material = (
@@ -216,6 +217,8 @@ export async function runImportBatch(materialId: string, adminId: string): Promi
   const client = await pool.connect()
   let saved = 0
   let low = 0
+  let review = 0
+  const porRazao: Partial<Record<Razao, number>> = {}
   const notes: string[] = []
   try {
     await client.query('BEGIN')
@@ -236,6 +239,19 @@ export async function runImportBatch(materialId: string, adminId: string): Promi
         `INSERT INTO question_sources (question_id, material_id, number, batch_id, confidence, answer_from, note) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
         [questionId, materialId, item.numero, batchId, decision.confidence, item.origem, decision.note],
       )
+      // O que falta (ano, tema, variante exata) leva a questão direta para a Revisão; o resto segue como rascunho normal.
+      await client.query('SAVEPOINT revisao')
+      try {
+        const razoes = ((await client.query(`UPDATE questions SET review_reasons = COALESCE(question_review_reasons(id), '{}') WHERE id = $1 RETURNING review_reasons`, [questionId])).rows[0]?.review_reasons ?? []) as Razao[]
+        await client.query('RELEASE SAVEPOINT revisao')
+        if (razoes.length > 0) {
+          review += 1
+          for (const razao of razoes) porRazao[razao] = (porRazao[razao] ?? 0) + 1
+        }
+      } catch (error) {
+        await client.query('ROLLBACK TO SAVEPOINT revisao')
+        console.error('[IMPORTAR] revisão (a migração do Admin v2 está aplicada?)', error)
+      }
       saved += 1
       if (decision.confidence === 'baixa') low += 1
     }
@@ -248,7 +264,7 @@ export async function runImportBatch(materialId: string, adminId: string): Promi
     )
     await client.query('COMMIT')
     if (!variant && variants.length > 0) notes.push('Não identifiquei a variante: escolhe-a ao rever (a disciplina tem variantes).')
-    return { saved, low, skipped, nextNumber: done ? from : nextNumber, done, notes }
+    return { saved, low, skipped, nextNumber: done ? from : nextNumber, done, notes, review, porRazao }
   } catch (error) {
     await client.query('ROLLBACK').catch(() => undefined)
     console.error('[IMPORTAR] gravação', error)

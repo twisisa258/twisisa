@@ -199,6 +199,11 @@ export async function saveQuestion(formData: FormData): Promise<ActionResult> {
     } finally {
       client.release()
     }
+    try {
+      await pool.query("UPDATE questions SET review_reasons = COALESCE(question_review_reasons(id), '{}') WHERE id = $1", [savedId])
+    } catch (error) {
+      console.error('[ADMIN QUESTOES] não foi possível recalcular a revisão', error)
+    }
     // A questão já existe como rascunho/publicada: o trabalho em curso (guardado automaticamente) deixa de estar por concluir.
     // Se isto falhar, a questão está guardada na mesma; só ficaria uma entrada em «Por concluir», que se descarta.
     if (draftId && !id) {

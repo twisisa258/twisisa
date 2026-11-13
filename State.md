@@ -139,8 +139,17 @@ Páginas públicas `/exames` (Google), temas principais (`/admin/temas-principai
 - **Eliminar conta:** tem de se abrir a zona, ler o que se perde e escrever «eliminar minha conta» (o servidor confere a frase). `lib/eliminar-conta.ts` apaga numa transação todas as linhas com `user_id`/`userId` e depois o utilizador; se algo falhar, não se apaga nada. As contas da equipa não se eliminam por aí. FALTA TESTE com uma conta descartável: confirmar que `session`, `account`, `student_profiles`, tentativas e favoritos desaparecem. Fica de fora: a foto no Cloudinary.
 - **Bloco Plus no menu** (`components/plano/bloco-plus.tsx`): primeiro do menu e da gaveta, com o selo. A (cartão) na primeira semana da conta, B (faixa) depois, «Plus ativo» com Plus. **Cartão de oferta e faixa** no painel (`components/plano/sugestao-plus.tsx`): o cartão antes de qualquer atividade do dia (fechado, volta amanhã), a faixa depois (fechada, volta em 3 dias).
 - **Tudo isto está desligado por `PAGAMENTO_ATIVO = false` em `lib/plano.ts`.** Só passa a `true` quando a cobrança funcionar e o preço de 60 MT valer só no primeiro pagamento de cada conta. Com Plus ativo, o bloco «Plus ativo» aparece já.
-- **Migração 0041** (`student_profiles.plus_suggestions`): correr `npm run migrate`. Sem ela, as sugestões ficam ligadas por defeito.
+- **Migração 0042** (`student_profiles.plus_suggestions`): correr `npm run migrate`. Sem ela, as sugestões ficam ligadas por defeito.
 - Falta: **Evolução** (`/aluno/evolucao`: sequência, precisão por semana e por disciplina, prontidão para o curso alvo, calendário de estudo, tudo de `study_days`, respostas do Simulador e `lib/desafios.ts`); o interruptor «mostrar o selo» (coluna nova); a sugestão passou de folha a cartão no painel porque já há modais à entrada (notificações, novidade).
+
+## Admin v3 (12/11/2026), FEITO, FALTA TESTE
+- **Menu lateral** escuro e por grupos (`lib/admin-grupos.ts`, `components/admin/admin-nav.tsx`): Fluxo de conteúdo (Materiais → Importar → Revisão → Banco de questões), Publicação, Catálogo (fechado), Qualidade e Sistema. Uma secção nova que não esteja num grupo aparece em «Outros»; nada desaparece. O revisor continua a ver só Banco de questões e Revisão.
+- **Importar com o Jonas → Revisão:** `runImportBatch` calcula `review_reasons` em cada questão guardada; a que fica sem ano, tema ou variante exata vai direta para `/admin/revisao` e o admin recebe um aviso; as restantes seguem como rascunho normal. Precisa da migração do Admin v2 (se faltar, a importação segue sem enviar para a Revisão e regista o erro).
+- **Materiais em passos** (`/admin/materiais/novo`, `components/admin/assistente-material.tsx`): tipo → nível → instituição → disciplina → ano, uma pergunta por ecrã, cada uma com «Deixar detetar»; depois os ficheiros herdam o contexto, que fica numa barra no topo (guardado no separador, com «Mudar»).
+- **Seletor personalizado** (`components/ui/seletor.tsx`, controlado, abre uma folha com procura) substitui os `<select>` nativos do carregamento de materiais. Falta trocar os de Cursos (4) e do editor do Blog (3), e converter para passos os formulários de Instituições, Temas, Variantes, Cursos, Equipa, Anúncios e Blog.
+- **Plus arquivado:** a linha «Plano» das Definições só aparece com `PAGAMENTO_ATIVO` ou com Plus ativo.
+- **Migrações:** havia duas com o número 0041 (`admin_v2` e `plus_sugestoes`); `_migrations.id` é chave primária, por isso a segunda falhava. A do Plus passou a ter o número seguinte. Se `npm run migrate status` mostrar `plus_sugestoes` APLICADA e `admin_v2` PENDENTE, corre `UPDATE "_migrations" SET id = 42, name = '0042_plus_sugestoes.sql' WHERE name = '0041_plus_sugestoes.sql';` e depois `npm run migrate`.
+- Falta: hubs de grupo, barra de topo com procura e o Painel como na proposta (o Painel do Admin v2 mantém-se), e a tabela do Banco de questões.
 
 ## Pendentes, por prioridade
 P0 (antes de receber estudantes)
@@ -209,3 +218,10 @@ Por fazer:
 - **Tema obrigatório** para publicar uma questão (rascunho pode ficar sem).
 - **Criar questão** abre uma configuração guiada (`app/admin/questoes/configuracao-guiada.tsx`): Instituição ou classe → Disciplina → Variante (só UEM) → Tema, um passo por ecrã. Depois vêm Enunciado, Opções e Detalhes.
 - Por testar num telemóvel; falta ver o efeito dos cursos arquivados no onboarding e no Simulador.
+
+## Admin v2.0 (12/11/2026)
+- **Painel** (`/admin`): números (publicadas, rascunhos, em revisão, reportes), «Primeiros passos» enquanto faltar preparação, avisos por ler, cobertura por disciplina e por instituição.
+- **Notificações** (`/admin/notificacoes`, tabela `admin_notifications`): `logAdminAction` avisa o próprio admin de tudo o que faz; importações enviam um resumo (`notifyAdmin`).
+- **Revisão** (`/admin/revisao`, colunas `questions.review_reasons` e `review_note`, função SQL `question_review_reasons`): sem ano, sem tema, sem variante, possível duplicada. Recalcula-se em cada gravação.
+- **Criar questões** (`/admin/questoes/nova`): passos Tipo → Instituição → Disciplina → Variante → Nível (`assistente.tsx`); depois uma sessão (`sessao.tsx`) para criar sem repetir a configuração, ou importar um CSV (`importarQuestoesSessao`: linhas com falhas corrigíveis entram em revisão, linhas ilegíveis são rejeitadas).
+- `components/admin/passos.tsx` é o componente de formulário em passos. **Falta** converter os outros formulários (Instituições, Temas, Variantes, Cursos, Equipa, Anúncios, Blog, Materiais) para passos.

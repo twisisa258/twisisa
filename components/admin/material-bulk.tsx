@@ -4,6 +4,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Check, FolderOpen, RotateCcw, Trash2, Upload } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
+import { Seletor } from '@/components/ui/seletor'
 import { finishUpload, findExistingMaterials, publishMaterials, type PublishItem } from '@/app/admin/materiais/actions'
 import { inferFromPath, titleFromFilename, type Inferred } from '@/lib/material-inference'
 
@@ -24,7 +25,7 @@ export type Catalog = {
 }
 
 type FieldKey = 'category' | 'subject' | 'level' | 'institution' | 'year' | 'course'
-type Fields = Record<FieldKey, string>
+export type Fields = Record<FieldKey, string>
 type Status = 'pendente' | 'a_enviar' | 'a_publicar' | 'publicado' | 'erro' | 'existe'
 
 type Row = {
@@ -71,13 +72,7 @@ function effective(row: Row, key: FieldKey, defaults: Fields, detect: boolean): 
 
 function FieldInputs({ values, onChange, catalog, blank, disabled }: { values: Fields; onChange: (key: FieldKey, value: string) => void; catalog: Catalog; blank: string; disabled?: boolean }) {
   const select = (key: FieldKey, label: string, options: { value: string; label: string }[]) => (
-    <label className="grid gap-1 text-xs font-semibold text-[#526057]">
-      {label}
-      <select value={values[key]} onChange={(event) => onChange(key, event.target.value)} disabled={disabled} className={input}>
-        <option value="">{blank}</option>
-        {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-      </select>
-    </label>
+    <Seletor rotulo={label} valor={values[key]} onChange={(valor) => onChange(key, valor)} opcoes={options} vazio={blank} desativado={disabled} />
   )
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -180,9 +175,9 @@ async function walk(entry: FileSystemEntry, prefix: string, out: { file: File; p
   }
 }
 
-export function MaterialBulk({ catalog }: { catalog: Catalog }) {
+export function MaterialBulk({ catalog, initialDefaults, contexto }: { catalog: Catalog; initialDefaults?: Fields; contexto?: React.ReactNode }) {
   const [rows, setRows] = useState<Row[]>([])
-  const [defaults, setDefaults] = useState<Fields>(EMPTY)
+  const [defaults, setDefaults] = useState<Fields>(initialDefaults ?? EMPTY)
   const [detect, setDetect] = useState(true)
   const [apply, setApply] = useState<Fields>(EMPTY)
   const [filter, setFilter] = useState<Filter>('todos')
@@ -527,7 +522,8 @@ export function MaterialBulk({ catalog }: { catalog: Catalog }) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4" onDragOver={(event) => event.preventDefault()} onDrop={onDrop}>
-      <section className="rounded-2xl border border-linha bg-white p-4 sm:p-5" aria-label="Para todos">
+      {contexto}
+      <section hidden={Boolean(initialDefaults)} className="rounded-2xl border border-linha bg-white p-4 sm:p-5" aria-label="Para todos">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div>
             <h2 className="text-sm font-semibold">Para todos os documentos</h2>

@@ -142,29 +142,7 @@ export default async function AdminQuestoesPage({ searchParams }: { searchParams
         title="Questões"
         description="O banco de questões do Simulador, da Prática e do Modo rápido."
         action={
-          !canManage ? undefined : <div className="flex shrink-0 items-center gap-2">
-            <FormModal variant="secondary" icon="upload" label="Importar CSV" title="Importar questões" description="Todas entram como rascunho, com a resposta por confirmar.">
-              <FeedbackForm action={importQuestionsCsv} successMessage="Importação concluída." errorMessage="Não foi possível importar o CSV." resetOnSuccess className="grid gap-4">
-                <p className="text-sm leading-6 text-[#526057]">
-                  Um ficheiro <strong>.csv</strong> com até 500 questões. Se houver um erro numa linha, nada é guardado e vês o que corrigir.
-                </p>
-                <ul className="grid gap-1 rounded-2xl bg-[#fafbf8] p-4 text-xs leading-5 text-[#526057]">
-                  <li><strong>Obrigatórias:</strong> statement, subject_name, track (10, 12 ou admissao), option_a, option_b, correct (A a E).</li>
-                  <li><strong>Opcionais:</strong> option_c a option_e, institution (sigla; obrigatória na admissão), variant (nome de uma variante já criada em Variantes), topic_name, difficulty (facil, media, dificil), year, origin_label, explanation.</li>
-                  <li>A disciplina e o tema têm de existir, com o mesmo nome, e a disciplina tem de estar no percurso indicado.</li>
-                  <li>O modelo traz 3 linhas de exemplo marcadas com <strong>[EXEMPLO]</strong>: apaga-as antes de importar.</li>
-                </ul>
-                <Link href="/admin/questoes/modelo" prefetch={false} className="inline-flex items-center gap-2 text-sm font-semibold text-marca hover:underline"><Download size={16} aria-hidden="true" /> Descarregar o modelo (com exemplos)</Link>
-                <label className="text-sm font-medium">Ficheiro CSV *
-                  <input name="csv" type="file" accept=".csv,text/csv" required className="mt-1 block w-full rounded-xl border border-[#dfe3d9] bg-white p-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-[#edf3ee] file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-marca" />
-                </label>
-                <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-marca px-5 py-3 text-sm font-semibold text-white hover:bg-marca-escura">Importar</button>
-              </FeedbackForm>
-            </FormModal>
-            <FormModal label="Adicionar" title="Adicionar questão" description="Em 3 passos: enunciado, opções e classificação.">
-              <QuestionForm {...formProps} editing={null} draft={null} />
-            </FormModal>
-          </div>
+          !canManage ? undefined : <Link href="/admin/questoes/nova" className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-marca px-4 text-sm font-semibold text-white hover:bg-marca-escura">Criar questões</Link>
         }
       />
       {editing && (

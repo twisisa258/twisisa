@@ -24,6 +24,7 @@ export async function listSubjects(): Promise<SubjectRow[]> {
         WHERE c.subject_id = s.id
       ), '[]'::json) AS scopes
     FROM library_subjects s
+    WHERE s.core = true
     ORDER BY s.name
   `)
   return result.rows.map((row) => ({

@@ -51,6 +51,7 @@ export default async function DefinicoesPage() {
 
         <ProfileAccordion items={items} />
 
+        {(PAGAMENTO_ATIVO || plus) && (
         <Grupo titulo="Plano">
           <div className="df-lista">
             <Link href="/aluno/plano" className="df-li">
@@ -63,6 +64,7 @@ export default async function DefinicoesPage() {
             )}
           </div>
         </Grupo>
+        )}
 
         <Grupo titulo="Sessão">
           <div className="df-lista">

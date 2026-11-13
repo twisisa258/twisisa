@@ -5,6 +5,8 @@ import { getAdminUser } from '@/lib/admin'
 import { logAdminAction } from '@/lib/admin-audit'
 import { AppError, runAction, type ActionResult } from '@/lib/action-result'
 import { runImportBatch, undoLastBatch } from '@/lib/importar-exame'
+import { notifyAdmin } from '@/lib/admin-notify'
+import { motivosDaRevisao } from '@/lib/revisao'
 
 async function requireAdmin() {
   const admin = await getAdminUser()
@@ -16,6 +18,7 @@ function refresh(materialId: string) {
   revalidatePath('/admin/importar')
   revalidatePath(`/admin/importar/${materialId}`)
   revalidatePath('/admin/questoes')
+  revalidatePath('/admin/revisao')
   revalidatePath('/admin')
 }
 
@@ -34,6 +37,18 @@ export async function importBatch(formData: FormData): Promise<ActionResult> {
     if (result.saved === 0 && result.done) return 'Não há mais questões neste documento. Leitura concluída.'
     if (result.saved === 0) throw new AppError(`Nenhuma questão deste lote ficou guardada.${result.skipped.length ? ` Ignoradas: ${describeSkipped(result.skipped)}.` : ''} Tenta outra vez.`)
     const parts = [`${result.saved} ${result.saved === 1 ? 'questão guardada' : 'questões guardadas'} como rascunho${result.low ? ` (${result.low} com resposta incerta)` : ''}.`]
+    if (result.review > 0) {
+      const motivos = motivosDaRevisao(result.porRazao)
+      parts.push(`${result.review} ${result.review === 1 ? 'foi direta para a Revisão' : 'foram diretas para a Revisão'}${motivos ? ` (${motivos})` : ''}.`)
+      await notifyAdmin(admin.id, {
+        kind: 'question.ai_import',
+        level: 'aviso',
+        title: `${result.review} ${result.review === 1 ? 'questão precisa' : 'questões precisam'} de revisão`,
+        body: `Importação do Jonas${motivos ? `: ${motivos}` : ''}. As restantes ficaram como rascunho normal.`,
+        link: '/admin/revisao',
+        data: { review: result.review, porRazao: result.porRazao },
+      })
+    }
     if (result.skipped.length) parts.push(`Ignoradas: ${describeSkipped(result.skipped)}.`)
     if (result.notes.length) parts.push(...result.notes)
     parts.push(result.done ? 'Leitura concluída.' : `Próxima: questão ${result.nextNumber}.`)

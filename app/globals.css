@@ -1251,3 +1251,25 @@ html[data-theme="dark"]{--selo:#5fd994;--selo-visto:#0b2a1b}
 .df-perigo-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;border:0;border-radius:14px;background:var(--erro);color:#fff;font-weight:700;cursor:pointer;white-space:nowrap}
 .df-perigo-btn:disabled{opacity:.4;cursor:not-allowed}
 @media (prefers-reduced-motion:reduce){.df-tg,.df-tg::after{transition:none}}
+
+/* [twisisa-admin-v3] barra lateral escura e agrupada da administração */
+.ad-sd{width:252px;flex-shrink:0;flex-direction:column;height:100%;padding:16px 10px;background:#0f2f27;color:#b8cbc2}
+.ad-logo{display:flex;align-items:center;gap:9px;padding:2px 8px 4px;color:#fff;font-size:1.05rem;font-weight:800;letter-spacing:-.03em;text-decoration:none}
+.ad-mark{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:#fff}
+.ad-papel{margin:0 8px 6px;padding-left:39px;color:#7f9a8e;font-size:.75rem;font-weight:600}
+.ad-nv{display:flex;flex-direction:column;gap:2px;flex:1;min-height:0;overflow-y:auto;padding:4px 0 12px}
+.ad-gh{display:flex;align-items:center;justify-content:space-between;width:100%;margin-top:12px;padding:6px 10px;border:0;background:none;color:#7f9a8e;font-size:.7rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer}
+.ad-gh svg{transition:rotate .15s}
+.ad-gh[aria-expanded="false"] svg{rotate:-90deg}
+.ad-it{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;color:#b8cbc2;font-size:.9rem;font-weight:500;text-decoration:none}
+.ad-it:hover{background:#16413a;color:#fff}
+.ad-it[aria-current="page"]{background:#16413a;color:#fff;font-weight:600;box-shadow:inset 2px 0 0 #3fbf75}
+.ad-it svg{flex:none;opacity:.85}
+.ad-b{min-width:20px;margin-left:auto;padding:1px 6px;border-radius:999px;background:#3fbf75;color:#06281a;font-size:.7rem;font-weight:800;text-align:center}
+.ad-b-w{background:#f5c04a}
+.ad-rodape{margin-top:auto;padding:12px 8px 0;border-top:1px solid rgba(255,255,255,.1)}
+.ad-volta{display:flex;align-items:center;gap:8px;padding:8px 2px;color:#b8cbc2;font-size:.85rem;text-decoration:none}
+.ad-volta:hover{color:#fff}
+.ad-eu{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;color:#fff;font-size:.8rem;font-weight:600}
+.ad-av{display:grid;place-items:center;flex:none;width:30px;height:30px;border-radius:50%;background:#16413a;color:#fff;font-weight:800}
+@media (prefers-reduced-motion:reduce){.ad-gh svg{transition:none}}

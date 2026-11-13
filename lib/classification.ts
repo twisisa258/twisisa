@@ -6,6 +6,7 @@ export async function listTopics(): Promise<TopicRow[]> {
   const result = await pool.query(`
     SELECT t.id, t.name, t.subject_id, s.name AS subject_name, t.active, t.sort_order
     FROM topics t JOIN library_subjects s ON s.id = t.subject_id
+    WHERE s.core = true
     ORDER BY s.name, t.sort_order, t.name
   `)
   return result.rows.map((r) => ({ id: r.id, name: r.name, subjectId: r.subject_id, subjectName: r.subject_name, active: r.active, sortOrder: r.sort_order }))

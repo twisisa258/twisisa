@@ -4,7 +4,8 @@ import { ArrowLeft, Upload } from 'lucide-react'
 import { pool } from '@/lib/db'
 import { getAdminUser } from '@/lib/admin'
 import { AdminLoadError, AdminPage, AdminPageHeader } from '@/components/admin/page-parts'
-import { MaterialBulk, type Catalog } from '@/components/admin/material-bulk'
+import type { Catalog } from '@/components/admin/material-bulk'
+import { NovoMaterial } from '@/components/admin/assistente-material'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Adicionar materiais | Twisisa' }
@@ -43,10 +44,10 @@ export default async function NovoMaterialPage() {
       <AdminPageHeader
         icon={Upload}
         title="Adicionar materiais"
-        description="Escolhe vários ficheiros ou uma pasta e classifica tudo de uma vez."
+        description="Diz primeiro do que se trata, uma pergunta de cada vez; depois junta os ficheiros."
         action={<Link href="/admin/materiais" className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-[#c9d7cd] bg-white/80 px-4 text-sm font-semibold text-marca shadow-sm hover:bg-white"><ArrowLeft size={16} aria-hidden="true" />Materiais</Link>}
       />
-      {catalog ? <MaterialBulk catalog={catalog} /> : <AdminLoadError href="/admin/materiais/novo" />}
+      {catalog ? <NovoMaterial catalog={catalog} /> : <AdminLoadError href="/admin/materiais/novo" />}
     </AdminPage>
   )
 }
