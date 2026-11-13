@@ -2,26 +2,24 @@ import Link from 'next/link'
 import { ArrowRight, Search, type LucideIcon } from 'lucide-react'
 
 // Estrutura padrão de TODAS as páginas de lista do admin:
-//   1. AdminPageHeader  — faixa verde com ícone, título e o botão principal («Adicionar», abre um modal)
+//   1. AdminPageHeader  — título, uma frase e o botão principal (sem faixa nem ícone: o menu e o caminho no topo já dizem onde estás)
 //   2. AdminSearchBar   — [ícone | pesquisa | botão] + contagem
 //   3. AdminListPanel   — ocupa o resto do ecrã; só a lista rola, com a paginação (AdminPager) sempre visível
-// O contentor (AdminPage) enche a altura da área de conteúdo definida em app/admin/layout.tsx.
+// O contentor (AdminPage) enche a altura da área de conteúdo definida em components/admin/admin-shell.tsx.
 
 export function AdminPage({ children }: { children: React.ReactNode }) {
   return <div className="flex min-h-[28rem] flex-1 flex-col gap-4">{children}</div>
 }
 
-export function AdminPageHeader({ icon: Icon, title, description, action }: { icon: LucideIcon; title: string; description?: string; action?: React.ReactNode }) {
+// `icon` continua aceite (as páginas passam-no) mas já não se desenha.
+export function AdminPageHeader({ title, description, action }: { icon?: LucideIcon; title: string; description?: string; action?: React.ReactNode }) {
   return (
-    <header className="flex shrink-0 items-center justify-between gap-3 rounded-2xl border border-[#d5e5da] bg-gradient-to-br from-[#d9eadf] via-[#e9f3ec] to-[#f6f8f3] px-4 py-4 sm:px-6 sm:py-5">
-      <div className="flex min-w-0 items-center gap-3">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-white text-marca shadow-sm"><Icon size={22} aria-hidden="true" /></span>
-        <div className="min-w-0">
-          <h1 className="text-lg font-semibold leading-tight tracking-tight sm:text-2xl">{title}</h1>
-          {description && <p className="mt-0.5 hidden truncate text-sm text-[#5f6d63] sm:block">{description}</p>}
-        </div>
+    <header className="flex shrink-0 flex-wrap items-end justify-between gap-3">
+      <div className="min-w-0">
+        <h1 className="text-[1.5rem] font-extrabold leading-tight tracking-[-0.04em]">{title}</h1>
+        {description && <p className="mt-1 text-sm text-texto-2">{description}</p>}
       </div>
-      {action}
+      {action && <div className="flex shrink-0 flex-wrap items-center gap-2">{action}</div>}
     </header>
   )
 }
@@ -47,20 +45,14 @@ export function AdminSearchBar({ q, placeholder, countLabel, hidden }: { q: stri
   )
 }
 
-// Separadores de uma página com mais de uma lista (ex.: Categorias | Níveis). Em qualquer largura ocupam a linha toda,
-// em partes iguais, por isso nunca partem no telemóvel.
+// Separadores de uma página com mais de uma lista (ex.: Categorias | Níveis): sublinhados, com a contagem em cada um.
 export function AdminTabs({ label, tabs }: { label: string; tabs: { href: string; label: string; count?: number; active: boolean }[] }) {
   return (
-    <nav aria-label={label} className="grid shrink-0 gap-1 rounded-xl bg-[#eceee8] p-1" style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
+    <nav aria-label={label} className="ad-tabs">
       {tabs.map((tab) => (
-        <Link
-          key={tab.href}
-          href={tab.href}
-          aria-current={tab.active ? 'page' : undefined}
-          className={`flex min-h-10 items-center justify-center gap-1.5 rounded-lg px-2 text-sm font-semibold transition ${tab.active ? 'bg-white text-marca shadow-sm' : 'text-[#5f6d63] hover:bg-white/60'}`}
-        >
+        <Link key={tab.href} href={tab.href} aria-current={tab.active ? 'page' : undefined}>
           <span className="truncate">{tab.label}</span>
-          {tab.count !== undefined && <span className={`shrink-0 rounded-full px-1.5 text-[11px] ${tab.active ? 'bg-[#e6f0e9]' : 'bg-white/70'}`}>{tab.count}</span>}
+          {tab.count !== undefined && <span className="ad-tabs-n">{tab.count}</span>}
         </Link>
       ))}
     </nav>

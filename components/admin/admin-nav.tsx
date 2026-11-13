@@ -27,42 +27,31 @@ function montarGrupos(role: StaffRole) {
     .filter((grupo) => grupo.itens.length > 0)
 }
 
-// `sidebar`: grupos por fluxo de trabalho (ecrãs largos). `pills`: linha deslizável com tudo, pela mesma ordem (telemóvel).
-export function AdminNav({ variant, role = 'admin', badges = {} }: { variant: 'sidebar' | 'pills'; role?: StaffRole; badges?: Record<string, number> }) {
+// Menu lateral por grupos. O título de cada grupo leva à página do grupo; a seta abre e fecha a lista (o Catálogo começa fechado).
+// O revisor não tem páginas de grupo: o título dele é só texto.
+export function AdminNav({ role = 'admin', badges = {} }: { variant?: 'sidebar'; role?: StaffRole; badges?: Record<string, number> }) {
   const pathname = usePathname()
   const grupos = montarGrupos(role)
   const [fechados, setFechados] = useState<Record<string, boolean>>({})
   const isActive = (href: string) => (href === '/admin' ? pathname === '/admin' : pathname === href || pathname.startsWith(`${href}/`))
   const numero = (href: string) => (badges[href] ? (badges[href] > 99 ? '99+' : String(badges[href])) : null)
 
-  if (variant === 'pills') {
-    return (
-      <nav aria-label="Administração" className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-3">
-        {grupos.flatMap((grupo) => grupo.itens).map(({ href, label, icon: Icon }) => {
-          const active = isActive(href)
-          return (
-            <Link key={href} href={href} aria-current={active ? 'page' : undefined} className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 text-sm transition-colors ${active ? 'border-marca bg-marca font-semibold text-white' : 'border-[#dfe3d9] bg-white text-[#526057]'}`}>
-              <Icon size={16} aria-hidden="true" />
-              {label}
-              {numero(href) ? <span className="ml-1 rounded-full bg-[#c0392b] px-1.5 text-[11px] font-semibold leading-5 text-white">{numero(href)}</span> : null}
-            </Link>
-          )
-        })}
-      </nav>
-    )
-  }
-
   return (
     <nav aria-label="Administração" className="ad-nv">
       {grupos.map((grupo) => {
+        const hub = `/admin/grupo/${grupo.id}`
         const fechado = grupo.titulo ? (fechados[grupo.id] ?? Boolean(grupo.fechado)) && !grupo.itens.some((item) => isActive(item.href)) : false
         return (
           <div key={grupo.id} className="contents">
             {grupo.titulo && (
-              <button type="button" className="ad-gh" aria-expanded={!fechado} onClick={() => setFechados((atual) => ({ ...atual, [grupo.id]: !fechado }))}>
-                {grupo.titulo}
-                <ChevronDown size={14} aria-hidden="true" />
-              </button>
+              <div className="ad-gh">
+                {role === 'admin' && grupo.id !== 'outros'
+                  ? <Link href={hub} aria-current={pathname === hub ? 'page' : undefined}>{grupo.titulo}</Link>
+                  : <span>{grupo.titulo}</span>}
+                <button type="button" aria-expanded={!fechado} aria-label={`${fechado ? 'Abrir' : 'Fechar'} ${grupo.titulo}`} onClick={() => setFechados((atual) => ({ ...atual, [grupo.id]: !fechado }))}>
+                  <ChevronDown size={14} aria-hidden="true" />
+                </button>
+              </div>
             )}
             {!fechado && grupo.itens.map(({ href, label, icon: Icon }) => (
               <Link key={href} href={href} aria-current={isActive(href) ? 'page' : undefined} className="ad-it">

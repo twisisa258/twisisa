@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Bell, ChevronRight, CircleAlert, CircleCheck, Circle, ClipboardCheck, Flag, LayoutDashboard, Plus, TriangleAlert, Users } from 'lucide-react'
+import { Bell, BookOpen, ChevronRight, CircleCheck, Circle, FileSearch, Megaphone, Plus, UserPlus } from 'lucide-react'
 import { getAdminUser } from '@/lib/admin'
 import { listNotifications } from '@/lib/admin-notify'
-import { getCatalog, timeAgo, type CatalogRow } from '@/lib/admin-overview'
+import { getActivity, timeAgo, type Activity } from '@/lib/admin-overview'
 import { getPainel, type Painel } from '@/lib/admin-painel'
-import { AdminListPanel, AdminLoadError, AdminPage, AdminPageHeader, AdminTabs } from '@/components/admin/page-parts'
+import { AdminLoadError, AdminPage, AdminPageHeader } from '@/components/admin/page-parts'
 import { UrlFeedback } from '@/components/url-feedback'
 
 export const dynamic = 'force-dynamic'
@@ -13,26 +13,39 @@ export const metadata = { title: 'Painel | Administração | Twisisa' }
 
 const nf = new Intl.NumberFormat('pt-PT')
 
-function Numero({ rotulo, valor, dica, href, alerta = false }: { rotulo: string; valor: number; dica?: string; href: string; alerta?: boolean }) {
+function Kpi({ rotulo, valor, dica, href, alerta = false }: { rotulo: string; valor: number; dica?: string; href: string; alerta?: boolean }) {
   return (
-    <Link href={href} className={`min-w-0 rounded-2xl border p-3.5 transition hover:shadow-sm sm:p-5 ${alerta ? 'border-[#ead9ae] bg-[#fbf6e8]' : 'border-linha bg-white'}`}>
-      <p className={`text-2xl font-semibold tracking-tight sm:text-3xl ${alerta ? 'text-aviso-texto' : 'text-marca'}`}>{nf.format(valor)}</p>
-      <p className="mt-1 truncate text-xs leading-4 text-texto-2 sm:text-sm">{rotulo}</p>
-      {dica && <p className="mt-0.5 truncate text-xs text-[#9aa39c]">{dica}</p>}
+    <Link href={href} className={`ad-kpi ${alerta ? 'ad-kpi-al' : ''}`}>
+      <small>{rotulo}</small>
+      <b>{nf.format(valor)}</b>
+      {dica && <i>{dica}</i>}
     </Link>
   )
 }
 
-function Cartao({ titulo, acao, children }: { titulo: string; acao?: { href: string; rotulo: string }; children: React.ReactNode }) {
+function Cartao({ titulo, acao, extra, children }: { titulo: string; acao?: { href: string; rotulo: string }; extra?: string; children: React.ReactNode }) {
   return (
-    <section className="min-w-0 rounded-2xl border border-linha bg-white">
-      <div className="flex items-center justify-between gap-3 border-b border-[#edf0e9] px-4 py-3 sm:px-5">
-        <h2 className="text-sm font-semibold">{titulo}</h2>
-        {acao && <Link href={acao.href} className="text-xs font-semibold text-marca hover:underline">{acao.rotulo}</Link>}
+    <section className="ad-cd">
+      <div className="ad-ch">
+        <h2>{titulo}</h2>
+        {acao ? <Link href={acao.href}>{acao.rotulo}</Link> : extra ? <span>{extra}</span> : null}
       </div>
       {children}
     </section>
   )
+}
+
+type Atencao = { tom: 'erro' | 'aviso' | 'info'; titulo: string; apoio: string; href: string; acao: string }
+
+// O que precisa de ti agora, só com o que a base já sabe: reportes, revisão, avisos por ler e disciplinas sem temas.
+function atencoes(painel: Painel, porLer: number): Atencao[] {
+  const itens: Atencao[] = []
+  if (painel.reportes > 0) itens.push({ tom: 'erro', titulo: `${nf.format(painel.reportes)} ${painel.reportes === 1 ? 'reporte por tratar' : 'reportes por tratar'}`, apoio: 'Questões que os alunos assinalaram como erradas ou ilegíveis', href: '/admin/reportes', acao: 'Ver reportes' })
+  if (painel.questoes.emRevisao > 0) itens.push({ tom: 'aviso', titulo: `${nf.format(painel.questoes.emRevisao)} ${painel.questoes.emRevisao === 1 ? 'questão à espera de revisão' : 'questões à espera de revisão'}`, apoio: 'Falta-lhes ano, tema ou variante exata', href: '/admin/revisao', acao: 'Rever' })
+  const semTemas = painel.disciplinas.filter((item) => item.temas === 0).length
+  if (semTemas > 0) itens.push({ tom: 'aviso', titulo: `${semTemas} ${semTemas === 1 ? 'disciplina sem temas' : 'disciplinas sem temas'}`, apoio: 'Cada questão pede um tema', href: '/admin/temas', acao: 'Criar temas' })
+  if (porLer > 0) itens.push({ tom: 'info', titulo: `${nf.format(porLer)} ${porLer === 1 ? 'aviso por ler' : 'avisos por ler'}`, apoio: 'O que aconteceu na administração', href: '/admin/notificacoes', acao: 'Abrir' })
+  return itens
 }
 
 // O que precisa de existir antes de convidar alguém ou criar questões.
@@ -48,10 +61,10 @@ function Preparacao({ painel }: { painel: Painel }) {
   if (passos.every((passo) => passo.feito)) return null
   return (
     <Cartao titulo="Primeiros passos">
-      <ul className="divide-y divide-[#edf0e9] px-4 sm:px-5">
+      <ul className="ad-lista">
         {passos.map((passo) => (
           <li key={passo.texto}>
-            <Link href={passo.href} className="flex items-center gap-3 py-3 text-sm">
+            <Link href={passo.href} className="ad-linha">
               {passo.feito ? <CircleCheck size={18} aria-hidden="true" className="shrink-0 text-marca" /> : <Circle size={18} aria-hidden="true" className="shrink-0 text-[#b0b6b1]" />}
               <span className={passo.feito ? 'text-texto-2' : 'font-semibold'}>{passo.texto}</span>
               <ChevronRight size={16} aria-hidden="true" className="ml-auto shrink-0 text-[#9aa39c]" />
@@ -66,151 +79,135 @@ function Preparacao({ painel }: { painel: Painel }) {
 export default async function AdminHomePage({ searchParams }: { searchParams: Promise<{ aba?: string }> }) {
   const admin = await getAdminUser()
   if (!admin) redirect('/admin/questoes')
-  const { aba } = await searchParams
-  const tab = aba === 'catalogo' ? 'catalogo' : 'painel'
+  // O antigo separador «Catálogo» é agora a página do grupo.
+  if ((await searchParams).aba === 'catalogo') redirect('/admin/grupo/catalogo')
 
   let painel: Painel | null = null
   let avisos: Awaited<ReturnType<typeof listNotifications>> = []
-  let catalogo: CatalogRow[] | null = null
+  let atividade: Activity | null = null
   try {
-    if (tab === 'painel') {
-      ;[painel, avisos] = await Promise.all([getPainel(), listNotifications(admin.id, 'por_ler', 5)])
-    } else {
-      catalogo = await getCatalog()
-    }
+    ;[painel, avisos, atividade] = await Promise.all([getPainel(), listNotifications(admin.id, 'por_ler', 50), getActivity().catch(() => null)])
   } catch (error) {
     console.error('[ADMIN] Erro ao consultar o painel', error)
   }
-  const falhou = tab === 'painel' ? painel === null : catalogo === null
+
+  const q = painel?.questoes
+  const total = q ? Math.max(1, q.rascunhos + q.emRevisao + q.publicadas) : 1
   const maior = painel ? Math.max(1, ...painel.disciplinas.map((item) => item.publicadas + item.rascunhos)) : 1
+  const itens = painel ? atencoes(painel, avisos.length) : []
 
   return (
     <AdminPage>
       <UrlFeedback />
       <AdminPageHeader
-        icon={LayoutDashboard}
         title="Painel"
-        description="O estado do banco de questões e o que precisa de ti."
+        description="O estado da plataforma e o que precisa de ti."
         action={
-          <Link href="/admin/questoes/nova" className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-marca px-4 text-sm font-semibold text-white hover:bg-marca-escura">
-            <Plus size={16} aria-hidden="true" /> Criar questões
-          </Link>
+          <>
+            <Link href="/admin/importar" className="ad-bt"><FileSearch size={16} aria-hidden="true" /> Importar exame</Link>
+            <Link href="/admin/questoes/nova" className="ad-bt ad-bt-p"><Plus size={16} aria-hidden="true" /> Criar questões</Link>
+          </>
         }
       />
-      <AdminTabs
-        label="Secções do painel"
-        tabs={[
-          { href: '/admin', label: 'Painel', active: tab === 'painel' },
-          { href: '/admin?aba=catalogo', label: 'Catálogo', active: tab === 'catalogo' },
-        ]}
-      />
 
-      {falhou ? (
-        <AdminListPanel><AdminLoadError href={tab === 'catalogo' ? '/admin?aba=catalogo' : '/admin'} /></AdminListPanel>
-      ) : tab === 'painel' && painel ? (
-        <div className="grid gap-4">
-          <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <Numero rotulo="Publicadas" valor={painel.questoes.publicadas} dica="o que os alunos veem" href="/admin/questoes?estado=publicadas" />
-            <Numero rotulo="Rascunhos" valor={painel.questoes.rascunhos} dica="por publicar" href="/admin/questoes" />
-            <Numero rotulo="Em revisão" valor={painel.questoes.emRevisao} dica="sem ano, tema ou variante" href="/admin/revisao" alerta={painel.questoes.emRevisao > 0} />
-            <Numero rotulo="Reportes" valor={painel.reportes} dica="de alunos, por tratar" href="/admin/reportes" alerta={painel.reportes > 0} />
+      {!painel || !q ? (
+        <AdminLoadError href="/admin" />
+      ) : (
+        <div className="grid gap-3">
+          <dl className="ad-kpis">
+            <Kpi rotulo="Publicadas" valor={q.publicadas} dica="o que os alunos veem" href="/admin/questoes?estado=publicadas" />
+            <Kpi rotulo="Em revisão" valor={q.emRevisao} dica="sem ano, tema ou variante" href="/admin/revisao" alerta={q.emRevisao > 0} />
+            <Kpi rotulo="Reportes por tratar" valor={painel.reportes} dica="de alunos" href="/admin/reportes" alerta={painel.reportes > 0} />
+            <Kpi rotulo="Novos alunos (7 dias)" valor={painel.contas.novos7d} dica={`${nf.format(painel.contas.total)} no total`} href="/admin/equipa" />
           </dl>
 
           <Preparacao painel={painel} />
 
-          <Cartao titulo="Precisa de ti" acao={{ href: '/admin/notificacoes', rotulo: 'Ver todas' }}>
-            {avisos.length === 0 ? (
-              <p className="flex items-center gap-2 px-4 py-4 text-sm text-texto-2 sm:px-5"><Bell size={16} aria-hidden="true" /> Nada por ler.</p>
-            ) : (
-              <ul className="divide-y divide-[#edf0e9] px-4 sm:px-5">
-                {avisos.map((aviso) => (
-                  <li key={aviso.id}>
-                    <Link href={aviso.link ?? '/admin/notificacoes'} className="flex items-start gap-3 py-3">
-                      {aviso.level === 'aviso' || aviso.level === 'erro' ? <TriangleAlert size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-aviso-texto" /> : <CircleAlert size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-marca" />}
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-semibold leading-5">{aviso.title}</span>
-                        {aviso.body && <span className="mt-0.5 line-clamp-2 block text-xs leading-5 text-texto-2">{aviso.body}</span>}
-                      </span>
-                      <time dateTime={aviso.createdAt.toISOString()} className="shrink-0 text-xs text-[#9aa39c]">{timeAgo(aviso.createdAt)}</time>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Cartao>
+          <div className="ad-g2">
+            <Cartao titulo="Precisa de atenção" extra={itens.length ? `${itens.length} ${itens.length === 1 ? 'item' : 'itens'}` : undefined}>
+              {itens.length === 0 ? (
+                <p className="ad-vazio"><CircleCheck size={16} aria-hidden="true" /> Tudo em dia.</p>
+              ) : (
+                <ul className="ad-lista">
+                  {itens.map((item) => (
+                    <li key={item.titulo} className="ad-at">
+                      <span className={`ad-dt ad-dt-${item.tom}`} aria-hidden="true" />
+                      <div className="min-w-0 flex-1"><b>{item.titulo}</b><small>{item.apoio}</small></div>
+                      <Link href={item.href} className="ad-go">{item.acao}</Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Cartao>
 
-          <Cartao titulo="Disciplinas" acao={{ href: '/admin/revisao', rotulo: 'Revisão' }}>
-            <ul className="divide-y divide-[#edf0e9] px-4 sm:px-5">
+            <Cartao titulo="Fluxo das questões" acao={{ href: '/admin/questoes', rotulo: 'Abrir banco' }}>
+              <div className="ad-fl">
+                <div><small>Rascunho</small><b>{nf.format(q.rascunhos)}</b><i><s style={{ width: `${(q.rascunhos / total) * 100}%`, background: 'var(--aviso, #a16207)' }} /></i></div>
+                <div><small>Em revisão</small><b>{nf.format(q.emRevisao)}</b><i><s style={{ width: `${(q.emRevisao / total) * 100}%`, background: '#b45309' }} /></i></div>
+                <div><small>Publicadas</small><b>{nf.format(q.publicadas)}</b><i><s style={{ width: `${(q.publicadas / total) * 100}%` }} /></i></div>
+              </div>
+              <div className="ad-sh">
+                <Link href="/admin/importar"><FileSearch size={16} aria-hidden="true" /> Importar exame</Link>
+                <Link href="/admin/materiais/novo"><BookOpen size={16} aria-hidden="true" /> Novo material</Link>
+                <Link href="/admin/anuncios"><Megaphone size={16} aria-hidden="true" /> Novo anúncio</Link>
+                <Link href="/admin/equipa"><UserPlus size={16} aria-hidden="true" /> Convidar revisor</Link>
+              </div>
+            </Cartao>
+          </div>
+
+          <Cartao titulo="Por disciplina" acao={{ href: '/admin/revisao', rotulo: 'Revisão' }}>
+            <ul className="ad-lista">
               {painel.disciplinas.map((disciplina) => {
-                const total = disciplina.publicadas + disciplina.rascunhos
+                const soma = disciplina.publicadas + disciplina.rascunhos
                 return (
-                  <li key={disciplina.id} className="py-3">
+                  <li key={disciplina.id} className="px-4 py-3">
                     <div className="flex items-baseline justify-between gap-3">
-                      <p className="truncate text-sm font-medium">{disciplina.name}</p>
+                      <p className="truncate text-sm font-semibold">{disciplina.name}</p>
                       <p className="shrink-0 text-xs text-texto-2">
                         {disciplina.publicadas} publicadas · {disciplina.rascunhos} rascunhos
                         {disciplina.revisao > 0 && <span className="font-semibold text-aviso-texto"> · {disciplina.revisao} em revisão</span>}
                       </p>
                     </div>
-                    <div className="mt-2 flex h-2 overflow-hidden rounded-full bg-[#eceee8]" role="img" aria-label={`${disciplina.name}: ${disciplina.publicadas} publicadas, ${disciplina.rascunhos} rascunhos`}>
-                      <span className="bg-marca" style={{ width: `${(disciplina.publicadas / maior) * 100}%` }} />
-                      <span className="bg-[#9bbfa8]" style={{ width: `${(disciplina.rascunhos / maior) * 100}%` }} />
+                    <div className="ad-barra" role="img" aria-label={`${disciplina.name}: ${disciplina.publicadas} publicadas, ${disciplina.rascunhos} rascunhos`}>
+                      <span style={{ width: `${(disciplina.publicadas / maior) * 100}%` }} />
+                      <span className="ad-barra-r" style={{ width: `${(disciplina.rascunhos / maior) * 100}%` }} />
                     </div>
-                    {disciplina.temas === 0 && (
-                      <Link href="/admin/temas" className="mt-1.5 inline-block text-xs font-semibold text-aviso-texto hover:underline">Sem temas: cria os temas desta disciplina</Link>
-                    )}
-                    {total === 0 && disciplina.temas > 0 && <p className="mt-1.5 text-xs text-[#9aa39c]">Ainda sem questões.</p>}
+                    {disciplina.temas === 0 && <Link href="/admin/temas" className="mt-1.5 inline-block text-xs font-semibold text-aviso-texto hover:underline">Sem temas: cria os temas desta disciplina</Link>}
+                    {soma === 0 && disciplina.temas > 0 && <p className="mt-1.5 text-xs text-[#9aa39c]">Ainda sem questões.</p>}
                   </li>
                 )
               })}
             </ul>
           </Cartao>
 
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="ad-g2 ad-g2-eq">
             <Cartao titulo="Instituições">
-              <ul className="divide-y divide-[#edf0e9] px-4 sm:px-5">
+              <ul className="ad-lista">
                 {painel.instituicoes.map((instituicao) => (
-                  <li key={instituicao.id} className="flex items-center justify-between gap-3 py-3 text-sm">
-                    <span className="font-medium">{instituicao.label}</span>
+                  <li key={instituicao.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
+                    <span className="font-semibold">{instituicao.label}</span>
                     <span className="text-xs text-texto-2">{instituicao.publicadas} publicadas · {instituicao.rascunhos} rascunhos</span>
                   </li>
                 ))}
               </ul>
             </Cartao>
-            <Cartao titulo="Contas" acao={{ href: '/admin/equipa', rotulo: 'Equipa' }}>
-              <p className="flex items-center gap-3 px-4 py-4 text-sm sm:px-5">
-                <Users size={18} aria-hidden="true" className="text-marca" />
-                <span><strong>{nf.format(painel.contas.total)}</strong> no total · {nf.format(painel.contas.novos7d)} nos últimos 7 dias</span>
-              </p>
-              <p className="flex items-center gap-3 border-t border-[#edf0e9] px-4 py-4 text-sm sm:px-5">
-                <ClipboardCheck size={18} aria-hidden="true" className="text-marca" />
-                <span><strong>{nf.format(painel.questoes.arquivadas)}</strong> questões arquivadas</span>
-              </p>
-              <Link href="/admin/reportes" className="flex items-center gap-3 border-t border-[#edf0e9] px-4 py-4 text-sm sm:px-5">
-                <Flag size={18} aria-hidden="true" className="text-marca" />
-                <span>Reportes dos alunos</span>
-                <ChevronRight size={16} aria-hidden="true" className="ml-auto text-[#9aa39c]" />
-              </Link>
+            <Cartao titulo="Registo recente" acao={{ href: '/admin/notificacoes', rotulo: 'Ver tudo' }}>
+              {!atividade || atividade.recent.length === 0 ? (
+                <p className="ad-vazio"><Bell size={16} aria-hidden="true" /> Ainda sem registo.</p>
+              ) : (
+                <ul className="ad-lista">
+                  {atividade.recent.slice(0, 6).map((entrada) => (
+                    <li key={entrada.id} className="ad-ac">
+                      <div className="min-w-0 flex-1"><b>{entrada.title}</b><small>{entrada.subtitle}</small></div>
+                      <time dateTime={entrada.at.toISOString()}>{timeAgo(entrada.at)}</time>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </Cartao>
           </div>
+
         </div>
-      ) : (
-        <AdminListPanel>
-          <ul className="min-h-0 flex-1 divide-y divide-[#edf0e9] overflow-y-auto px-2 sm:px-3">
-            {catalogo?.map((row) => (
-              <li key={row.label}>
-                <Link href={row.href} className="flex items-center gap-3 rounded-xl px-2 py-3.5 hover:bg-[#f7f8f4] sm:px-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold leading-5">{row.label}</p>
-                    <p className="mt-0.5 truncate text-xs text-texto-2">{nf.format(row.on)} {row.unit}{row.total !== row.on ? ` · ${nf.format(row.total)} no total` : ''}</p>
-                  </div>
-                  <span className="shrink-0 text-lg font-semibold tracking-tight text-marca">{nf.format(row.on)}</span>
-                  <ChevronRight size={18} aria-hidden="true" className="shrink-0 text-[#9aa39c]" />
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </AdminListPanel>
       )}
     </AdminPage>
   )
