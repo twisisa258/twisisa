@@ -87,7 +87,6 @@ export default async function NovaQuestaoPage({ searchParams }: { searchParams: 
               variant: variante,
               nivel,
               nivelLabel: NIVEIS[nivel],
-              podePublicar: !precisaVariante(onde === '10' || onde === '12' ? onde : 'admissao', instituicao?.id ?? '', dados.idsComVariantes, variantesDaDisciplina.length > 0) || !!variante,
             }}
             temas={topicos}
             anos={examYearOptions('Sem ano (fica para revisão)')}

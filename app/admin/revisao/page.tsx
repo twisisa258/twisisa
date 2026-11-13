@@ -6,6 +6,8 @@ import { contarReportesAbertos, listarRevisao } from '@/lib/revisao-db'
 import { ORDEM_RAZOES, razaoLabel } from '@/lib/revisao'
 import { AdminListPanel, AdminLoadError, AdminPage, AdminPageHeader, AdminPager, AdminTabs } from '@/components/admin/page-parts'
 import { EmptyState } from '@/components/states/empty-state'
+import { ClassificarTemasButton } from '@/components/admin/classificar-temas-button'
+import { classificarTemasComJonas } from '@/app/admin/questoes/actions'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Revisão | Administração | Twisisa' }
@@ -45,6 +47,7 @@ export default async function RevisaoPage({ searchParams }: { searchParams: Prom
           <Flag size={18} aria-hidden="true" /> {reportes} {reportes === 1 ? 'reporte de aluno por tratar' : 'reportes de alunos por tratar'}
         </Link>
       )}
+      {(dados?.porRazao.sem_tema ?? 0) > 0 && <ClassificarTemasButton action={classificarTemasComJonas} />}
       <AdminTabs
         label="Filtrar por motivo"
         tabs={[

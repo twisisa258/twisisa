@@ -21,7 +21,6 @@ export type ConfigSessao = {
   variant: string
   nivel: string
   nivelLabel: string
-  podePublicar: boolean
 }
 
 const campo = 'w-full rounded-xl border border-[#dfe3d9] bg-white px-3.5 py-3 text-sm outline-none transition-colors placeholder:text-[#8a928c] focus:border-marca focus:ring-2 focus:ring-marca/10'
@@ -107,9 +106,9 @@ function Manual({ cfg, temasIniciais, anos, aoGuardar }: { cfg: ConfigSessao; te
   const passos: Passo[] = [
     {
       id: 'tema',
-      titulo: 'Qual é o tema?',
-      ajuda: 'Cada questão pede um tema. Se não existir, cria-o aqui.',
-      pronto: !!topicId,
+      titulo: 'Qual é o tema? (opcional)',
+      ajuda: 'Podes saltar: o Jonas escolhe o tema depois. Se não existir, cria-o aqui.',
+      pronto: true,
       conteudo: (
         <div className="grid gap-3">
           <ListaEscolha rotulo="Tema" itens={temas.map((item) => ({ id: item.id, label: item.name }))} valor={topicId || null} onChange={setTopicId} procuraDepois={8} vazio="Esta disciplina ainda não tem temas. Cria o primeiro abaixo." />
@@ -182,8 +181,7 @@ function Manual({ cfg, temasIniciais, anos, aoGuardar }: { cfg: ConfigSessao; te
       final={
         <div className="grid w-full gap-2 sm:flex">
           <button type="button" disabled={ocupado} onClick={() => guardar('draft')} className={`${botao} border border-[#c9d7cd] bg-white text-marca hover:bg-[#f1f4ef]`}>{ocupado ? 'A guardar…' : 'Guardar rascunho'}</button>
-          <button type="button" disabled={ocupado || !cfg.podePublicar} onClick={() => guardar('publish')} className={`${botao} bg-marca text-white hover:bg-marca-escura`}>Publicar</button>
-          {!cfg.podePublicar && <p className="text-xs text-texto-2 sm:self-center">Sem variante só se guarda como rascunho.</p>}
+          <button type="button" disabled={ocupado} onClick={() => guardar('publish')} className={`${botao} bg-marca text-white hover:bg-marca-escura`}>Publicar</button>
         </div>
       }
     />

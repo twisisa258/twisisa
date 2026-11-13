@@ -2,6 +2,7 @@
 
 import { randomUUID } from 'node:crypto'
 import { revalidatePath } from 'next/cache'
+import { after } from 'next/server'
 import type { PoolClient } from 'pg'
 import { pool } from '@/lib/db'
 import { getAdminUser } from '@/lib/admin'
@@ -9,6 +10,7 @@ import { logAdminAction } from '@/lib/admin-audit'
 import { notifyAdmin } from '@/lib/admin-notify'
 import { AppError, runAction, type ActionResult } from '@/lib/action-result'
 import { parseCsv } from '@/lib/csv'
+import { classificarTemas } from '@/lib/classificar-temas'
 import { COLUNAS_OBRIGATORIAS_SESSAO, analisarLinha, semAcentos, type ContextoImportacao } from '@/lib/importacao-sessao'
 import { isUniqueViolation } from '@/lib/pg-errors'
 import { optionsProblem, subjectHasScope } from '@/lib/questions'
@@ -115,6 +117,7 @@ export async function importarQuestoesSessao(formData: FormData): Promise<Action
     const rejeitadas: { linha: number; motivo: string }[] = []
     const totais: TotaisImportacao = { lidas: linhas.length - 1, importadas: 0, rejeitadas: 0, emRevisao: 0, porRazao: {}, temaDesconhecido: 0, varianteDesconhecida: 0 }
 
+    const novas: string[] = []
     const client = await pool.connect()
     try {
       await client.query('BEGIN')
@@ -139,6 +142,7 @@ export async function importarQuestoesSessao(formData: FormData): Promise<Action
         // As razões vêm da base de dados (inclui «possível duplicada»), por isso contam-se depois de guardar.
         const razoes = (await client.query("UPDATE questions SET review_reasons = COALESCE(question_review_reasons(id), '{}') WHERE id = $1 RETURNING review_reasons", [id])).rows[0].review_reasons as string[]
         totais.importadas += 1
+        if (!analise.topicId) novas.push(id)
         if (razoes.length) totais.emRevisao += 1
         for (const razao of razoes) if ((ORDEM_RAZOES as string[]).includes(razao)) totais.porRazao[razao as Razao] = (totais.porRazao[razao as Razao] ?? 0) + 1
         if (analise.temaDesconhecido) totais.temaDesconhecido += 1
@@ -152,6 +156,8 @@ export async function importarQuestoesSessao(formData: FormData): Promise<Action
       client.release()
     }
     totais.rejeitadas = rejeitadas.length
+    // O Jonas dá tema, em segundo plano, às questões que chegaram sem tema.
+    if (novas.length) after(() => classificarTemas({ ids: novas, limite: 60 }).catch((error) => console.error('[TEMAS] após importação', error)))
 
     const resumo = resumoImportacao(totais)
     await logAdminAction(admin, 'question.csv_import', 'question', null, { count: totais.importadas, emRevisao: totais.emRevisao, rejeitadas: totais.rejeitadas }, { notify: false })

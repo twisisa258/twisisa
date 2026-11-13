@@ -106,7 +106,7 @@ export function AssistenteSessao({
           {
             id: 'variante',
             titulo: 'A disciplina tem variante?',
-            ajuda: 'Na UEM o exame tem variantes I, II e III. Sem variante, a questão fica na Revisão.',
+            ajuda: 'Na UEM o exame tem variantes I, II e III. Podes publicar sem variante: a questão fica marcada na Revisão.',
             pronto: temVariante === 'nao' || (temVariante === 'sim' && !!variant),
             conteudo: (
               <div className="grid gap-4">

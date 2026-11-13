@@ -38,12 +38,11 @@ export function precisaVariante(track: string, institutionId: string, idsComVari
   return track === 'admissao' && !!institutionId && idsComVariantes.includes(institutionId) && disciplinaTemVariantes
 }
 
-/** Primeiro passo da configuração que ainda não tem escolha (ou null se está completa). */
+/** Primeiro passo obrigatório sem escolha (ou null). Variante e tema são opcionais: ficam marcados na Revisão e o Jonas classifica o tema. */
 export function etapaEmFalta(config: ConfigQuestao, idsComVariantes: string[], disciplinaTemVariantes: boolean): EtapaConfig | null {
   const ondeOk = config.track === '10' || config.track === '12' || (config.track === 'admissao' && !!config.institutionId)
   if (!ondeOk) return 'onde'
   if (!config.subjectId) return 'disciplina'
-  if (precisaVariante(config.track, config.institutionId, idsComVariantes, disciplinaTemVariantes) && !config.variant) return 'variante'
-  if (!config.topicId) return 'tema'
+  void idsComVariantes; void disciplinaTemVariantes
   return null
 }

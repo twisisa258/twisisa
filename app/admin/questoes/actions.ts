@@ -11,6 +11,7 @@ import { AppError, runAction, type ActionResult } from '@/lib/action-result'
 import { parseCsv } from '@/lib/csv'
 import { CSV_EXAMPLE_MARK } from '@/lib/question-csv-template'
 import { finishDraft } from '@/lib/question-drafts'
+import { classificarTemas, resumoTemas } from '@/lib/classificar-temas'
 import { ANSWER_SOURCES, DIFFICULTIES, ORIGINS, listDraftIdsByReview, optionsProblem, subjectHasScope, type OptionInput } from '@/lib/questions'
 import { normalizarVariante } from '@/lib/regras'
 
@@ -39,8 +40,8 @@ function refresh() {
 // ---------- Validação partilhada (formulário e importação) ----------
 
 /** Disciplina ativa, presente no âmbito escolhido; tema da disciplina; instituição ativa (só na admissão). */
-// `publishing`: ao publicar, uma disciplina que tem variantes exige que a questão tenha uma (o tema continua opcional).
-async function assertClassification(client: Pick<PoolClient, 'query'>, c: { subjectId: string; track: string; institutionId: string | null; topicId: string | null; variant: string | null; publishing: boolean; currentVariant?: string | null }) {
+// Variante e tema são opcionais, também ao publicar: só se validam quando vêm preenchidos. O que falta fica marcado na Revisão.
+async function assertClassification(client: Pick<PoolClient, 'query'>, c: { subjectId: string; track: string; institutionId: string | null; topicId: string | null; variant: string | null; currentVariant?: string | null }) {
   const subject = await client.query('SELECT 1 FROM library_subjects WHERE id = $1 AND active = true', [c.subjectId])
   if (!subject.rowCount) throw new AppError('A disciplina não existe ou está arquivada.')
   let comVariantes = false
@@ -60,8 +61,6 @@ async function assertClassification(client: Pick<PoolClient, 'query'>, c: { subj
   if (c.topicId) {
     const topic = await client.query('SELECT 1 FROM topics WHERE id = $1 AND subject_id = $2 AND active = true', [c.topicId, c.subjectId])
     if (!topic.rowCount) throw new AppError('O tema não pertence à disciplina ou está arquivado.')
-  } else if (c.publishing) {
-    throw new AppError('Escolhe o tema da questão.')
   }
   if (c.variant) {
     if (!comVariantes) throw new AppError('Só a UEM tem variantes. Tira a variante desta questão.')
@@ -69,9 +68,6 @@ async function assertClassification(client: Pick<PoolClient, 'query'>, c: { subj
     const variant = await client.query('SELECT active FROM subject_variants WHERE subject_id = $1 AND name = $2', [c.subjectId, c.variant])
     if (!variant.rowCount) throw new AppError('A variante não existe nesta disciplina. Cria-a em Variantes.')
     if (!variant.rows[0].active && c.variant !== c.currentVariant) throw new AppError('A variante está arquivada.')
-  } else if (c.publishing && comVariantes) {
-    const has = await client.query('SELECT 1 FROM subject_variants WHERE subject_id = $1 AND active LIMIT 1', [c.subjectId])
-    if (has.rowCount) throw new AppError('Esta disciplina tem variantes: escolhe a variante da questão antes de publicar.')
   }
 }
 
@@ -145,7 +141,7 @@ export async function saveQuestion(formData: FormData): Promise<ActionResult> {
       if (id && !existing) throw new AppError('Questão não encontrada.')
 
       const status = intent === 'publish' ? 'publicada' : existing ? existing.status : 'rascunho'
-      await assertClassification(client, { subjectId, track, institutionId, topicId, variant, publishing: status === 'publicada', currentVariant: existing?.variant ?? null })
+      await assertClassification(client, { subjectId, track, institutionId, topicId, variant, currentVariant: existing?.variant ?? null })
       if (status === 'publicada' && !isConfirmed(answerSource)) throw new AppError('Antes de publicar, confirma a resposta ou assinala o gabarito oficial.')
       const oldOptions = existing ? (await client.query('SELECT body, is_correct, is_fixed, media_id FROM question_options WHERE question_id = $1 ORDER BY position', [id])).rows : []
       // Enquanto o editor não suportar imagens nas opções, não se reescreve uma questão que as tenha (perderia as imagens).
@@ -248,7 +244,7 @@ export async function setQuestionStatus(formData: FormData): Promise<ActionResul
       const problem = optionsProblem(options.rows.map((o) => ({ body: o.body ?? '', isCorrect: o.is_correct, isFixed: o.is_fixed })))
       if (problem) throw new AppError(problem)
       if (!isConfirmed(question.answer_source)) throw new AppError('Antes de publicar, marca a questão como revista (menu ⋯) ou confirma a resposta ao editá-la.')
-      await assertClassification(pool, { subjectId: question.subject_id, track: question.track, institutionId: question.institution_id, topicId: question.topic_id, variant: question.variant ?? null, publishing: true, currentVariant: question.variant ?? null })
+      await assertClassification(pool, { subjectId: question.subject_id, track: question.track, institutionId: question.institution_id, topicId: question.topic_id, variant: question.variant ?? null, currentVariant: question.variant ?? null })
     } else if (!((to === 'arquivada' && question.status === 'publicada') || (to === 'rascunho' && question.status === 'arquivada'))) {
       throw new AppError('Essa mudança de estado não é permitida.')
     }
@@ -501,7 +497,7 @@ export async function bulkManageQuestions(formData: FormData): Promise<ActionRes
         const key = [q.subject_id, q.track, q.institution_id, q.topic_id, q.variant].join('|')
         let result = classification.get(key)
         if (!result) {
-          result = assertClassification(pool, { subjectId: q.subject_id as string, track: q.track as string, institutionId: q.institution_id, topicId: q.topic_id, variant: q.variant ?? null, publishing: true, currentVariant: q.variant ?? null })
+          result = assertClassification(pool, { subjectId: q.subject_id as string, track: q.track as string, institutionId: q.institution_id, topicId: q.topic_id, variant: q.variant ?? null, currentVariant: q.variant ?? null })
             .then(() => null)
             .catch((error) => (error instanceof Error ? error.message : 'classificação inválida.'))
           classification.set(key, result)
@@ -563,4 +559,15 @@ export async function bulkManageQuestions(formData: FormData): Promise<ActionRes
     refresh()
     return `${ids.length} ${ids.length === 1 ? 'questão atualizada' : 'questões atualizadas'}.`
   }, 'Não foi possível concluir a operação em lote. Tenta novamente.')
+}
+
+// O Jonas dá tema às questões que ainda não têm (até 20 por pedido; carrega outra vez para as seguintes).
+export async function classificarTemasComJonas(): Promise<ActionResult> {
+  return runAction(async () => {
+    const admin = await requireReviewer()
+    const resultado = await classificarTemas({ limite: 20, admin })
+    revalidatePath('/admin/revisao')
+    refresh()
+    return resumoTemas(resultado)
+  }, 'Não foi possível classificar os temas. Tenta novamente.')
 }
